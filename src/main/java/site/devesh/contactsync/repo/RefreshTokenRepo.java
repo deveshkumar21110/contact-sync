@@ -1,4 +1,19 @@
 package site.devesh.contactsync.repo;
 
-public class RefreshTokenRepo {
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import site.devesh.contactsync.entities.RefreshToken;
+import site.devesh.contactsync.entities.UserInfo;
+
+import java.util.Optional;
+
+@Repository
+public interface RefreshTokenRepo extends JpaRepository<RefreshToken, Long> {
+    Optional<RefreshToken> findByToken(String token);
+    
+    @Modifying
+    @Transactional
+    void deleteByUserInfo(UserInfo userInfo);
 }

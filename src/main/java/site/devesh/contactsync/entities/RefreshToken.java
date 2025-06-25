@@ -16,20 +16,28 @@ import java.time.Instant;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "refresh_token")
+@Table(
+    name = "refresh_token",
+    // user_id is unique across rows in the refresh_token table
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = "user_id")
+    }
+)
 public class RefreshToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    //  token is unique and cannot be null.
+    @Column(nullable = false, unique = true)
     private String token;
 
     private Instant expiryDate;
 
 
     @OneToOne
-    @JoinColumn(name = "id" , referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id" , referencedColumnName = "user_id")
     private UserInfo userInfo;
 
 }

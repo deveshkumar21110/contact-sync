@@ -18,13 +18,13 @@ public class UserInfo {
 
     @Id
     @Column(name = "user_id")
-    private Long id;
+    private String id;
 
     private String username;
 
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),

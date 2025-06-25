@@ -1,24 +1,43 @@
 package site.devesh.contactsync.services;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import site.devesh.contactsync.entities.UserInfo;
+import site.devesh.contactsync.entities.UserRole;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class CustomUserDetails extends UserInfo implements UserDetails {
 
+    // three basic details - username,password,authorities/roles
     private String username;
 
     private String password;
 
-
     Collection<? extends GrantedAuthority> authorities;
 
 
+    public CustomUserDetails(UserInfo loadedUser){
+        this.username = loadedUser.getUsername();
+        this.password = loadedUser.getPassword();
+//        user's roles/permissions
+        List<GrantedAuthority> auths = new ArrayList<>();
 
+        for(UserRole userRole : loadedUser.getRoles()){
+            auths.add(new SimpleGrantedAuthority(userRole.getName().toUpperCase()));
+        }
+        this.authorities = auths;
+    }
+
+//    getAuthorities() returns the user's roles/permissions; List.of() means the user has none.
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
 
     @Override
     public String getUsername() {
@@ -41,27 +60,23 @@ public class CustomUserDetails extends UserInfo implements UserDetails {
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
-    }
-
-    @Override
     public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
+        return true;
     }
+
 }
