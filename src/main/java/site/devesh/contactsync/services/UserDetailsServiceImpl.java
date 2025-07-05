@@ -10,21 +10,21 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import site.devesh.contactsync.entities.UserInfo;
 import site.devesh.contactsync.entities.UserRole;
+import site.devesh.contactsync.enums.RoleType;
 import site.devesh.contactsync.model.UserInfoDto;
 import site.devesh.contactsync.repo.UserRepo;
+import site.devesh.contactsync.repo.UserRoleRepo;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
-@AllArgsConstructor
-@Data
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private UserRoleService userRoleService;
 
     @Autowired
     private PasswordEncoder encoder;
@@ -33,7 +33,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserInfo userInfo = userRepo.findByUsername(username);
         if(userInfo == null) {
-            throw new UsernameNotFoundException("could not found user..!!");
+            throw new UsernameNotFoundException("could not found user..!!" + username);
         }
         return new CustomUserDetails(userInfo);
     }
@@ -42,13 +42,26 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return userRepo.findByUsername(userInfoDto.getUsername());
     }
 
-    public Boolean SignUpUser(UserInfoDto userInfoDto){
-        if(Objects.nonNull(checkUserAlreadyExist(userInfoDto))) return false;
+    public Boolean SignUpUser(UserInfoDto userInfoDto) {
+        if (Objects.nonNull(checkUserAlreadyExist(userInfoDto))) return false;
+
         userInfoDto.setPassword(encoder.encode(userInfoDto.getPassword()));
         String userId = UUID.randomUUID().toString();
+
+        //  Fetch role from DB (assuming you have UserRoleRepository)
+//        UserRole role = userRoleService.getRoleByName("ROLE_USER");
+//        if(role == null){
+            UserRole role = userRoleService.createRole(new UserRole(null, RoleType.ROlE_USER));
+//        }
         Set<UserRole> roles = new HashSet<>();
-        roles.add(new UserRole(null, "ROLE_USER"));
-        userRepo.save(new UserInfo(userId,userInfoDto.getUsername(),userInfoDto.getPassword(),roles));
+        roles.add(role);
+
+        userRepo.save(new UserInfo(userId, userInfoDto.getUsername(), userInfoDto.getPassword(), roles));
         return true;
+    }
+
+
+    public List<UserInfo> findAllUsers(){
+        return userRepo.findAll();
     }
 }

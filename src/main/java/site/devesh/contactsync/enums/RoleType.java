@@ -1,4 +1,6 @@
 package site.devesh.contactsync.enums;
 
-public class RoleType {
+public enum RoleType {
+    ROlE_USER,
+    ROLE_ADMIN,
 }

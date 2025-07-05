@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import site.devesh.contactsync.enums.RoleType;
 
 @Entity
 @Data
@@ -16,5 +17,7 @@ public class UserRole {
     @Column(name = "role_id")
     private Long roleId;
 
-    private String name;
+    @Enumerated(EnumType.STRING)
+    @Column(unique = true, nullable = false)
+    private RoleType name;
 }

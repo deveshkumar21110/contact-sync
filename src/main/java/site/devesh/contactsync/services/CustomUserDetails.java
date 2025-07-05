@@ -24,16 +24,19 @@ public class CustomUserDetails extends UserInfo implements UserDetails {
     public CustomUserDetails(UserInfo loadedUser){
         this.username = loadedUser.getUsername();
         this.password = loadedUser.getPassword();
-//        user's roles/permissions
-        List<GrantedAuthority> auths = new ArrayList<>();
 
+        List<GrantedAuthority> auths = new ArrayList<>();
         for(UserRole userRole : loadedUser.getRoles()){
-            auths.add(new SimpleGrantedAuthority(userRole.getName().toUpperCase()));
+            System.out.println("DEBUG: Adding role -> " + userRole.getName());
+            auths.add(new SimpleGrantedAuthority(userRole.getName().toString()));
         }
         this.authorities = auths;
+
+        System.out.println("DEBUG: Final authorities -> " + this.authorities);
     }
 
-//    getAuthorities() returns the user's roles/permissions; List.of() means the user has none.
+
+    //    getAuthorities() returns the user's roles/permissions; List.of() means the user has none.
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;

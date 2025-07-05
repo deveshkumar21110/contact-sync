@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import site.devesh.contactsync.enums.RoleType;
 import site.devesh.contactsync.repo.UserRepo;
 import site.devesh.contactsync.services.UserDetailsServiceImpl;
 
@@ -33,10 +34,6 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtFilter;
 
-    @Bean
-    public UserDetailsService userDetailsService(UserRepo userRepo, PasswordEncoder passwordEncoder) {
-        return new UserDetailsServiceImpl(userRepo, passwordEncoder);
-    }
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws  Exception{
@@ -56,6 +53,7 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/v1/login", "/auth/v1/signup","/auth/v1/refreshToken").permitAll()
+                        .requestMatchers("/api/v1/admin/**").hasAuthority(RoleType.ROLE_ADMIN.toString())
                         .anyRequest().authenticated())
                 .sessionManagement(session ->session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

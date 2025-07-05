@@ -18,7 +18,7 @@ import site.devesh.contactsync.services.JwtService;
 import site.devesh.contactsync.services.RefreshTokenService;
 
 @RestController
-@RequestMapping("/auth/v1/")
+@RequestMapping("/auth/v1")
 public class TokenController {
 
     @Autowired
@@ -30,7 +30,7 @@ public class TokenController {
     @Autowired
     private JwtService jwtService;
 
-    @PostMapping("login")
+    @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequestDTO authRequestDTO) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(), authRequestDTO.getPassword()));
         if (authentication.isAuthenticated()) {

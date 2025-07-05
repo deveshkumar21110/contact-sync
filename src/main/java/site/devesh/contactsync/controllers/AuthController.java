@@ -14,7 +14,7 @@ import site.devesh.contactsync.services.RefreshTokenService;
 import site.devesh.contactsync.services.UserDetailsServiceImpl;
 
 @RestController
-@RequestMapping("/auth/v1/")
+@RequestMapping("/auth/v1")
 public class AuthController {
 
     private final JwtService jwtService;
@@ -27,7 +27,7 @@ public class AuthController {
         this.refreshTokenService = refreshTokenService;
     }
 
-    @PostMapping("signup")
+    @PostMapping("/signup")
     public ResponseEntity<?> signUp(@RequestBody UserInfoDto userInfoDto) {
         try {
             Boolean isSignedUp = userDetailsService.SignUpUser(userInfoDto);
