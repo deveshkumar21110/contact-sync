@@ -30,7 +30,7 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(@RequestBody UserInfoDto userInfoDto) {
         try {
-            Boolean isSignedUp = userDetailsService.SignUpUser(userInfoDto);
+            Boolean isSignedUp = userDetailsService.signUpUser(userInfoDto);
             if (Boolean.FALSE.equals(isSignedUp)) {
                 return new ResponseEntity<>("Account already exist", HttpStatus.BAD_REQUEST);
             }

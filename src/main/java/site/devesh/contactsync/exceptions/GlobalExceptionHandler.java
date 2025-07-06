@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleGenericException(
-            IllegalArgumentException ex, HttpServletRequest request) {
+            Exception ex, HttpServletRequest request) {
         ApiError error = ApiError
                 .builder()
                 .error("Internal Server Error")

@@ -49,7 +49,7 @@ public class TokenController {
 
     }
 
-    @PostMapping("refreshToken")
+    @PostMapping("/refreshToken")
     public JwtResponseDTO refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
         return refreshTokenService.findByToken(refreshTokenRequest.getToken())
                 .map(refreshTokenService::verifyExpiration)

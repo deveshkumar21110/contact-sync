@@ -42,23 +42,32 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return userRepo.findByUsername(userInfoDto.getUsername());
     }
 
-    public Boolean SignUpUser(UserInfoDto userInfoDto) {
+    public Boolean signUpUser(UserInfoDto userInfoDto) {
+        // Check if user already exists
         if (Objects.nonNull(checkUserAlreadyExist(userInfoDto))) return false;
 
+        // Encode password
         userInfoDto.setPassword(encoder.encode(userInfoDto.getPassword()));
         String userId = UUID.randomUUID().toString();
 
-        //  Fetch role from DB (assuming you have UserRoleRepository)
-//        UserRole role = userRoleService.getRoleByName("ROLE_USER");
-//        if(role == null){
-            UserRole role = userRoleService.createRole(new UserRole(null, RoleType.ROlE_USER));
-//        }
+        // Always try to fetch role from DB
+        UserRole role = userRoleService.getRoleByName(RoleType.ROlE_USER);
+
+        // If not found, create it
+        if (role == null) {
+            role = userRoleService.createRole(new UserRole(null, RoleType.ROlE_USER));
+        }
+
+        // Assign role to new user
         Set<UserRole> roles = new HashSet<>();
         roles.add(role);
 
+        // Save new user with roles
         userRepo.save(new UserInfo(userId, userInfoDto.getUsername(), userInfoDto.getPassword(), roles));
+
         return true;
     }
+
 
 
     public List<UserInfo> findAllUsers(){

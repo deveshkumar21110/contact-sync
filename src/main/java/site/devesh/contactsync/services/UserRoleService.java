@@ -3,6 +3,7 @@ package site.devesh.contactsync.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import site.devesh.contactsync.entities.UserRole;
+import site.devesh.contactsync.enums.RoleType;
 import site.devesh.contactsync.repo.UserRepo;
 import site.devesh.contactsync.repo.UserRoleRepo;
 
@@ -31,8 +32,8 @@ public class UserRoleService {
     }
 
     // get role by name
-    public UserRole getRoleByName(String name){
-        return userRoleRepo.findByName(name);
+    public UserRole getRoleByName(RoleType name){
+        return userRoleRepo.findByName(name).orElse(null);
     }
 }
 
