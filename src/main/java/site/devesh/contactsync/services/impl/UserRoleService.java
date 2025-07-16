@@ -1,10 +1,9 @@
-package site.devesh.contactsync.services;
+package site.devesh.contactsync.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import site.devesh.contactsync.entities.UserRole;
 import site.devesh.contactsync.enums.RoleType;
-import site.devesh.contactsync.repo.UserRepo;
 import site.devesh.contactsync.repo.UserRoleRepo;
 
 import java.util.List;

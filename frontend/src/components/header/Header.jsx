@@ -5,15 +5,15 @@ import personImage from "/contacts_product_24dp_0158CC_FILL0_wght400_GRAD0_opsz2
 import SearchIcon from "@mui/icons-material/Search";
 import { Box } from "@mui/material";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
-import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import { useSelector } from "react-redux";
+import LogoutBtn from "./LogoutBtn";
+import HelpIcon from '@mui/icons-material/Help';
 
 function Header() {
+  const authStatus = useSelector((state) => state.auth.status);
 
   // javaScript code for this component
-  
-
-  
-
 
   return (
     <div className="w-full bg-slate-50 h-20 flex items-center">
@@ -21,7 +21,7 @@ function Header() {
       <div className="flex gap-4 px-4 py-2 w-full justify-between ">
         {/* single header's div */}
         <div className="flex items-center justify-center pr-8">
-          <div className="px-2 py-1">
+          <div className="px-2 py-1 pr-4">
             <MenuIcon sx={{ fontSize: 28 }} />
           </div>
 
@@ -29,7 +29,7 @@ function Header() {
           <h1 className="text-2xl text-gray-600 pl-1">Contacts</h1>
         </div>
         {/* Right Section - Search and Settings */}
-        <div className="flex items-center gap-4 w-[55%] justify-end">
+        <div className="flex items-center gap-4 w-[45%] justify-end">
           <div
             className="flex items-center bg-gray-200 h-12 w-full rounded-lg"
             style={{ padding: "0px 30px 0px 10px" }}
@@ -41,18 +41,21 @@ function Header() {
               className="w-full bg-transparent outline-none text-gray-700 placeholder:text-gray-500"
             />
           </div>
-
-          <div className="px-2 py-1 text-gray-500">
-            <SettingsOutlinedIcon sx={{ fontSize: 28 }} />
-          </div>
         </div>
 
         {/* profile, Login buttons */}
-        <div className="flex items-center gap-4  justify-end">
-          <AccountCircleOutlinedIcon />
+        <div className="flex items-center gap-4  justify-end ">
+        <div className="px-2 py-1 text-gray-600">
+            <AccountCircleOutlinedIcon sx={{fontSize : 28}} />
+          </div>
+          {/* {authStatus && <LogoutBtn />} */}
+          <div className="px-2 py-1 text-gray-600">
+            <HelpIcon sx={{fontSize : 28}} />
+          </div>
+          <div className="px-2 py-1 text-gray-600">
+            <SettingsOutlinedIcon sx={{ fontSize: 28 }} />
+          </div>
         </div>
-
-
       </div>
     </div>
   );

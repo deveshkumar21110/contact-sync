@@ -1,11 +1,11 @@
-package site.devesh.contactsync.services;
+package site.devesh.contactsync.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.devesh.contactsync.entities.RefreshToken;
-import site.devesh.contactsync.entities.UserInfo;
+import site.devesh.contactsync.entities.AppUser;
 import site.devesh.contactsync.repo.RefreshTokenRepo;
 import site.devesh.contactsync.repo.UserRepo;
 
@@ -28,10 +28,10 @@ public class RefreshTokenService {
     private long  refreshTokenExpiration;
 
     @Transactional
-    public RefreshToken createRefreshToken(String username) {
-        UserInfo userInfo = userRepo.findByUsername(username);
+    public RefreshToken createRefreshToken(String email) {
+        AppUser userInfo = userRepo.findByEmail(email);
         if (userInfo == null) {
-            throw new RuntimeException("User not found: " + username);
+            throw new RuntimeException("User not found: " + email);
         }
 
         try {

@@ -1,4 +1,4 @@
-package site.devesh.contactsync.services;
+package site.devesh.contactsync.services.impl;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -7,18 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
-import io.jsonwebtoken.io.Decoders;
-import site.devesh.contactsync.entities.UserInfo;
-import site.devesh.contactsync.entities.UserRole;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -39,8 +32,8 @@ public class JwtService {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
-    public String extractUsername(String token) {
-        return extractClaims(token, Claims::getSubject); // username is called subject in jwt
+    public String extractUserId(String token) {
+        return extractClaims(token, Claims::getSubject); // userId is called subject in jwt
     }
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -53,8 +46,8 @@ public class JwtService {
         return extractExpiration(token).before(new Date());
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
+    public Boolean validateToken(String token, CustomUserDetails userDetails) {
+        final String userId = extractUserId(token);
         Boolean isTokenExpired = isTokenExpired(token);
         if(!isTokenExpired)
         {
@@ -67,7 +60,7 @@ public class JwtService {
             logger.info("Token expires in {} minutes", minutes);
 
         }
-        return username.equals(userDetails.getUsername()) && !isTokenExpired;
+        return userId.equals(userDetails.getId()) && !isTokenExpired;
     }
 
     public <T> T extractClaims(String token, Function<Claims, T> claimsResolver) {
@@ -96,16 +89,17 @@ public class JwtService {
         return List.of();
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String email) {
         Map<String, Object> claims = new HashMap<>();
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        // user id problem 
+        CustomUserDetails userDetails = userDetailsService.loadUserByUsername(email);
         List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
         claims.put("roles", roles);
 
         String token = Jwts
                 .builder()
                 .claims().add(claims)
-                .subject(username)
+                .subject(userDetails.getId())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + Duration.ofDays(1).toMillis()))
                 .and().signWith(getKey())

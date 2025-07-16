@@ -9,12 +9,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import site.devesh.contactsync.services.JwtService;
-import site.devesh.contactsync.services.UserDetailsServiceImpl;
+import site.devesh.contactsync.services.impl.CustomUserDetails;
+import site.devesh.contactsync.services.impl.JwtService;
+import site.devesh.contactsync.services.impl.UserDetailsServiceImpl;
 
 import java.io.IOException;
 
@@ -34,15 +34,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         try{
             String authHeader = request.getHeader("Authorization");
-            String username =null;
+            String userId =null;
             String token = null;
 
             if(authHeader != null && authHeader.startsWith("Bearer ") ) {
                 token = authHeader.substring(7);
-                username = jwtService.extractUsername(token);
+                userId = jwtService.extractUserId(token);
             }
-            if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if(userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                // user id problem 
+                CustomUserDetails userDetails = userDetailsService.loadUserById(userId);
                 if(jwtService.validateToken(token,userDetails)){
                     UsernamePasswordAuthenticationToken usernamePassToken = new UsernamePasswordAuthenticationToken(userDetails,null, userDetails.getAuthorities());
                     usernamePassToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

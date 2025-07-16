@@ -2,18 +2,18 @@ package site.devesh.contactsync.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import site.devesh.contactsync.entities.RefreshToken;
-import site.devesh.contactsync.model.UserInfoDto;
+import site.devesh.contactsync.model.AppUserDto;
+import site.devesh.contactsync.request.AuthRequestDTO;
+import site.devesh.contactsync.request.SignUpRequestDto;
 import site.devesh.contactsync.response.JwtResponseDTO;
-import site.devesh.contactsync.services.JwtService;
-import site.devesh.contactsync.services.RefreshTokenService;
-import site.devesh.contactsync.services.UserDetailsServiceImpl;
+import site.devesh.contactsync.services.impl.JwtService;
+import site.devesh.contactsync.services.impl.RefreshTokenService;
+import site.devesh.contactsync.services.impl.UserDetailsServiceImpl;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/auth/v1")
 public class AuthController {
 
@@ -28,14 +28,14 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signUp(@RequestBody UserInfoDto userInfoDto) {
+    public ResponseEntity<?> signUp(@RequestBody SignUpRequestDto signUpRequestDto) {
         try {
-            Boolean isSignedUp = userDetailsService.signUpUser(userInfoDto);
-            if (Boolean.FALSE.equals(isSignedUp)) {
-                return new ResponseEntity<>("Account already exist", HttpStatus.BAD_REQUEST);
+            if (!userDetailsService.signUpUser(signUpRequestDto)) {
+                return ResponseEntity.badRequest().body("Account already exists");
             }
-            RefreshToken refreshToken = refreshTokenService.createRefreshToken(userInfoDto.getUsername());
-            String jwtToken = jwtService.generateToken(userInfoDto.getUsername());
+
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(signUpRequestDto.getEmail());
+            String jwtToken = jwtService.generateToken(signUpRequestDto.getEmail());
             return new ResponseEntity<>(JwtResponseDTO
                     .builder()
                     .accessToken(jwtToken)
@@ -44,6 +44,11 @@ public class AuthController {
         }catch (Exception e) {
             return new ResponseEntity<>("Exception in User Service", HttpStatus.INTERNAL_SERVER_ERROR );
         }
+    }
+
+    @GetMapping("/current-user")
+    public ResponseEntity<?> getCurrentUser() {
+        return new ResponseEntity<>(userDetailsService.getCurrentUser(), HttpStatus.OK);
     }
 
 }

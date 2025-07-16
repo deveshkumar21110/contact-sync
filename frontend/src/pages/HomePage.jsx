@@ -1,13 +1,18 @@
 // HomePage.js
-import React from 'react'
-import Header from '../header/Header'
+import React from "react";
+import Header from "../components/header/Header";
+import Container from "../components/Container";
+import Home from "../components/Home";
 
 function HomePage() {
   return (
     <div className="w-full">
-      <Header/>
+      <Header />
+      <Container>
+        <Home />
+      </Container>
     </div>
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;

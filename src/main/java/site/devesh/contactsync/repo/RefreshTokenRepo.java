@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import site.devesh.contactsync.entities.RefreshToken;
-import site.devesh.contactsync.entities.UserInfo;
+import site.devesh.contactsync.entities.AppUser;
 
 import java.util.Optional;
 
@@ -15,5 +15,5 @@ public interface RefreshTokenRepo extends JpaRepository<RefreshToken, Long> {
     
     @Modifying
     @Transactional
-    void deleteByUserInfo(UserInfo userInfo);
+    void deleteByUserInfo(AppUser userInfo);
 }

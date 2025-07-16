@@ -4,9 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import site.devesh.contactsync.entities.UserInfo;
-import site.devesh.contactsync.model.UserInfoDto;
-import site.devesh.contactsync.services.UserDetailsServiceImpl;
+import site.devesh.contactsync.entities.AppUser;
+import site.devesh.contactsync.services.impl.UserDetailsServiceImpl;
 
 import java.util.List;
 
@@ -18,7 +17,7 @@ public class AdminController {
     private UserDetailsServiceImpl userDetailsService;
 
     @GetMapping("/users")
-    public List<UserInfo> getAllUsers(){
+    public List<AppUser> getAllUsers(){
         return userDetailsService.findAllUsers();
     }
 }

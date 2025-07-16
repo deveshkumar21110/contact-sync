@@ -1,19 +1,32 @@
-package site.devesh.contactsync.services;
+package site.devesh.contactsync.services.impl;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
-import site.devesh.contactsync.entities.UserInfo;
+import site.devesh.contactsync.entities.AppUser;
 import site.devesh.contactsync.entities.UserRole;
+import site.devesh.contactsync.model.AppUserDto;
+import site.devesh.contactsync.response.JwtResponseDTO;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class CustomUserDetails extends UserInfo implements UserDetails {
+public class CustomUserDetails extends AppUser implements UserDetails {
 
     // three basic details - username,password,authorities/roles
+    @Setter
+    @Getter
+    private String id;
+
+    @Setter
+    @Getter
+    private String email;
+
     private String username;
 
     private String password;
@@ -21,9 +34,13 @@ public class CustomUserDetails extends UserInfo implements UserDetails {
     Collection<? extends GrantedAuthority> authorities;
 
 
-    public CustomUserDetails(UserInfo loadedUser){
+
+
+    public CustomUserDetails(AppUser loadedUser){
         this.username = loadedUser.getUsername();
         this.password = loadedUser.getPassword();
+        this.email = loadedUser.getEmail();
+        this.id = loadedUser.getId();
 
         List<GrantedAuthority> auths = new ArrayList<>();
         for(UserRole userRole : loadedUser.getRoles()){
