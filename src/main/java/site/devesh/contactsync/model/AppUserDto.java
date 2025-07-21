@@ -17,15 +17,14 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class AppUserDto {
 
+    private String id;
+
     private String userName;
 
     private Long phoneNumber;
 
     private String email;
-
-
     private List<UserRole> roles;
-
     private String profileImageUrl;
 
 }

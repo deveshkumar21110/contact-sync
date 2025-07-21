@@ -17,7 +17,6 @@ import site.devesh.contactsync.services.impl.JwtService;
 import site.devesh.contactsync.services.impl.RefreshTokenService;
 
 @RestController
-@CrossOrigin("http://localhost:5173")
 @RequestMapping("/auth/v1")
 public class TokenController {
 

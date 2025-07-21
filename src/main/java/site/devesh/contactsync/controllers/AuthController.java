@@ -13,7 +13,6 @@ import site.devesh.contactsync.services.impl.RefreshTokenService;
 import site.devesh.contactsync.services.impl.UserDetailsServiceImpl;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/auth/v1")
 public class AuthController {
 

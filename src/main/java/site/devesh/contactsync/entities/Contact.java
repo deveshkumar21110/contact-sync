@@ -1,6 +1,10 @@
 package site.devesh.contactsync.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -9,11 +13,15 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "contacts")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Contact {
 
 
     @Id
-    @Column(name = "id" , updatable = false, nullable = false)
+    @Column(name = "id", updatable = false, nullable = false)
     private String id;
 
     private String displayName;
@@ -24,12 +32,11 @@ public class Contact {
     private String jobTitle;
 
     private String imageUrl;
+    @Builder.Default
     private Boolean isFavourite = false;
+    @Builder.Default
     private Boolean isDeleted = false;
     private LocalDateTime deletedAt;
-
-    private String address;
-    private String website;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -57,7 +64,7 @@ public class Contact {
     @OneToMany(mappedBy = "contact", cascade = CascadeType.ALL)
     private List<SignificantDate> significantDates;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
     @JoinTable(
             name = "contact_labels",
             joinColumns = @JoinColumn(name= "contact_id"),
@@ -65,10 +72,4 @@ public class Contact {
     )
     private List<Label> labels;
 
-    @PrePersist
-    public void generateId() {
-        if (id == null) {
-            id = UUID.randomUUID().toString();
-        }
-    }
 }
