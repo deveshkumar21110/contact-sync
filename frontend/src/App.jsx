@@ -12,13 +12,28 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 
 function App() {
-  // const [isAuth , setIsAuth] = useState(null);
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
 
-  // useEffect(() => {
-  //   const checkAuth = 
-  // }, []);
-
-  // if (loading) return null;
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        setLoading(true);
+        const user = await authService.getCurrentUser();
+        if (user) {
+          dispatch(login(user));
+        } else {
+          dispatch(logout());
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+        dispatch(logout());
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkAuthStatus();
+  }, [dispatch]);
 
   return (
     <Router>

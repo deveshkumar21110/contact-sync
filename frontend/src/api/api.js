@@ -17,8 +17,15 @@ const api = axios.create({
 
 // Request Interceptor – add Authorization token if available
 api.interceptors.request.use(
-  (config) => {
-    // Do not add Authorization header for login, signup, or refreshToken
+  async (config) => {
+    console.log("==== OUTGOING REQUEST ====");
+    console.log("URL:", config.url);
+    console.log("Method:", config.method);
+    console.log("Headers:", config.headers);
+    console.log("Params:", config.params);
+    console.log("Data (body):", config.data);
+    console.log("==========================");
+
     const noAuthEndpoints = [
       "/auth/v1/login",
       "/auth/v1/signup",
@@ -28,15 +35,20 @@ api.interceptors.request.use(
       config.url.endsWith(endpoint)
     );
     if (!isNoAuth) {
-      const token = authService.getCurrentToken();
+      const token = await authService.getCurrentToken();
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
+
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    console.error("Request error:", error);
+    return Promise.reject(error);
+  }
 );
+
 
 // ===== Refresh Token Logic ===== //
 let isRefreshing = false;

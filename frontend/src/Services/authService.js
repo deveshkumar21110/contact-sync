@@ -1,8 +1,8 @@
 import Cookies from "js-cookie";
 import api from "../api/api";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
-const TOKEN_KEY = "token";
+const TOKEN_KEY = "access_token";
 let cachedRoles = null;
 
 export const authService = {
@@ -27,14 +27,19 @@ export const authService = {
   //   return null;
   // },
 
-  getCurrentToken : async () => {
-    return Cookies.get(TOKEN_KEY);
+  getCurrentToken: async () => {
+    const token  = Cookies.get(TOKEN_KEY);
+    if(token) {
+      console.log("Current token:", token);
+      return token;
+    }
+    console.warn("No token found");
   },
 
   // Remove token on logout
-  logout: async() => {
+  logout: async () => {
     Cookies.remove("access_token");
-    Cookies.remove("refresh_token")
+    Cookies.remove("refresh_token");
     delete api.defaults.headers.common["Authorization"];
     cachedRoles = null;
   },
@@ -103,12 +108,12 @@ export const authService = {
     }
   },
 
-  getUserRoles : () => {
+  getUserRoles: () => {
     if (cachedRoles) return cachedRoles;
-  
+
     const token = Cookies.get("access_token");
     if (!token) return [];
-  
+
     try {
       const decoded = jwtDecode(token);
       cachedRoles = decoded.roles || [];
@@ -122,16 +127,30 @@ export const authService = {
     return authService.getUserRoles().includes(role);
   },
 
-  isAuthenticated : async () => {
+  isAuthenticated: async () => {
     const token = Cookies.get("access_token");
     if (!token) return false;
-    
+
     try {
       const { exp } = jwtDecode(token);
-      console.log("isAuthenticated : ",exp * 1000 > Date.now())
+      console.log("isAuthenticated : ", exp * 1000 > Date.now());
       return exp * 1000 > Date.now(); // check if still valid
     } catch {
       return false;
     }
+  },
+
+  getCurrentUser: async () => {
+    const isAuth = await authService.isAuthenticated();
+    if (isAuth) {
+      try {
+        const response = await api.get("/auth/v1/current-user");
+        return response.data;
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+        return null;
+      }
+    }
+    return null;
   },
 };
