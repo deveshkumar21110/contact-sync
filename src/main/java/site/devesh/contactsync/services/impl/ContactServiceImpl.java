@@ -42,11 +42,33 @@ public class ContactServiceImpl implements ContactService {
             throw new RuntimeException("User not found");
         }
         contact.setUser(managedUser);
-//        linkChildEntities(contact);
+        linkChildEntities(contact);
 
         Contact savedContact = contactRepo.save(contact);
         return contactMapper.toContactResponseDTO(savedContact);
     }
+
+
+    private void linkChildEntities(Contact contact) {
+        if (contact.getPhoneNumbers() != null) {
+            contact.getPhoneNumbers().forEach(p -> p.setContact(contact));
+        }
+        if (contact.getEmails() != null) {
+            contact.getEmails().forEach(e -> e.setContact(contact));
+        }
+        if (contact.getAddresses() != null) {
+            contact.getAddresses().forEach(a -> a.setContact(contact));
+        }
+        if (contact.getWebsites() != null) {
+            contact.getWebsites().forEach(w -> w.setContact(contact));
+        }
+        if (contact.getSignificantDates() != null) {
+            contact.getSignificantDates().forEach(s -> s.setContact(contact));
+        }
+    }
+
+
+
 
     @Override
     public List<ContactResponseDTO> getContactByUser() {
