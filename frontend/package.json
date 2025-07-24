@@ -25,6 +25,7 @@
     "react-dom": "^19.1.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.6.3",
+    "react-table": "^7.8.0",
     "react-toastify": "^11.0.5"
   },
   "devDependencies": {

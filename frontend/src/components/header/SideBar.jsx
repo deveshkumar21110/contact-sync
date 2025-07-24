@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   Person,
@@ -11,25 +10,48 @@ import {
   Folder,
 } from "@mui/icons-material";
 import { Button } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
   return (
-    <div className="w-64  bg-slate-50 h-screen p-4 flex flex-col justify-between">
+    <div className="w-72 bg-gray-50 h-screen p-6 flex flex-col border-r border-gray-200 shadow-md">
       <div>
-
         {/* Create Contact Button */}
         <Button
           variant="contained"
-          className=" !normal-case w-full !rounded-lg !py-2 mb-4 "
-          startIcon={<Add />}
+          startIcon={<AddIcon />}
+          sx={{
+            backgroundColor: "#C2E7FF",
+            color: "black",
+            textTransform: "none",
+            borderRadius: "12px",
+            boxShadow: "none",
+            px: 4,
+            py: 2,
+            fontWeight: 500,
+            fontSize: "0.95rem",
+            "&:hover": {
+              backgroundColor: "#A0D7FF",
+              boxShadow: "none",
+            },
+          }}
         >
           Create contact
         </Button>
 
         {/* Navigation */}
         <div className="space-y-1">
-          <SidebarItem icon={<Person />} label="Contacts" badge="3" />
-          <SidebarItem icon={<History />} label="Frequent" />
+          <SidebarItem
+            icon={<Person />}
+            label="Contacts"
+            badge="3"
+            onClick={() => {
+              navigate("/home");
+            }}
+          />
+          {/* <SidebarItem icon={<History />} label="Frequent" /> */}
           <SidebarItem icon={<Info />} label="Other contacts" />
         </div>
 
@@ -51,13 +73,22 @@ const Sidebar = () => {
   );
 };
 
-const SidebarItem = ({ icon, label, badge }) => (
-  <div className="flex items-center justify-between text-sm hover:bg-gray-100 p-2 rounded-lg cursor-pointer">
+const SidebarItem = ({ icon, label, badge, onClick }) => (
+  <div
+    className="flex items-center justify-between text-[15px] font-medium hover:bg-blue-50 hover:text-blue-700 focus:bg-blue-100 transition-colors duration-150 p-2 rounded-lg cursor-pointer group"
+    onClick={onClick}
+  >
     <div className="flex items-center space-x-3">
-      <span>{icon}</span>
+      <span className="text-blue-600 group-hover:text-blue-700 transition-colors duration-150">
+        {icon}
+      </span>
       <span>{label}</span>
     </div>
-    {badge && <span className="text-xs">{badge}</span>}
+    {badge && (
+      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full ml-2 font-semibold">
+        {badge}
+      </span>
+    )}
   </div>
 );
 

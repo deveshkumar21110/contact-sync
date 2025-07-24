@@ -20,7 +20,7 @@ function LogoutBtn() {
     }
 
   return (
-    <button className='bg-blue-700 rounded-md py-2 px-1' onClick={logoutHandler}>
+    <button className='bg-blue-700 text-white rounded-md py-2 px-3' onClick={logoutHandler}>
         Logout
     </button>
   )
