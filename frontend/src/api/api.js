@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 import API_BASE_URL from "../conf/config";
 import { authService } from "../Services/authService";
 
-const TOKEN_KEY = "token";
+const TOKEN_KEY = "access_token"; // Fixed to match authService
 
 // Create Axios instance
 const api = axios.create({
@@ -89,7 +89,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const newToken = await authService.refreshAuthToken(); // to be implemented next
+        const newToken = await authService.refreshToken(); // Fixed method name
         Cookies.set(TOKEN_KEY, newToken);
         api.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
         originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
@@ -97,8 +97,8 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        authService.logout();
-        window.location.href = "/login";
+        // Don't automatically logout and redirect, let the component handle it
+        console.error("Token refresh failed:", refreshError);
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

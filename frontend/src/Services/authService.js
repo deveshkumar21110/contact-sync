@@ -30,10 +30,14 @@ export const authService = {
   getCurrentToken: async () => {
     const token  = Cookies.get(TOKEN_KEY);
     if(token) {
-      console.log("Current token:", token);
+      // console.log("Current token:", token);
       return token;
     }
     console.warn("No token found");
+  },
+
+  getRefreshToken: () => {
+    return Cookies.get("refresh_token");
   },
 
   // Remove token on logout
@@ -46,14 +50,14 @@ export const authService = {
 
   refreshToken: async () => {
     try {
-      const token = Cookies.get(TOKEN_KEY);
-      if (!token) throw new Error("No token available for refresh");
+      const refreshToken = Cookies.get("refresh_token");
+      if (!refreshToken) throw new Error("No refresh token available");
 
-      const response = await api.get("/auth/v1/refreshToken", null, {
-        headers: { Authorization: `Bearer ${token}` },
+      const response = await api.post("/auth/v1/refreshToken", {
+        token: refreshToken
       });
 
-      const newToken = response.data?.token;
+      const newToken = response.data?.accessToken;
       if (!newToken) throw new Error("Invalid refresh token response");
 
       Cookies.set(TOKEN_KEY, newToken, {

@@ -72,4 +72,10 @@ public class Contact {
     )
     private List<Label> labels;
 
+    @PrePersist
+    public void ensureId() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+        }
+    }
 }

@@ -12,5 +12,15 @@ export const contactService = {
             throw error;
         }
     },
+
+    addContact : async (data) => {
+        try {
+            const response = await api.post("/api/v1/contact/add",data);
+            return response.data;
+        } catch (error) {
+            console.log("Error in adding contact: " , error)
+            throw error;
+        }
+    }
     
 }

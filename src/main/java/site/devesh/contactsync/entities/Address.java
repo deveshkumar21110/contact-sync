@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import jakarta.persistence.PrePersist;
+import java.util.UUID;
 
 @Entity
 @Table(name = "addresses")
@@ -26,4 +28,11 @@ public class Address {
     @ManyToOne()
     @JoinColumn(name = "contact_id")
     private Contact contact;
+
+    @PrePersist
+    public void ensureId() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+        }
+    }
 }

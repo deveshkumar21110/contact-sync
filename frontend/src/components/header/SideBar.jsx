@@ -9,6 +9,7 @@ import {
   Delete,
   Folder,
 } from "@mui/icons-material";
+import { Link } from "react-router-dom";
 import { Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 const Sidebar = () => {
   const navigate = useNavigate();
   return (
-    <div className="w-72 bg-gray-50 h-screen p-6 flex flex-col border-r border-gray-200 shadow-md">
+    <div className="w-72 bg-gray-50 h-screen p-6 flex flex-col  shadow-md">
       <div>
         {/* Create Contact Button */}
         <Button
@@ -37,21 +38,16 @@ const Sidebar = () => {
               boxShadow: "none",
             },
           }}
+          onClick={() => navigate('/new')}
         >
           Create contact
         </Button>
 
         {/* Navigation */}
         <div className="space-y-1">
-          <SidebarItem
-            icon={<Person />}
-            label="Contacts"
-            badge="3"
-            onClick={() => {
-              navigate("/home");
-            }}
-          />
-          {/* <SidebarItem icon={<History />} label="Frequent" /> */}
+          <Link to="/">
+            <SidebarItem icon={<Person />} label="Contacts" badge="3" />
+          </Link>
           <SidebarItem icon={<Info />} label="Other contacts" />
         </div>
 

@@ -11,9 +11,9 @@ import LogoutBtn from "./LogoutBtn";
 import HelpIcon from "@mui/icons-material/Help";
 import { authService } from "../../Services/authService";
 
-function Header() {
+function Header({ onMenuClick }) {
   const authStatus = useSelector((state) => state.auth.status);
-  console.log("Auth Status:", authStatus);
+  // console.log("Auth Status:", authStatus);
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ function Header() {
       setCurrentUser(user);
     };
     fetchUser();
-  }, []);
+  }, [authStatus]);
 
   return (
     <div className="w-full bg-slate-50 h-20 flex items-center fixed top-0 left-0 z-50">
@@ -30,7 +30,7 @@ function Header() {
         {/* Left section */}
         <div className="flex items-center justify-center pr-8">
           <div className="px-2 py-1 pr-4">
-            <MenuIcon sx={{ fontSize: 28 }} />
+          <MenuIcon sx={{ fontSize: 28, cursor: "pointer" }} onClick={onMenuClick} />
           </div>
           <img src={personImage} alt="Person Icon" className="w-10 h-10 pr-1" />
           <h1 className="text-2xl text-gray-600 pl-1">Contacts</h1>

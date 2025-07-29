@@ -33,7 +33,7 @@ public class ContactServiceImpl implements ContactService {
 
         Contact contact = contactMapper.toContact(contactRequestDTO);
 
-        contact.setId(UUID.randomUUID().toString());
+//        contact.setId(UUID.randomUUID().toString());
         String firstName = contact.getFirstName() != null ? contact.getFirstName().trim() : "";
         String lastName = contact.getLastName() != null ? contact.getLastName().trim() : "";
         contact.setDisplayName((firstName + " " + lastName).trim());

@@ -74,7 +74,7 @@ function Home() {
           <CircularProgress />
         </div>
       ) : (
-        <div className="rounded-lg bg-white w-full">
+        <div className="bg-white w-full">
           <h1 className="text-2xl mb-2">
             Contacts <span className="text-base">({contacts.length})</span>
           </h1>
@@ -101,7 +101,7 @@ function Home() {
                 </thead>
                 <tbody className="bg-white cursor-pointer">
                   {contacts.map((contact) => (
-                    <tr key={contact.id} className="hover:bg-gray-50 group">
+                    <tr key={contact.id} className="hover:bg-gray-100 group">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
@@ -143,7 +143,7 @@ function Home() {
                               size="large"
                             >
                               {contact.isFavourite ? (
-                                <Star fontSize="medium" sx={{ color: "red" }} />
+                                <Star fontSize="medium" sx={{ color: "blue" }} />
                               ) : (
                                 <StarBorder fontSize="medium" />
                               )}
