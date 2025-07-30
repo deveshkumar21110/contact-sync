@@ -1,6 +1,13 @@
 import React from "react";
-import { useForm } from "react-hook-form";
-import { ArrowBack, StarBorder, Add, Phone, LocationOnOutlined, LinkOutlined } from "@mui/icons-material";
+import { useForm, useFieldArray } from "react-hook-form";
+import {
+  ArrowBack,
+  StarBorder,
+  Add,
+  Phone,
+  LocationOnOutlined,
+  LinkOutlined,
+} from "@mui/icons-material";
 import { Avatar, TextField, Stack } from "@mui/material";
 import Container from "../components/Container";
 import BusinessIcon from "@mui/icons-material/Business";
@@ -12,11 +19,66 @@ import { useNavigate } from "react-router-dom";
 function CreateContactPage() {
   const navigate = useNavigate();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit, control } = useForm({
+    defaultValues: {
+      emails: [{ email: "" }],
+      phoneNumbers: [{ countryCode: "+91", number: "" }],
+      addresses: [
+        {
+          country: "",
+          streetAddress: "",
+          streetAddress2: "",
+          city: "",
+          pincode: "",
+          state: "",
+        },
+      ],
+      websites: [{ url: "" }],
+    },
+  });
+
+  const { fields: emailFields, append: appendEmail } = useFieldArray({
+    control,
+    name: "emails",
+  });
+
+  const { fields: phoneFields, append: appendPhone } = useFieldArray({
+    control,
+    name: "phoneNumbers",
+  });
+
+  const { fields: addressFields, append: appendAddress } = useFieldArray({
+    control,
+    name: "addresses",
+  });
+
+  const { fields: websiteFields, append: appendWebsite } = useFieldArray({
+    control,
+    name: "websites",
+  });
+
+  const addEmailField = () => {
+    appendEmail({ email: "" });
+  };
+
+  const addPhoneField = () => {
+    appendPhone({ countryCode: "+91", number: "" });
+  };
+
+  const addAddressField = () => {
+    appendAddress({
+      country: "",
+      streetAddress: "",
+      streetAddress2: "",
+      city: "",
+      pincode: "",
+      state: "",
+    });
+  };
+
+  const addWebsiteField = () => {
+    appendWebsite({ url: "" });
+  };
 
   const onSubmit = async (data) => {
     // Convert flat form data into backend-expected format
@@ -28,19 +90,17 @@ function CreateContactPage() {
       imageUrl: "", // handle image upload later
       isFavourite: false,
 
-      emails: [
-        {
-          email: data.email,
-        },
-      ],
-      phoneNumbers: [
-        {
-          countryCode: "+91",
-          number: data.phoneNumbers
-        },
-      ],
-      addresses: [],
-      websites: [],
+      emails: data.emails.filter((email) => email.email.trim() !== ""),
+      phoneNumbers: data.phoneNumbers.filter(
+        (phone) => phone.number.trim() !== ""
+      ),
+      addresses: data.addresses.filter(
+        (addr) =>
+          addr.country.trim() !== "" ||
+          addr.streetAddress.trim() !== "" ||
+          addr.city.trim() !== ""
+      ),
+      websites: data.websites.filter((website) => website.url.trim() !== ""),
       significantDates: [],
       labelIds: [],
     };
@@ -54,12 +114,12 @@ function CreateContactPage() {
   };
 
   return (
-    <Container>
+    <Container >
       <div className="mt-8 pl-4 w-1/2 bg-white">
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Header */}
-          <div className="flex justify-between">
-            <ArrowBack
+          <div className="sticky top-[64px] z-30 bg-white  flex justify-between items-center">
+          <ArrowBack
               onClick={() => navigate(-1)}
               className="cursor-pointer"
             />
@@ -149,12 +209,15 @@ function CreateContactPage() {
 
             {/* Email */}
             <Stack spacing={2}>
-              <IconTextField
-                icon={<MailOutlineIcon />}
-                label="Email"
-                name="email"
-                register={register}
-              />
+              {emailFields.map((field, index) => (
+                <IconTextField
+                  key={field.id}
+                  icon={<MailOutlineIcon />}
+                  label="Email"
+                  name={`emails.${index}.email`}
+                  register={register}
+                />
+              ))}
               <Stack
                 direction="row"
                 spacing={2}
@@ -162,18 +225,25 @@ function CreateContactPage() {
                 sx={{ width: "100%" }}
               >
                 <div style={{ width: 40 }}></div>
-                <AddButton label="Add email" icon={<Add />} />
+                <AddButton
+                  label="Add email"
+                  icon={<Add />}
+                  onClick={addEmailField}
+                />
               </Stack>
             </Stack>
 
             {/* Phone number */}
             <Stack spacing={2}>
-              <IconTextField
-                icon={<Phone />}
-                label="Phone"
-                name="phoneNumbers"
-                register={register}
-              />
+              {phoneFields.map((field, index) => (
+                <IconTextField
+                  key={field.id}
+                  icon={<Phone />}
+                  label="Phone"
+                  name={`phoneNumbers.${index}.number`}
+                  register={register}
+                />
+              ))}
               <Stack
                 direction="row"
                 spacing={2}
@@ -181,21 +251,51 @@ function CreateContactPage() {
                 sx={{ width: "100%" }}
               >
                 <div style={{ width: 40 }}></div>
-                <AddButton label="Add phone" icon={<Add />} />
+                <AddButton
+                  label="Add phone"
+                  icon={<Add />}
+                  onClick={addPhoneField}
+                />
               </Stack>
             </Stack>
 
             {/* Address */}
-            <AddressSection register={register} />
-
-            {/* Website Link */}
             <Stack spacing={2}>
-              <IconTextField
-                icon={<LinkOutlined />}
-                label="Website"
-                name="websites"
-                register={register}
-              />
+              {addressFields.map((field, index) => (
+                <Stack key={field.id} spacing={2}>
+                  <IconTextField
+                    icon={<LocationOnOutlined />}
+                    label="Country / Region"
+                    name={`addresses.${index}.country`}
+                    register={register}
+                  />
+                  <IconTextField
+                    label="Street address"
+                    name={`addresses.${index}.streetAddress`}
+                    register={register}
+                  />
+                  <IconTextField
+                    label="Street address line 2 (Optional)"
+                    name={`addresses.${index}.streetAddress2`}
+                    register={register}
+                  />
+                  <IconTextField
+                    label="City"
+                    name={`addresses.${index}.city`}
+                    register={register}
+                  />
+                  <IconTextField
+                    label="Pincode"
+                    name={`addresses.${index}.pincode`}
+                    register={register}
+                  />
+                  <IconTextField
+                    label="State"
+                    name={`addresses.${index}.state`}
+                    register={register}
+                  />
+                </Stack>
+              ))}
               <Stack
                 direction="row"
                 spacing={2}
@@ -203,10 +303,39 @@ function CreateContactPage() {
                 sx={{ width: "100%" }}
               >
                 <div style={{ width: 40 }}></div>
-                <AddButton label="Add website" icon={<Add />} />
+                <AddButton
+                  label="Add address"
+                  icon={<LocationOnOutlined />}
+                  onClick={addAddressField}
+                />
               </Stack>
             </Stack>
 
+            {/* Website Link */}
+            <Stack spacing={2}>
+              {websiteFields.map((field, index) => (
+                <IconTextField
+                  key={field.id}
+                  icon={<LinkOutlined />}
+                  label="Website"
+                  name={`websites.${index}.url`}
+                  register={register}
+                />
+              ))}
+              <Stack
+                direction="row"
+                spacing={2}
+                alignItems="center"
+                sx={{ width: "100%" }}
+              >
+                <div style={{ width: 40 }}></div>
+                <AddButton
+                  label="Add website"
+                  icon={<Add />}
+                  onClick={addWebsiteField}
+                />
+              </Stack>
+            </Stack>
           </div>
         </form>
       </div>
