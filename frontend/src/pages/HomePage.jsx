@@ -5,11 +5,9 @@ import Home from "../components/Home";
 
 function HomePage() {
   return (
-    <div className="w-full bg-gray-50 p-6 min-h-screen">
-      <Container>
-        <Home />
-      </Container>
-    </div>
+    <Container className="min-h-screen">
+      <Home />
+    </Container>
   );
 }
 

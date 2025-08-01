@@ -3,6 +3,7 @@ package site.devesh.contactsync.services.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import site.devesh.contactsync.entities.AppUser;
 import site.devesh.contactsync.entities.Contact;
 import site.devesh.contactsync.mapper.ContactMapper;
@@ -15,7 +16,6 @@ import site.devesh.contactsync.response.ContactResponseDTO;
 import site.devesh.contactsync.services.ContactService;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -75,6 +75,21 @@ public class ContactServiceImpl implements ContactService {
         AppUser user = userMapper.toAppUser(userDetailsService.getCurrentUser());
         return contactMapper.toContactResponseDTOList(contactRepo.findContactByUser(user));
     }
+    
+    @Override
+    public ContactResponseDTO getContactById(String id) {
+        Contact contact = contactRepo.getContactById(id);
+        return contactMapper.toContactResponseDTO(contact);
+    }
 
+    @Override
+    @Transactional
+    public ContactResponseDTO updateContact(String id,ContactRequestDTO contactRequestDTO){
+        Contact oldContact = contactRepo.findById(id).orElseThrow(() -> new RuntimeException("contact not found with id: "+id));
+        contactMapper.updateContactFromDto(contactRequestDTO, oldContact);
+        Contact saved = contactRepo.save(oldContact);
+        return contactMapper.toContactResponseDTO(saved);
+    }
+    
 
 }

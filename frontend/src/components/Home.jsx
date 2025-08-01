@@ -74,7 +74,7 @@ function Home() {
           <CircularProgress />
         </div>
       ) : (
-        <div className="bg-white w-full">
+        <div className="w-full">
           <h1 className="text-2xl mb-2">
             Contacts <span className="text-base">({contacts.length})</span>
           </h1>
@@ -131,11 +131,14 @@ function Home() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 relative">
                         <div className="flex items-center justify-between">
-                          <span>
-                            {`${contact.jobTitle || ""}, ${
-                              contact.company || ""
-                            }`.trim()}
-                          </span>
+                          {(contact.jobTitle || contact.company) && (
+                            <span>
+                              {[contact.jobTitle, contact.company]
+                                .filter(Boolean)
+                                .join(", ")}
+                            </span>
+                          )}
+
                           <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-4">
                             <IconButton
                               onClick={() => handleFavouriteToggle(contact.id)}
@@ -143,7 +146,10 @@ function Home() {
                               size="large"
                             >
                               {contact.isFavourite ? (
-                                <Star fontSize="medium" sx={{ color: "blue" }} />
+                                <Star
+                                  fontSize="medium"
+                                  sx={{ color: "blue" }}
+                                />
                               ) : (
                                 <StarBorder fontSize="medium" />
                               )}

@@ -3,6 +3,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import {
   ArrowBack,
   StarBorder,
+  Star,
   Add,
   Phone,
   LocationOnOutlined,
@@ -15,27 +16,40 @@ import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import { AddButton, AddressSection, IconTextField } from "../index";
 import { contactService } from "../Services/contactService";
 import { useNavigate } from "react-router-dom";
+import { blue } from "@mui/material/colors";
 
 function CreateContactPage() {
   const navigate = useNavigate();
 
-  const { register, handleSubmit, control } = useForm({
-    defaultValues: {
-      emails: [{ email: "" }],
-      phoneNumbers: [{ countryCode: "+91", number: "" }],
-      addresses: [
-        {
-          country: "",
-          streetAddress: "",
-          streetAddress2: "",
-          city: "",
-          pincode: "",
-          state: "",
-        },
-      ],
-      websites: [{ url: "" }],
-    },
-  });
+  const handleIsFavourite = () => {
+    const currentValue = getValues("isFavourite");
+    const newValue = !currentValue;
+    setValue("isFavourite", newValue);
+    console.log("isFavourite toggled to: " + newValue);
+  };
+  
+
+  const { register, setValue, getValues, handleSubmit, control, watch } =
+    useForm({
+      defaultValues: {
+        isFavourite: false,
+        emails: [{ email: "" }],
+        phoneNumbers: [{ countryCode: "+91", number: "" }],
+        addresses: [
+          {
+            country: "",
+            streetAddress: "",
+            streetAddress2: "",
+            city: "",
+            pincode: "",
+            state: "",
+          },
+        ],
+        websites: [{ url: "" }],
+      },
+    });
+
+  const isFavourite = watch("isFavourite");
 
   const { fields: emailFields, append: appendEmail } = useFieldArray({
     control,
@@ -88,7 +102,7 @@ function CreateContactPage() {
       jobTitle: data.jobTitle || "",
       company: data.company,
       imageUrl: "", // handle image upload later
-      isFavourite: false,
+      isFavourite: data.isFavourite,
 
       emails: data.emails.filter((email) => email.email.trim() !== ""),
       phoneNumbers: data.phoneNumbers.filter(
@@ -114,17 +128,23 @@ function CreateContactPage() {
   };
 
   return (
-    <Container >
-      <div className="mt-8 pl-4 w-1/2 bg-white">
+    <Container>
+      <div className="pl-6 w-1/2 bg-white ">
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Header */}
-          <div className="sticky top-[64px] z-30 bg-white  flex justify-between items-center">
-          <ArrowBack
+          <div className=" bg-white  flex justify-between items-center">
+            <ArrowBack
               onClick={() => navigate(-1)}
               className="cursor-pointer"
             />
             <div className="flex gap-4 justify-center items-center">
-              <StarBorder fontSize="medium" className="text-gray-700" />
+              <button type="button" onClick={handleIsFavourite}>
+                {isFavourite ? (
+                  <Star fontSize="medium" sx={{ color: blue[700] }} />
+                ) : (
+                  <StarBorder fontSize="medium" className="text-gray-700" />
+                )}
+              </button>
               <button
                 type="submit"
                 className="bg-blue-700 text-white px-6 py-2 rounded-full"
@@ -262,39 +282,11 @@ function CreateContactPage() {
             {/* Address */}
             <Stack spacing={2}>
               {addressFields.map((field, index) => (
-                <Stack key={field.id} spacing={2}>
-                  <IconTextField
-                    icon={<LocationOnOutlined />}
-                    label="Country / Region"
-                    name={`addresses.${index}.country`}
-                    register={register}
-                  />
-                  <IconTextField
-                    label="Street address"
-                    name={`addresses.${index}.streetAddress`}
-                    register={register}
-                  />
-                  <IconTextField
-                    label="Street address line 2 (Optional)"
-                    name={`addresses.${index}.streetAddress2`}
-                    register={register}
-                  />
-                  <IconTextField
-                    label="City"
-                    name={`addresses.${index}.city`}
-                    register={register}
-                  />
-                  <IconTextField
-                    label="Pincode"
-                    name={`addresses.${index}.pincode`}
-                    register={register}
-                  />
-                  <IconTextField
-                    label="State"
-                    name={`addresses.${index}.state`}
-                    register={register}
-                  />
-                </Stack>
+                <AddressSection
+                  key={field.id}
+                  register={register}
+                  index={index}
+                />
               ))}
               <Stack
                 direction="row"

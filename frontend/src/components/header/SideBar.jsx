@@ -14,10 +14,13 @@ import { Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen = true }) => {
   const navigate = useNavigate();
   return (
-    <div className="w-72 bg-gray-50 h-screen p-6 flex flex-col  shadow-md">
+    <div
+      className={`fixed top-20 left-0 w-72 h-screen bg-gray-50 p-6 flex flex-col  z-40 transition-transform duration-300
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+    >
       <div>
         {/* Create Contact Button */}
         <Button
@@ -44,11 +47,11 @@ const Sidebar = () => {
         </Button>
 
         {/* Navigation */}
-        <div className="space-y-1">
+        <div className="space-y-1 pt-4">
           <Link to="/">
             <SidebarItem icon={<Person />} label="Contacts" badge="3" />
           </Link>
-          <SidebarItem icon={<Info />} label="Other contacts" />
+          {/* <SidebarItem icon={<Info />} label="Other contacts" /> */}
         </div>
 
         {/* Fix & Manage */}

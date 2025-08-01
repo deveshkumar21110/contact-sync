@@ -30,6 +30,16 @@ public class ContactController {
         }
     }
 
+    @GetMapping("/{contactId}")
+    public ResponseEntity<?> getContactById(@PathVariable String contactId){
+        try{
+            ContactResponseDTO contactResponseDTO = contactService.getContactById(contactId);
+            return ResponseEntity.ok(contactResponseDTO);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @GetMapping("/all")
     public ResponseEntity<?> getAllContactsOfUser(){
         try{
@@ -37,6 +47,19 @@ public class ContactController {
             return ResponseEntity.ok(contactResponseDTOS);
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateContact(
+        @PathVariable String id,
+        @RequestBody ContactRequestDTO contactRequestDTO
+    ) {
+        try {
+            ContactResponseDTO responseDTO = contactService.updateContact(id, contactRequestDTO);
+            return ResponseEntity.ok().body(responseDTO);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 

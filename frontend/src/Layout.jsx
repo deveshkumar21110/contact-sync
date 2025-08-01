@@ -14,18 +14,16 @@ function Layout() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="min-h-screen">
       {/* Sidebar */}
-      {!hideSidebar && isSidebarOpen && (
-        <div className="pt-20">
-          <Sidebar />
-        </div>
+      {!hideSidebar && (
+        <Sidebar isOpen={isSidebarOpen} />
       )}
 
       {/* Main Content Area */}
-      <div className="flex-1">
+      <div className={`transition-all duration-300 ${!hideSidebar && isSidebarOpen ? 'ml-72' : ''}`}>
         <Header onMenuClick={toggleSidebar} />
-        <main className="flex-1 mt-20">
+        <main className="mt-20 bg-gray-50 ">
           <Outlet />
         </main>
       </div>

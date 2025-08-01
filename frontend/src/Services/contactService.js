@@ -21,6 +21,16 @@ export const contactService = {
             console.log("Error in adding contact: " , error)
             throw error;
         }
+    },
+
+    updateContact : async (data) => {
+        try {
+            const response = await api.post("/api/v1/contact/update",data);
+            return response.data;
+        } catch (error) {
+            console.log("Error in updating contact: ", error)
+            throw error;
+        }
     }
     
 }
