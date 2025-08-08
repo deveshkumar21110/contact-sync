@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { blue } from "@mui/material/colors";
 import { useDispatch } from "react-redux";
 import BasicModal from "../components/BasicModal";
+import { addContact } from "../redux/contactSlice";
 
 function CreateContactPage() {
   const navigate = useNavigate();

@@ -31,6 +31,20 @@ export const contactService = {
             console.log("Error in updating contact: ", error)
             throw error;
         }
+    },
+
+    toggleFavourite: async (contactId,newFavoriteStatus) => {
+        try {
+            const response = await api.patch(`/api/v1/contact/${contactId}/favourite`,
+                {
+                    isFavourite: newFavoriteStatus
+                }
+            )
+            return response.data;
+        } catch (error) {
+            console.error('Error toggling favourite: ' , error);
+            throw error;
+        }
     }
     
 }
