@@ -16,7 +16,8 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const Sidebar = ({ isOpen = true }) => {
-    const contactCount = useSelector((state) => state.contact.data.length);
+    // const contactCount = useSelector((state) => state.contact.data.length);
+    const contactCount = useSelector((state) => state.contact?.data?.length);
   const navigate = useNavigate();
   return (
     <div

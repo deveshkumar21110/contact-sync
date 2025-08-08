@@ -1,4 +1,5 @@
 import React from "react";
+import { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import {
   ArrowBack,
@@ -14,11 +15,10 @@ import Container from "../components/Container";
 import BusinessIcon from "@mui/icons-material/Business";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import { AddButton, AddressSection, IconTextField } from "../index";
-import { contactService } from "../Services/contactService";
 import { useNavigate } from "react-router-dom";
 import { blue } from "@mui/material/colors";
 import { useDispatch } from "react-redux";
-import { addContact } from "../redux/ContactSlice";
+import BasicModal from "../components/BasicModal";
 
 function CreateContactPage() {
   const navigate = useNavigate();
