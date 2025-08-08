@@ -16,7 +16,7 @@ function Home() {
   const { data: contacts, status } = useSelector((state) => state.contact);
 
   useEffect(() => {
-    if (contacts.length === 0 && status !== STATUSES.LOADING) {
+    if (contacts.length === 0 && status !== STATUSES.IDLE) {
       dispatch(fetchContacts());
     }
   }, [dispatch, contacts, status]);
@@ -42,6 +42,13 @@ function Home() {
       </div>
     );
   }
+  if (contacts.length === 0) {
+  return (
+    <div className="flex justify-center items-center h-40 text-gray-500">
+      No contact found
+    </div>
+  );
+}
 
   return (
     <div className="w-full">
