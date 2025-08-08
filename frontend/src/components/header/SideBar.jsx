@@ -13,8 +13,10 @@ import { Link } from "react-router-dom";
 import { Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Sidebar = ({ isOpen = true }) => {
+    const contactCount = useSelector((state) => state.contact.data.length);
   const navigate = useNavigate();
   return (
     <div
@@ -49,7 +51,7 @@ const Sidebar = ({ isOpen = true }) => {
         {/* Navigation */}
         <div className="space-y-1 pt-4">
           <Link to="/">
-            <SidebarItem icon={<Person />} label="Contacts" badge="3" />
+            <SidebarItem icon={<Person />} label="Contacts" badge={contactCount} />
           </Link>
           {/* <SidebarItem icon={<Info />} label="Other contacts" /> */}
         </div>

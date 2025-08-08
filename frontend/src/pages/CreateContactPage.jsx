@@ -17,9 +17,19 @@ import { AddButton, AddressSection, IconTextField } from "../index";
 import { contactService } from "../Services/contactService";
 import { useNavigate } from "react-router-dom";
 import { blue } from "@mui/material/colors";
+import { useDispatch } from "react-redux";
+import { addContact } from "../redux/ContactSlice";
 
 function CreateContactPage() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [open, setOpen] = useState(false);
+
+  const openModal = () => {
+    // if(getValues("imageUrl"))
+    setOpen(true);
+  }
+  const closeModal = () => setOpen(false);
 
   const handleIsFavourite = () => {
     const currentValue = getValues("isFavourite");
@@ -101,7 +111,7 @@ function CreateContactPage() {
       lastName: data.lastName,
       jobTitle: data.jobTitle || "",
       company: data.company,
-      imageUrl: "", // handle image upload later
+      imageUrl: data.imageUrl ||"", // handle image upload later
       isFavourite: data.isFavourite,
 
       emails: data.emails.filter((email) => email.email.trim() !== ""),
@@ -120,8 +130,9 @@ function CreateContactPage() {
     };
 
     try {
-      const response = await contactService.addContact(payload);
+      const response = await dispatch(addContact(payload)).unwrap(); 
       console.log("Add contact response:", response);
+      navigate("/");
     } catch (error) {
       console.error("Error adding contact: ", error);
     }
@@ -156,14 +167,27 @@ function CreateContactPage() {
 
           {/* Avatar */}
           <div className="relative inline-block my-4 pb-4">
-            <Avatar sx={{ width: 128, height: 128 }} />
+            <Avatar
+              src={watch("imageUrl") || ""}
+              sx={{ width: 128, height: 128 }}
+              onClick={openModal}
+              className="cursor-pointer"
+            />
+
             <button
               type="button"
+              onClick={openModal}
               className="absolute bottom-1 right-1 bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center ring-4 ring-white"
               title="Add photo"
             >
               +
             </button>
+            <BasicModal
+              open={open}
+              handleClose={closeModal}
+              register={register}
+              setValue={setValue}
+            />
           </div>
 
           {/* Form Fields */}
