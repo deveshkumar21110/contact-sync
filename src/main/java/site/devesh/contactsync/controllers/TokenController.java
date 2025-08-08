@@ -18,6 +18,9 @@ import site.devesh.contactsync.services.impl.RefreshTokenService;
 
 @RestController
 @RequestMapping("/auth/v1")
+@CrossOrigin(origins = {"https://contact-sync-ochre.vercel.app", "https://contacts.devesh.site"}, 
+             allowCredentials = "true",
+             methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
 public class TokenController {
 
     @Autowired
