@@ -6,7 +6,7 @@ import {
   fetchContacts,
   toggleFavourite,
   STATUSES,
-} from "../redux/ContactSlice";
+} from "../redux/contactSlice";
 
 const DEFAULT_PROFILE =
   "/contacts_product_24dp_0158CC_FILL0_wght400_GRAD0_opsz24.svg";
