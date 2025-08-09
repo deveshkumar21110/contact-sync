@@ -7,6 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -24,7 +25,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsServiceImpl userDetailsService;
 
-    public JwtAuthFilter (JwtService jwtService, UserDetailsServiceImpl userDetailsService) {
+    // Use @Lazy to break circular dependency
+    public JwtAuthFilter(@Lazy JwtService jwtService, @Lazy UserDetailsServiceImpl userDetailsService) {
         this.userDetailsService = userDetailsService;
         this.jwtService = jwtService;
     }
@@ -34,35 +36,33 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         try{
             String authHeader = request.getHeader("Authorization");
-            String userId =null;
+            String userId = null;
             String token = null;
 
             if(authHeader != null && authHeader.startsWith("Bearer ") ) {
                 token = authHeader.substring(7);
                 userId = jwtService.extractUserId(token);
             }
+            
             if(userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                // user id problem 
                 CustomUserDetails userDetails = userDetailsService.loadUserById(userId);
-                if(jwtService.validateToken(token,userDetails)){
-                    UsernamePasswordAuthenticationToken usernamePassToken = new UsernamePasswordAuthenticationToken(userDetails,null, userDetails.getAuthorities());
+                if(jwtService.validateToken(token, userDetails)){
+                    UsernamePasswordAuthenticationToken usernamePassToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
                     usernamePassToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(usernamePassToken);
                 }
-
             }
-        }catch (ExpiredJwtException e) {
+        } catch (ExpiredJwtException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Token expired, Please login again.");
             return;
-        }catch (MalformedJwtException |
-                SignatureException e ){
+        } catch (MalformedJwtException | SignatureException e ){
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("Invalid Token");
             return;
         }
 
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
-
 }

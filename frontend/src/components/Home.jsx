@@ -16,9 +16,9 @@ function Home() {
   const { data: contacts, status } = useSelector((state) => state.contact);
 
   useEffect(() => {
-    if (contacts.length === 0 && status !== STATUSES.IDLE) {
-      dispatch(fetchContacts());
-    }
+      if (contacts.length === 0 && status === STATUSES.IDLE) {
+          dispatch(fetchContacts());
+      }
   }, [dispatch, contacts, status]);
 
   const handleImageError = useCallback((e) => {
