@@ -27,6 +27,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+        @Value("${cors.allowed.origins}")
+    private String allowedOrigins;
+
     private final PasswordEncoder passwordEncoder;
 
     private final UserDetailsServiceImpl userDetailsService;
@@ -60,17 +63,31 @@ public class SecurityConfig {
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+    
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        logger.info("Initializing CORS configuration with allowed origins: {}", allowedOrigins);
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:5174"));
+        String[] origins = allowedOrigins.split(",");
+        configuration.setAllowedOrigins(Arrays.asList(origins));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With",
-                "Accept", "Origin", "Access-Control-Request-Method",
+        configuration.setAllowedHeaders(Arrays.asList(
+                "Authorization",
+                "Content-Type",
+                "X-Requested-With",
+                "Accept",
+                "Origin",
+                "Access-Control-Request-Method",
                 "Access-Control-Request-Headers"));
-        configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
+
+        logger.info("CORS Configuration details:");
+        logger.info("Allowed Origins: {}", Arrays.toString(origins));
+        logger.info("Allowed Methods: {}", configuration.getAllowedMethods());
+        logger.info("Allowed Headers: {}", configuration.getAllowedHeaders());
+        logger.info("Allow Credentials: {}", configuration.getAllowCredentials());
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
