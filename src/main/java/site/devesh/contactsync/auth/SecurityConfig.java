@@ -59,7 +59,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // Add this line
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/v1/login", "/auth/v1/signup","/auth/v1/refreshToken").permitAll()
+                        .requestMatchers("/auth/v1/login", "/auth/v1/signup","/auth/v1/refreshToken","/api/health").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasAuthority(RoleType.ROLE_ADMIN.toString())
                         .anyRequest().authenticated())
                 .sessionManagement(session ->session
