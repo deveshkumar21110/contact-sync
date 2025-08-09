@@ -1,4 +1,3 @@
-
 import { contactService } from "../Services/contactService";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
@@ -33,7 +32,7 @@ export const updateContact = createAsyncThunk(
 export const toggleFavourite = createAsyncThunk(
   "contact/toggleFavourite",
   async ({ contactId, newFavouriteStatus }) => {
-        console.log("PATCH Favourite:", contactId, newFavouriteStatus); 
+    console.log("PATCH Favourite:", contactId, newFavouriteStatus);
     await contactService.toggleFavourite(contactId, newFavouriteStatus);
     return { contactId, newFavouriteStatus };
   }
@@ -69,7 +68,23 @@ const contactSlice = createSlice({
         }
       })
 
+      
+      .addCase(toggleFavourite.pending, (state, action) => {
+        const { contactId, newFavouriteStatus } = action.meta.arg;
+        const contact = state.data.find((c) => c.id === contactId);
+        if (contact) {
+          contact.isFavourite = newFavouriteStatus; // instant change
+        }
+      })
+      .addCase(toggleFavourite.rejected, (state, action) => {
+        const { contactId, newFavouriteStatus } = action.meta.arg;
+        const contact = state.data.find((c) => c.id === contactId);
+        if (contact) {
+          contact.isFavourite = !newFavouriteStatus; // revert if failed
+        }
+      })
       .addCase(toggleFavourite.fulfilled, (state, action) => {
+        // Optional: trust server and re-sync in case of mismatch
         const { contactId, newFavouriteStatus } = action.payload;
         const contact = state.data.find((c) => c.id === contactId);
         if (contact) {

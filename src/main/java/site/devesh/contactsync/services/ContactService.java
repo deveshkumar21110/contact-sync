@@ -16,4 +16,6 @@ public interface ContactService {
     ContactResponseDTO updateContact(String id, ContactRequestDTO contactRequestDTO);
 
     ContactResponseDTO getContactById(String id);
+
+    ContactResponseDTO updateFavouriteStatus(String id, Boolean isFavourite);
 }

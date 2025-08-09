@@ -10,6 +10,7 @@ import site.devesh.contactsync.services.ContactService;
 import site.devesh.contactsync.services.UserService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/contact")
@@ -60,6 +61,23 @@ public class ContactController {
             return ResponseEntity.ok().body(responseDTO);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PatchMapping("/{contactId}/favourite")
+    public ResponseEntity<?> toggleFavourite(
+            @PathVariable String contactId,
+            @RequestBody Map<String,Boolean> favouriteStatus
+
+    ) {
+        try {
+            Boolean isFavourite = favouriteStatus.get("isFavourite");
+            if(isFavourite == null) return ResponseEntity.badRequest().build();
+
+            ContactResponseDTO updatedContact = contactService.updateFavouriteStatus(contactId,isFavourite);
+            return ResponseEntity.ok().body(updatedContact);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
         }
     }
 

@@ -90,6 +90,22 @@ public class ContactServiceImpl implements ContactService {
         Contact saved = contactRepo.save(oldContact);
         return contactMapper.toContactResponseDTO(saved);
     }
-    
+
+    @Override
+    @Transactional
+    public ContactResponseDTO updateFavouriteStatus(String id, Boolean isFavourite) {
+        Contact contact = contactRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Contact not found with id: " + id));
+
+        // Verify ownership
+        AppUserDto currentUser = userDetailsService.getCurrentUser();
+        if (!contact.getUser().getEmail().equals(currentUser.getEmail())) {
+            throw new RuntimeException("Unauthorized to update this contact");
+        }
+
+        contact.setIsFavourite(isFavourite);
+        Contact savedContact = contactRepo.save(contact);
+        return contactMapper.toContactResponseDTO(savedContact);
+    }
 
 }
