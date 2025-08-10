@@ -94,5 +94,5 @@ const contactSlice = createSlice({
   },
 });
 
-export const { setContacts, setStatus } = contactSlice.actions;
+// export const { setContacts, setStatus } = contactSlice.actions;
 export default contactSlice.reducer;

@@ -42,7 +42,7 @@ function Home() {
       </div>
     );
   }
-  if (contacts.length === 0) {
+  else if (contacts.length === 0) {
   return (
     <div className="flex justify-center items-center h-40 text-gray-500">
       No contact found

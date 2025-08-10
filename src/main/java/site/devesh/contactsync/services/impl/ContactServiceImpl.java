@@ -6,16 +6,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.devesh.contactsync.entities.AppUser;
 import site.devesh.contactsync.entities.Contact;
+import site.devesh.contactsync.entities.Label;
 import site.devesh.contactsync.mapper.ContactMapper;
 import site.devesh.contactsync.mapper.UserMapper;
 import site.devesh.contactsync.model.AppUserDto;
+import site.devesh.contactsync.model.LabelDTO;
 import site.devesh.contactsync.repo.ContactRepo;
+import site.devesh.contactsync.repo.LabelRepo;
 import site.devesh.contactsync.repo.UserRepo;
 import site.devesh.contactsync.request.ContactRequestDTO;
 import site.devesh.contactsync.response.ContactResponseDTO;
 import site.devesh.contactsync.services.ContactService;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,14 +31,15 @@ public class ContactServiceImpl implements ContactService {
     private final UserMapper userMapper;
     private final UserDetailsServiceImpl userDetailsService;
     private final UserRepo userRepo;
+    private final LabelRepo labelRepo;
 
     @Override
     public ContactResponseDTO createContact(ContactRequestDTO contactRequestDTO) {
-        AppUserDto  user = userDetailsService.getCurrentUser();
+        AppUserDto user = userDetailsService.getCurrentUser();
 
         Contact contact = contactMapper.toContact(contactRequestDTO);
 
-//        contact.setId(UUID.randomUUID().toString());
+        // contact.setId(UUID.randomUUID().toString());
         String firstName = contact.getFirstName() != null ? contact.getFirstName().trim() : "";
         String lastName = contact.getLastName() != null ? contact.getLastName().trim() : "";
         contact.setDisplayName((firstName + " " + lastName).trim());
@@ -43,11 +49,11 @@ public class ContactServiceImpl implements ContactService {
         }
         contact.setUser(managedUser);
         linkChildEntities(contact);
+        handleLabels(contact, contactRequestDTO.getLabels());
 
         Contact savedContact = contactRepo.save(contact);
         return contactMapper.toContactResponseDTO(savedContact);
     }
-
 
     private void linkChildEntities(Contact contact) {
         if (contact.getPhoneNumbers() != null) {
@@ -67,15 +73,12 @@ public class ContactServiceImpl implements ContactService {
         }
     }
 
-
-
-
     @Override
     public List<ContactResponseDTO> getContactByUser() {
         AppUser user = userMapper.toAppUser(userDetailsService.getCurrentUser());
         return contactMapper.toContactResponseDTOList(contactRepo.findContactByUser(user));
     }
-    
+
     @Override
     public ContactResponseDTO getContactById(String id) {
         Contact contact = contactRepo.getContactById(id);
@@ -84,9 +87,12 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional
-    public ContactResponseDTO updateContact(String id,ContactRequestDTO contactRequestDTO){
-        Contact oldContact = contactRepo.findById(id).orElseThrow(() -> new RuntimeException("contact not found with id: "+id));
+    public ContactResponseDTO updateContact(String id, ContactRequestDTO contactRequestDTO) {
+        Contact oldContact = contactRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("contact not found with id: " + id));
         contactMapper.updateContactFromDto(contactRequestDTO, oldContact);
+        // Handle labels separately
+        handleLabels(oldContact, contactRequestDTO.getLabels());
         Contact saved = contactRepo.save(oldContact);
         return contactMapper.toContactResponseDTO(saved);
     }
@@ -106,6 +112,46 @@ public class ContactServiceImpl implements ContactService {
         contact.setIsFavourite(isFavourite);
         Contact savedContact = contactRepo.save(contact);
         return contactMapper.toContactResponseDTO(savedContact);
+    }
+
+    private void handleLabels(Contact contact, List<LabelDTO> labelDTOs) {
+        if (labelDTOs == null || labelDTOs.isEmpty()) {
+            contact.setLabels(new ArrayList<>());
+            return;
+        }
+
+        List<Label> labels = new ArrayList<>();
+
+        for (LabelDTO labelDTO : labelDTOs) {
+            Label label = null;
+
+            // If label has an ID, try to find existing label
+            if (labelDTO.getId() != null) {
+                Optional<Label> existingLabel = labelRepo.findById(labelDTO.getId());
+                if (existingLabel.isPresent()) {
+                    label = existingLabel.get();
+                }
+            }
+
+            // If no existing label found by ID, try to find by name
+            if (label == null && labelDTO.getName() != null && !labelDTO.getName().trim().isEmpty()) {
+                label = labelRepo.findByName(labelDTO.getName().trim());
+            }
+
+            // If still no label found, create a new one
+            if (label == null && labelDTO.getName() != null && !labelDTO.getName().trim().isEmpty()) {
+                label = new Label();
+                label.setName(labelDTO.getName().trim());
+                label = labelRepo.save(label);// saving new label
+            }
+
+            if (label != null) {
+                labels.add(label);
+            }
+
+        }
+
+        contact.setLabels(labels);
     }
 
 }

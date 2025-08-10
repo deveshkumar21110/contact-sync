@@ -20,17 +20,26 @@ import { blue } from "@mui/material/colors";
 import { useDispatch } from "react-redux";
 import BasicModal from "../components/BasicModal";
 import { addContact } from "../redux/contactSlice";
+import LabelModal from "../components/Modal/LabelModal";
 
 function CreateContactPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const openLabel = Boolean(anchorEl);
 
   const openModal = () => {
-    // if(getValues("imageUrl"))
     setOpen(true);
-  }
+  };
+  const openLabelModal = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
   const closeModal = () => setOpen(false);
+  const closeLabelModal = () => {
+    setAnchorEl(null);
+  };
 
   const handleIsFavourite = () => {
     const currentValue = getValues("isFavourite");
@@ -38,7 +47,6 @@ function CreateContactPage() {
     setValue("isFavourite", newValue);
     console.log("isFavourite toggled to: " + newValue);
   };
-  
 
   const { register, setValue, getValues, handleSubmit, control, watch } =
     useForm({
@@ -82,6 +90,15 @@ function CreateContactPage() {
     name: "websites",
   });
 
+  const { fields: labels, append: appendLabel } = useFieldArray({
+    control,
+    name: "labels",
+  });
+
+  const addLabelField = () => {
+    appendLabel({ name: "" });
+  };
+
   const addEmailField = () => {
     appendEmail({ email: "" });
   };
@@ -112,7 +129,7 @@ function CreateContactPage() {
       lastName: data.lastName,
       jobTitle: data.jobTitle || "",
       company: data.company,
-      imageUrl: data.imageUrl ||"", // handle image upload later
+      imageUrl: data.imageUrl || "", // handle image upload later
       isFavourite: data.isFavourite,
 
       emails: data.emails.filter((email) => email.email.trim() !== ""),
@@ -127,11 +144,11 @@ function CreateContactPage() {
       ),
       websites: data.websites.filter((website) => website.url.trim() !== ""),
       significantDates: [],
-      labelIds: [],
+      labels: data.labels.filter((label) => label.name.trim() != ""),
     };
 
     try {
-      const response = await dispatch(addContact(payload)).unwrap(); 
+      const response = await dispatch(addContact(payload)).unwrap();
       console.log("Add contact response:", response);
       navigate("/");
     } catch (error) {
@@ -193,11 +210,21 @@ function CreateContactPage() {
 
           {/* Form Fields */}
           <div className="flex flex-col gap-4">
-            <div>
-              <span className="inline-block text-gray-700 border border-gray-500 rounded-xl px-4 py-2">
+            {/* Label */}
+            <div >
+              <span onClick={openLabelModal} className=" cursor-pointer inline-block text-gray-700 border border-gray-500 rounded-xl px-4 py-2">
                 + Label
               </span>
             </div>
+
+            {/* Popover OUTSIDE clickable div */}
+            <LabelModal
+              anchorEl={anchorEl}
+              open={openLabel}
+              handleClose={closeLabelModal}
+              register={register}
+              setValue={setValue}
+            />
 
             {/* Name */}
             <Stack spacing={2}>

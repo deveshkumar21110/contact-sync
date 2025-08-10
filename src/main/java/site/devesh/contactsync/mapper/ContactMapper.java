@@ -24,6 +24,7 @@ public interface ContactMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "displayName", ignore = true) // Will be set in service
+    @Mapping(target = "labels", ignore = true) // Will be handled in service
     Contact toContact(ContactRequestDTO dto);
 
     // Convert entity to DTO
@@ -37,10 +38,12 @@ public interface ContactMapper {
 
     // List conversions
     List<Contact> toEntityList(List<ContactRequestDTO> dtos);
+
     List<ContactRequestDTO> toDtoList(List<Contact> entities);
 
     // Convert to response DTO
     ContactResponseDTO toContactResponseDTO(Contact contact);
+
     List<ContactResponseDTO> toContactResponseDTOList(List<Contact> contacts);
 
     // Update contact basic fields only (no collections)
@@ -68,8 +71,8 @@ public interface ContactMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "displayName", ignore = true)
+    @Mapping(target = "labels", ignore = true)
     void updateContactFromDto(ContactRequestDTO dto, @MappingTarget Contact contact);
-
 
     @AfterMapping
     default void afterUpdateContact(ContactRequestDTO dto, @MappingTarget Contact contact) {
@@ -77,7 +80,7 @@ public interface ContactMapper {
         String firstName = contact.getFirstName() != null ? contact.getFirstName().trim() : "";
         String lastName = contact.getLastName() != null ? contact.getLastName().trim() : "";
         contact.setDisplayName((firstName + " " + lastName).trim());
-        
+
         // Link child entities to parent contact
         if (contact.getPhoneNumbers() != null) {
             contact.getPhoneNumbers().forEach(phone -> phone.setContact(contact));
@@ -94,5 +97,9 @@ public interface ContactMapper {
         if (contact.getSignificantDates() != null) {
             contact.getSignificantDates().forEach(date -> date.setContact(contact));
         }
+        if (contact.getLabels() != null) {
+            contact.getLabels().forEach(label -> contact.addLabel(label));
+        }
+
     }
 }

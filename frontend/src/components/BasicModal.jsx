@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Modal from "@mui/material/Modal";
 import DevicesIcon from "@mui/icons-material/Devices";
-import { Avatar, Button } from "@mui/material";
+import { Avatar,CircularProgress, Button } from "@mui/material";
 
 // Hardcoded avatar styles
 const avatarStyles = [
@@ -29,6 +29,7 @@ export default function BasicModal({ open, handleClose, register, setValue }) {
   const [selectedImage, setSelectedImage] = useState(null);
   const [activeTab, setActiveTab] = useState(null);
   const fileInputRef = useRef(null);
+  const [loading, setLoading] = useState(true);
 
   // Generate variations from styles
   const variations = useMemo(() => {
@@ -56,6 +57,31 @@ export default function BasicModal({ open, handleClose, register, setValue }) {
 
     return generated;
   }, []);
+
+  useEffect(() => {
+    if (open) {
+      setActiveTab("illustrations");
+      setLoading(true);
+
+      let loadedCount = 0;
+      variations.forEach((v) => {
+        const img = new Image();
+        img.src = v.uri;
+        img.onload = () => {
+          loadedCount++;
+          if (loadedCount === variations.length) {
+            setLoading(false);
+          }
+        };
+        img.onerror = () => {
+          loadedCount++;
+          if (loadedCount === variations.length) {
+            setLoading(false);
+          }
+        };
+      });
+    }
+  }, [open, variations]);
 
   const handleClick = (uri) => {
     setSelectedImage(uri);
@@ -135,29 +161,38 @@ export default function BasicModal({ open, handleClose, register, setValue }) {
           </div>
 
           {/* Variations grouped by style */}
-          {activeTab === "illustrations" && (
-            <div className="flex flex-col gap-4">
-              {avatarStyles.map((style) => (
-                <div key={style.name}>
-                  <h3 className="text-sm font-medium mb-2">
-                    {style.name.toUpperCase()}
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {variations
-                      .filter((v) => v.styleName === style.name)
-                      .map((v) => (
-                        <img
-                          onClick={() => handleClick(v.uri)}
-                          key={`${v.styleName}-${v.seed}`}
-                          src={v.uri}
-                          alt={`${v.styleName}-${v.seed}`}
-                          className="w-20 h-20 cursor-pointer hover:scale-105 transition rounded-xl"
-                        />
-                      ))}
-                  </div>
-                </div>
-              ))}
+          {loading ? (
+            <div className="flex justify-center items-center h-full">
+              <CircularProgress />
             </div>
+          ) : (
+            <>
+              {activeTab === "illustrations" && (
+                <div className="flex flex-col gap-4">
+                  {avatarStyles.map((style) => (
+                    <div key={style.name}>
+                      <h3 className="text-sm font-medium mb-2">
+                        {style.name.toUpperCase()}
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {variations
+                          .filter((v) => v.styleName === style.name)
+                          .map((v) => (
+                            <img
+                              onClick={() => handleClick(v.uri)}
+                              key={`${v.styleName}-${v.seed}`}
+                              src={v.uri}
+                              alt={`${v.styleName}-${v.seed}`}
+                              loading="lazy"
+                              className="w-20 h-20 cursor-pointer hover:scale-105 transition rounded-xl"
+                            />
+                          ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
           )}
 
           {/* Variations grouped by style */}

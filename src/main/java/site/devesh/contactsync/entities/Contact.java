@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,7 +19,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class Contact {
-
 
     @Id
     @Column(name = "id", updatable = false, nullable = false)
@@ -54,7 +54,6 @@ public class Contact {
     @OneToMany(mappedBy = "contact", cascade = CascadeType.ALL)
     private List<Email> emails;
 
-
     @OneToMany(mappedBy = "contact", cascade = CascadeType.ALL)
     private List<Address> addresses;
 
@@ -64,12 +63,8 @@ public class Contact {
     @OneToMany(mappedBy = "contact", cascade = CascadeType.ALL)
     private List<SignificantDate> significantDates;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
-    @JoinTable(
-            name = "contact_labels",
-            joinColumns = @JoinColumn(name= "contact_id"),
-            inverseJoinColumns = @JoinColumn(name = "label_id")
-    )
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE })
+    @JoinTable(name = "contact_labels", joinColumns = @JoinColumn(name = "contact_id"), inverseJoinColumns = @JoinColumn(name = "label_id"))
     private List<Label> labels;
 
     @PrePersist
@@ -78,4 +73,21 @@ public class Contact {
             this.id = UUID.randomUUID().toString();
         }
     }
+
+    public void addLabel(Label label) {
+        if (labels == null) {
+            labels = new ArrayList<>();
+        }
+        if (!labels.contains(label)) {
+            labels.add(label);
+            label.addContact(this); // Keep the reverse link in sync
+        }
+    }
+
+    public void removeLabel(Label label) {
+        if (labels != null && labels.remove(label)) {
+            label.removeContact(this);
+        }
+    }
+
 }
