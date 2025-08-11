@@ -11,10 +11,11 @@ export const STATUSES = Object.freeze({
 const initialState = {
   data: [],
   status: STATUSES.IDLE,
+  // Track contact-label associations for instant updates
+  contactLabels: {}, // { contactId: [labelId1, labelId2, ...] }
 };
 
-// Thunks
-
+// Existing Thunks
 export const fetchLabels = createAsyncThunk("labels/fetch", async () => {
   return await labelService.getLabels();
 });
@@ -23,21 +24,71 @@ export const addLabel = createAsyncThunk("labels/add", async (data) => {
   return await labelService.createLabel(data);
 });
 
-// export const updateContact = createAsyncThunk(
-//   "contact/update",
-//   async (data) => {
-//     return await contactService.updateContact(data);
-//   }
-// );
+// New Thunk for toggling label assignment to contacts
+export const toggleLabelForContact = createAsyncThunk(
+  "labels/toggleForContact",
+  async ({ contactId, labelId, isSelected }) => {
+    // Call your API to assign/unassign label to contact
+    const response = await contactService.toggleContactLabel({
+      contactId,
+      labelId,
+      isSelected
+    });
+    return { contactId, labelId, isSelected, ...response };
+  }
+);
 
+// New Thunk to fetch contact labels (if needed separately)
+export const fetchContactLabels = createAsyncThunk(
+  "labels/fetchContactLabels",
+  async (contactId) => {
+    const labels = await contactService.getContactLabels(contactId);
+    return { contactId, labels };
+  }
+);
 
 const labelSlice = createSlice({
   name: "label",
   initialState: initialState,
 
-  reducers: {},
+  reducers: {
+    // Synchronous action for instant UI updates
+    toggleLabelSelection: (state, action) => {
+      const { contactId, labelId, isSelected } = action.payload;
+      
+      if (!state.contactLabels[contactId]) {
+        state.contactLabels[contactId] = [];
+      }
+      
+      if (isSelected) {
+        // Add label to contact
+        if (!state.contactLabels[contactId].includes(labelId)) {
+          state.contactLabels[contactId].push(labelId);
+        }
+      } else {
+        // Remove label from contact
+        state.contactLabels[contactId] = state.contactLabels[contactId].filter(
+          id => id !== labelId
+        );
+      }
+    },
+
+    // Set contact labels (useful for initialization)
+    setContactLabels: (state, action) => {
+      const { contactId, labelIds } = action.payload;
+      state.contactLabels[contactId] = labelIds;
+    },
+
+    // Clear contact labels when needed
+    clearContactLabels: (state, action) => {
+      const { contactId } = action.payload;
+      delete state.contactLabels[contactId];
+    }
+  },
+
   extraReducers: (builder) => {
     builder
+      // Existing cases
       .addCase(fetchLabels.pending, (state) => {
         state.status = STATUSES.LOADING;
       })
@@ -53,39 +104,71 @@ const labelSlice = createSlice({
         state.data.push(action.payload);
       })
 
-      // .addCase(updateContact.fulfilled, (state, action) => {
-      //   const updatedContact = action.payload;
-      //   const index = state.data.findIndex((c) => c.id === updatedContact.id);
-      //   if (index !== -1) {
-      //     state.data[index] = updatedContact;
-      //   }
-      // })
+      // New cases for label toggling
+      .addCase(toggleLabelForContact.pending, (state, action) => {
+        // Optimistic update already done by synchronous action
+        // This ensures the change persists during API call
+        const { contactId, labelId, isSelected } = action.meta.arg;
+        
+        if (!state.contactLabels[contactId]) {
+          state.contactLabels[contactId] = [];
+        }
+        
+        if (isSelected) {
+          if (!state.contactLabels[contactId].includes(labelId)) {
+            state.contactLabels[contactId].push(labelId);
+          }
+        } else {
+          state.contactLabels[contactId] = state.contactLabels[contactId].filter(
+            id => id !== labelId
+          );
+        }
+      })
 
-      
-      // .addCase(toggleFavourite.pending, (state, action) => {
-      //   const { contactId, newFavouriteStatus } = action.meta.arg;
-      //   const contact = state.data.find((c) => c.id === contactId);
-      //   if (contact) {
-      //     contact.isFavourite = newFavouriteStatus; // instant change
-      //   }
-      // })
-      // .addCase(toggleFavourite.rejected, (state, action) => {
-      //   const { contactId, newFavouriteStatus } = action.meta.arg;
-      //   const contact = state.data.find((c) => c.id === contactId);
-      //   if (contact) {
-      //     contact.isFavourite = !newFavouriteStatus; // revert if failed
-      //   }
-      // })
-      // .addCase(toggleFavourite.fulfilled, (state, action) => {
-      //   // Optional: trust server and re-sync in case of mismatch
-      //   const { contactId, newFavouriteStatus } = action.payload;
-      //   const contact = state.data.find((c) => c.id === contactId);
-      //   if (contact) {
-      //     contact.isFavourite = newFavouriteStatus;
-      //   }
-      // });
+      .addCase(toggleLabelForContact.fulfilled, (state, action) => {
+        // API call successful - state should already be correct from pending
+        // Optional: sync with server response if needed
+        const { contactId, labelId, isSelected } = action.payload;
+        // Trust the optimistic update unless server returns different state
+      })
+
+      .addCase(toggleLabelForContact.rejected, (state, action) => {
+        // Revert the optimistic update on failure
+        const { contactId, labelId, isSelected } = action.meta.arg;
+        
+        if (state.contactLabels[contactId]) {
+          if (isSelected) {
+            // Remove the label that failed to be added
+            state.contactLabels[contactId] = state.contactLabels[contactId].filter(
+              id => id !== labelId
+            );
+          } else {
+            // Re-add the label that failed to be removed
+            if (!state.contactLabels[contactId].includes(labelId)) {
+              state.contactLabels[contactId].push(labelId);
+            }
+          }
+        }
+      })
+
+      .addCase(fetchContactLabels.fulfilled, (state, action) => {
+        const { contactId, labels } = action.payload;
+        state.contactLabels[contactId] = labels.map(label => label.id);
+      });
   },
 });
 
-export const { setContacts, setStatus } = labelSlice.actions;
+export const { 
+  toggleLabelSelection, 
+  setContactLabels, 
+  clearContactLabels 
+} = labelSlice.actions;
+
 export default labelSlice.reducer;
+
+// Selectors for easy access
+export const selectContactLabels = (state, contactId) => 
+  state.label.contactLabels[contactId] || [];
+
+export const selectIsLabelAssigned = (state, contactId, labelId) => 
+  state.label.contactLabels[contactId]?.includes(labelId) || false;

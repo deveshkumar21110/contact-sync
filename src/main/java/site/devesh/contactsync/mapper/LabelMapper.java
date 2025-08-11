@@ -12,8 +12,9 @@ public interface LabelMapper {
 
     // Ignore contacts list to avoid infinite recursion
     @Mapping(target = "contacts", ignore = true)
+    @Mapping(target = "appUser", ignore = true)
     Label toEntity(LabelDTO dto);
-
+    
     LabelDTO toDto(Label entity);
 
     List<Label> toEntityList(List<LabelDTO> dtos);

@@ -28,8 +28,12 @@ public class LabelServiceImpl implements LabelService {
         }
 
         Label newLabel = labelMapper.toEntity(labelDTO);
+        
+        // set current AppUser
+        AppUser user = userMapper.toAppUser(userDetailsService.getCurrentUser());
+        newLabel.setAppUser(user);
+        
         Label savedLabel = labelRepo.save(newLabel);
-
         return labelMapper.toDto(savedLabel);
     }
 

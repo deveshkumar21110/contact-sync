@@ -12,5 +12,7 @@ public interface LabelRepo extends JpaRepository<Label,String> {
     Label findByName(String name);
     List<Label> findByAppUser(AppUser user);
     boolean existsByName(String name);
+
+    Label findByNameAndAppUser(String name, AppUser appUser);
     
 }

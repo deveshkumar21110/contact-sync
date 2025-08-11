@@ -120,35 +120,44 @@ public class ContactServiceImpl implements ContactService {
             return;
         }
 
+        // Get current user
+        AppUserDto currentUserDto = userDetailsService.getCurrentUser();
+        AppUser currentUser = userRepo.findByEmail(currentUserDto.getEmail());
+        if (currentUser == null) {
+            throw new RuntimeException("Current user not found");
+        }
+
         List<Label> labels = new ArrayList<>();
 
         for (LabelDTO labelDTO : labelDTOs) {
             Label label = null;
 
-            // If label has an ID, try to find existing label
+            // If label has an ID, try to find existing label belonging to current user
             if (labelDTO.getId() != null) {
                 Optional<Label> existingLabel = labelRepo.findById(labelDTO.getId());
-                if (existingLabel.isPresent()) {
+                if (existingLabel.isPresent() &&
+                        existingLabel.get().getAppUser() != null &&
+                        existingLabel.get().getAppUser().equals(currentUser)) {
                     label = existingLabel.get();
                 }
             }
 
-            // If no existing label found by ID, try to find by name
+            // If no existing label found by ID, try to find by name for current user
             if (label == null && labelDTO.getName() != null && !labelDTO.getName().trim().isEmpty()) {
-                label = labelRepo.findByName(labelDTO.getName().trim());
+                label = labelRepo.findByNameAndAppUser(labelDTO.getName().trim(), currentUser);
             }
 
-            // If still no label found, create a new one
+            // If still no label found, create a new one for current user
             if (label == null && labelDTO.getName() != null && !labelDTO.getName().trim().isEmpty()) {
                 label = new Label();
                 label.setName(labelDTO.getName().trim());
-                label = labelRepo.save(label);// saving new label
+                label.setAppUser(currentUser); // Link to current user
+                label = labelRepo.save(label); // saving new label
             }
 
             if (label != null) {
                 labels.add(label);
             }
-
         }
 
         contact.setLabels(labels);
