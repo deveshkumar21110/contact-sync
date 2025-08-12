@@ -28,8 +28,8 @@ export const authService = {
   // },
 
   getCurrentToken: async () => {
-    const token  = Cookies.get(TOKEN_KEY);
-    if(token) {
+    const token = Cookies.get(TOKEN_KEY);
+    if (token) {
       // console.log("Current token:", token);
       return token;
     }
@@ -54,7 +54,7 @@ export const authService = {
       if (!refreshToken) throw new Error("No refresh token available");
 
       const response = await api.post("/auth/v1/refreshToken", {
-        token: refreshToken
+        token: refreshToken,
       });
 
       const newToken = response.data?.accessToken;
@@ -95,6 +95,34 @@ export const authService = {
         });
 
         // Store refresh token in cookies
+        Cookies.set("refresh_token", token, {
+          expires: 30, // usually longer than access token
+          secure: true,
+          sameSite: "Lax",
+        });
+
+        // set token in axios header for future request
+        api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+        return response.data;
+      }
+    } catch (error) {
+      // Optional: clear data on failed login attempt
+      authService.logout();
+      throw error;
+    }
+  },
+
+  signup: async (Credentials) => {
+    try {
+      const response = await api.post("/auth/v1/signup", Credentials);
+      console.log("SignUp response: ", response.data);
+      if (response.data) {
+        const { accessToken, token } = response.data;
+        Cookies.set("access_token", accessToken, {
+          expires: 0.0105,
+          secure: true,
+          sameSite: "Lax",
+        });
         Cookies.set("refresh_token", token, {
           expires: 30, // usually longer than access token
           secure: true,

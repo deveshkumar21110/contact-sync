@@ -9,6 +9,8 @@ import {
   Phone,
   LocationOnOutlined,
   LinkOutlined,
+  LabelOutlined,
+  PermIdentityOutlined,
 } from "@mui/icons-material";
 import { Avatar, TextField, Stack } from "@mui/material";
 import Container from "../components/Container";
@@ -33,10 +35,13 @@ function CreateContactPage() {
   const openModal = () => {
     setOpen(true);
   };
+
   const openLabelModal = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const closeModal = () => setOpen(false);
+
   const closeLabelModal = () => {
     setAnchorEl(null);
   };
@@ -45,9 +50,9 @@ function CreateContactPage() {
     const currentValue = getValues("isFavourite");
     const newValue = !currentValue;
     setValue("isFavourite", newValue);
-    console.log("isFavourite toggled to: " + newValue);
   };
 
+  // React Hook Form setup with labels included
   const { register, setValue, getValues, handleSubmit, control, watch } =
     useForm({
       defaultValues: {
@@ -65,11 +70,14 @@ function CreateContactPage() {
           },
         ],
         websites: [{ url: "" }],
+        labels: [],
       },
     });
 
   const isFavourite = watch("isFavourite");
+  const selectedLabels = watch("labels") || [];
 
+  // Field arrays for dynamic form sections
   const { fields: emailFields, append: appendEmail } = useFieldArray({
     control,
     name: "emails",
@@ -90,15 +98,7 @@ function CreateContactPage() {
     name: "websites",
   });
 
-  const { fields: labels, append: appendLabel } = useFieldArray({
-    control,
-    name: "labels",
-  });
-
-  const addLabelField = () => {
-    appendLabel({ name: "" });
-  };
-
+  // Add field functions
   const addEmailField = () => {
     appendEmail({ email: "" });
   };
@@ -122,16 +122,23 @@ function CreateContactPage() {
     appendWebsite({ url: "" });
   };
 
+  // Remove label function
+  const removeLabel = (indexToRemove) => {
+    const updatedLabels = selectedLabels.filter(
+      (_, index) => index !== indexToRemove
+    );
+    setValue("labels", updatedLabels);
+  };
+
   const onSubmit = async (data) => {
-    // Convert flat form data into backend-expected format
+    // Clean up the data before sending
     const payload = {
       firstName: data.firstName,
       lastName: data.lastName,
       jobTitle: data.jobTitle || "",
       company: data.company,
-      imageUrl: data.imageUrl || "", // handle image upload later
+      imageUrl: data.imageUrl || "",
       isFavourite: data.isFavourite,
-
       emails: data.emails.filter((email) => email.email.trim() !== ""),
       phoneNumbers: data.phoneNumbers.filter(
         (phone) => phone.number.trim() !== ""
@@ -144,7 +151,11 @@ function CreateContactPage() {
       ),
       websites: data.websites.filter((website) => website.url.trim() !== ""),
       significantDates: [],
-      labels: data.labels.filter((label) => label.name.trim() != ""),
+      // Convert label objects to the format expected by your backend
+      labels: data.labels.map((label) => ({
+        id: label.id,
+        name: label.name,
+      })),
     };
 
     try {
@@ -158,18 +169,18 @@ function CreateContactPage() {
 
   return (
     <Container>
-      <div className="pl-6 w-1/2 bg-white ">
+      <div className="pl-6 w-1/2 bg-white">
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Header */}
-          <div className=" bg-white  flex justify-between items-center">
+          <div className="bg-white flex justify-between items-center">
             <ArrowBack
               onClick={() => navigate(-1)}
               className="cursor-pointer"
             />
             <div className="flex gap-4 justify-center items-center">
-              <button type="button" onClick={handleIsFavourite}>
+              <button className="p-2 rounded-full hover:rounded-full hover:bg-gray-100" type="button" onClick={handleIsFavourite}>
                 {isFavourite ? (
-                  <Star fontSize="medium" sx={{ color: blue[700] }} />
+                  <Star fontSize="medium" sx={{ color: blue[800] }} />
                 ) : (
                   <StarBorder fontSize="medium" className="text-gray-700" />
                 )}
@@ -210,50 +221,71 @@ function CreateContactPage() {
 
           {/* Form Fields */}
           <div className="flex flex-col gap-4">
-            {/* Label */}
-            <div >
-              <span onClick={openLabelModal} className=" cursor-pointer inline-block text-gray-700 border border-gray-500 rounded-xl px-4 py-2">
-                + Label
-              </span>
-            </div>
+            {/* Labels Section */}
+            <div className="space-y-2">
+              {/* Label Button */}
+              <button
+                type="button"
+                onClick={openLabelModal}
+                className="inline-flex items-center px-2 py-1 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <Add className="w-2 h-2 mr-2" />
+                {selectedLabels.length === 0
+                  ? "Label"
+                  : `Labels (${selectedLabels.length})`}
+              </button>
 
-            {/* Popover OUTSIDE clickable div */}
-            <LabelModal
-              anchorEl={anchorEl}
-              open={openLabel}
-              handleClose={closeLabelModal}
-              register={register}
-              setValue={setValue}
-            />
+              {/* Selected Labels Display */}
+              {selectedLabels.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {selectedLabels.map((label, index) => (
+                    <span
+                      key={label.id || index}
+                      onClick={() => removeLabel(index)}
+                      className="inline-flex cursor-pointer items-center px-2 py-1 text-xs font-medium  text-blue-800 rounded-lg border-2 mt-1 border-black"
+                    >
+                      <LabelOutlined
+                        className="mx-2 text-gray-400"
+                        fontSize="small"
+                      />
+                      {label.name}
+                      <button
+                        type="button"
+                        onClick={() => removeLabel(index)}
+                        className="ml-2 text-blue-600 hover:text-blue-800"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Label Modal - Pass react-hook-form props */}
+              <LabelModal
+                anchorEl={anchorEl}
+                open={openLabel}
+                handleClose={closeLabelModal}
+                control={control}
+                setValue={setValue}
+                watch={watch}
+              />
+            </div>
 
             {/* Name */}
             <Stack spacing={2}>
-              <Stack
-                direction="row"
-                spacing={2}
-                alignItems="center"
-                sx={{ width: "100%" }}
-              >
-                <Avatar variant="plain" />
-                <TextField
-                  {...register("firstName")}
-                  label="First name"
-                  sx={{ flexGrow: 1 }}
-                />
-              </Stack>
-              <Stack
-                direction="row"
-                spacing={2}
-                alignItems="center"
-                sx={{ width: "100%" }}
-              >
-                <div style={{ width: 40 }}></div>
-                <TextField
-                  {...register("lastName")}
-                  label="Last name"
-                  sx={{ flexGrow: 1 }}
-                />
-              </Stack>
+              <IconTextField
+                icon={<PermIdentityOutlined />}
+                label="First name"
+                name="firstName"
+                register={register}
+              />
+              <IconTextField
+                icon={<div />} // empty placeholder to keep alignment
+                label="Last name"
+                name="lastName"
+                register={register}
+              />
             </Stack>
 
             {/* Company & Job Title */}

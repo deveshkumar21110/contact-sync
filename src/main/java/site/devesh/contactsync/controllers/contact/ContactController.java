@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import site.devesh.contactsync.model.ContactPreviewDTO;
 import site.devesh.contactsync.request.ContactRequestDTO;
 import site.devesh.contactsync.response.ContactResponseDTO;
 import site.devesh.contactsync.services.ContactService;
@@ -46,6 +48,16 @@ public class ContactController {
         try{
             List<ContactResponseDTO> contactResponseDTOS = contactService.getContactByUser();
             return ResponseEntity.ok(contactResponseDTOS);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/preview/all")
+    public ResponseEntity<?> getAllContactsPreviewOfUser(){
+        try{
+            List<ContactPreviewDTO> contactPreviewDTOs = contactService.getContactPreviewByUser();
+            return ResponseEntity.ok(contactPreviewDTOs);
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

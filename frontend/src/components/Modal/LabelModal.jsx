@@ -1,144 +1,183 @@
 import * as React from "react";
-import Popover from "@mui/material/Popover";
-import Typography from "@mui/material/Typography";
-import LabelIcon from "@mui/icons-material/Label";
-import { LabelOutlined } from "@mui/icons-material";
-import { CircularProgress } from "@mui/material";
-import { fetchLabels, addLabel, toggleLabelSelection, STATUSES } from "../../redux/labelSlice";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
-import { useCallback } from "react";
+import Popover from "@mui/material/Popover";
+import { CircularProgress, TextField, Checkbox } from "@mui/material";
+import { LabelOutlined, Add } from "@mui/icons-material";
+import { fetchLabels, addLabel, STATUSES } from "../../redux/labelSlice";
 
 export default function LabelModal({
   anchorEl,
   open,
   handleClose,
-  register,
-  setValue,
-  contactId, // Added missing contactId prop
+  control,      
+  setValue,     
+  watch,
 }) {
-  const id = open ? "simple-popover" : undefined;
-
-  const [selectedLabels, setSelectedLabels] = useState([]);
-
   const dispatch = useDispatch();
   const { data: labels, status } = useSelector((state) => state.label);
+  
+  const [newLabelName, setNewLabelName] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
 
+  // Watch the current form value for labels
+  const currentLabels = watch("labels") || [];
+
+  // Load labels on mount
   useEffect(() => {
     if (labels.length === 0 && status === STATUSES.IDLE) {
       dispatch(fetchLabels());
     }
   }, [dispatch, labels.length, status]);
 
-  // Fixed: Proper label selection handler
-  const handleSelectedLabel = useCallback(
-    (labelId) => {
-      // Update local state for instant UI feedback
-      setSelectedLabels(prev => {
-        const isSelected = prev.includes(labelId);
-        if (isSelected) {
-          return prev.filter(id => id !== labelId);
-        } else {
-          return [...prev, labelId];
-        }
-      });
+  // Handle label selection toggle
+  const handleLabelToggle = (labelId) => {
+    const isCurrentlySelected = currentLabels.some(label => 
+      typeof label === 'object' ? label.id === labelId : label === labelId
+    );
 
-      // Dispatch proper action for label toggle
-      dispatch(toggleLabelSelection({ 
-        contactId, 
-        labelId,
-        isSelected: !selectedLabels.includes(labelId)
-      }));
-
-      // Update form value if using react-hook-form
-      if (setValue) {
-        setValue('labels', selectedLabels.includes(labelId) 
-          ? selectedLabels.filter(id => id !== labelId)
-          : [...selectedLabels, labelId]
-        );
-      }
-    },
-    [dispatch, contactId, selectedLabels, setValue]
-  );
-
-  const handleCreateLabel = useCallback(() => {
-    // Handle label creation
-    const labelName = prompt("Enter label name:");
-    if (labelName?.trim()) {
-      dispatch(addLabel({ name: labelName.trim() }));
+    let updatedLabels;
+    if (isCurrentlySelected) {
+      // Remove label
+      updatedLabels = currentLabels.filter(label => 
+        typeof label === 'object' ? label.id !== labelId : label !== labelId
+      );
+    } else {
+      // Add label - store as object with id and name for easier handling
+      const labelToAdd = labels.find(l => l.id === labelId);
+      updatedLabels = [...currentLabels, { id: labelId, name: labelToAdd.name }];
     }
-  }, [dispatch]);
+
+    setValue("labels", updatedLabels, { shouldValidate: true });
+  };
+
+  // Create new label
+  const handleCreateLabel = async () => {
+    if (!newLabelName.trim()) return;
+    
+    setIsCreating(true);
+    try {
+      const result = await dispatch(addLabel({ name: newLabelName.trim() })).unwrap();
+      setNewLabelName("");
+      
+      // Auto-select the newly created label
+      const newLabel = { id: result.id, name: result.name };
+      const updatedLabels = [...currentLabels, newLabel];
+      setValue("labels", updatedLabels, { shouldValidate: true });
+    } catch (error) {
+      console.error("Failed to create label:", error);
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleCreateLabel();
+    }
+  };
+
+  // Check if a label is selected
+  const isLabelSelected = (labelId) => {
+    return currentLabels.some(label => 
+      typeof label === 'object' ? label.id === labelId : label === labelId
+    );
+  };
 
   if (status === STATUSES.LOADING) {
     return (
-      <div className="flex justify-center items-center h-40">
-        <CircularProgress />
-      </div>
+      <Popover
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      >
+        <div className="flex justify-center items-center p-8">
+          <CircularProgress size={24} />
+        </div>
+      </Popover>
     );
   }
 
   return (
     <Popover
-      id={id}
       open={open}
       anchorEl={anchorEl}
       onClose={handleClose}
-      anchorOrigin={{
-        vertical: "bottom",
-        horizontal: "left",
-      }}
-      transitionDuration={200}
-      disableAutoFocus
-      disableEnforceFocus
+      anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      transformOrigin={{ vertical: "top", horizontal: "left" }}
     >
-      <div className="w-64 max-h-64 overflow-y-auto p-3 bg-gray-100 text-gray-700 font-normal">
-        <div className="pb-3 text-sm font-medium">Manage labels</div>
-        <div className="flex-col">
-          {labels.map((label, index) => {
-            const isSelected = selectedLabels.includes(label.id);
-            
-            return (
-              <button
-                key={label.id || index}
-                onClick={() => handleSelectedLabel(label.id)} // ✅ Pass labelId
-                className={`w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-200 text-left ${
-                  isSelected ? 'bg-blue-50 border-l-4 border-blue-500' : ''
-                }`} // ✅ Visual feedback for selection
+      <div className="w-72 max-h-80 bg-white shadow-lg rounded-lg overflow-hidden">
+        {/* Header */}
+        <div className="px-4 py-3 border-b bg-gray-50">
+          <h3 className="text-sm font-medium text-gray-900">Select Labels</h3>
+        </div>
+
+        {/* Labels List */}
+        <div className="max-h-48 overflow-y-auto">
+          {labels.length === 0 ? (
+            <div className="px-4 py-6 text-center text-gray-500 text-sm">
+              No labels yet. Create your first label below.
+            </div>
+          ) : (
+            labels.map((label) => (
+              <div
+                key={label.id}
+                className="flex items-center px-4 py-2 hover:bg-gray-50 cursor-pointer"
+                onClick={() => handleLabelToggle(label.id)}
               >
-                <LabelOutlined
-                  sx={{ 
-                    backgroundColor: "transparent",
-                    color: isSelected ? 'blue' : 'inherit' // ✅ Selected state styling
-                  }}
-                  fontSize="small"
+                <LabelOutlined 
+                  className="mx-2 text-gray-800" 
+                  fontSize="small" 
                 />
-                <span className={`text-sm font-medium ${
-                  isSelected ? 'text-blue-700' : 'text-gray-900'
-                }`}>
-                  {label.name || label} {/* Handle both object and string labels */}
+                <span className="text-sm text-gray-700 flex-1">
+                  {label.name}
                 </span>
-              </button>
-            );
-          })}
-          
-          {/* Hidden input for form integration */}
-          <input 
-            type="hidden" 
-            value={selectedLabels.join(',')} 
-            {...(register && register('labels'))}
-          />
+                <Checkbox
+                  checked={isLabelSelected(label.id)}
+                  onChange={() => handleLabelToggle(label.id)}
+                  size="small"
+                  color="primary"
+                />
+              </div>
+            ))
+          )}
         </div>
-        
-        <div className="border-t border-t-gray-300 p-1">
-          <button 
-            onClick={handleCreateLabel}
-            className="text-sm font-medium rounded-sm text-gray-900 flex px-2 py-1 items-center hover:bg-gray-200 w-full"
-          >
-            <span className="pr-4 text-xl">+</span>
-            Create label
-          </button>
+
+        {/* Create New Label */}
+        <div className="border-t bg-gray-50 px-4 py-3">
+          <div className="flex items-center space-x-2">
+            <TextField
+              size="small"
+              placeholder="Create new label"
+              value={newLabelName}
+              onChange={(e) => setNewLabelName(e.target.value)}
+              onKeyDown={handleKeyPress}
+              disabled={isCreating}
+              sx={{ flexGrow: 1 }}
+            />
+            <button
+              type="button"
+              onClick={handleCreateLabel}
+              disabled={!newLabelName.trim() || isCreating}
+              className="flex items-center justify-center w-8 h-8 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+            >
+              {isCreating ? (
+                <CircularProgress size={16} color="inherit" />
+              ) : (
+                <Add fontSize="small" />
+              )}
+            </button>
+          </div>
         </div>
+
+        {/* Selected Count */}
+        {/* {currentLabels.length > 0 && (
+          <div className="px-4 py-2 bg-blue-50 border-t text-xs text-blue-600">
+            {currentLabels.length} label{currentLabels.length !== 1 ? 's' : ''} selected
+          </div>
+        )} */}
       </div>
     </Popover>
   );

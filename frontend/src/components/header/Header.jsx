@@ -10,12 +10,13 @@ import { useSelector } from "react-redux";
 import LogoutBtn from "./LogoutBtn";
 import HelpIcon from "@mui/icons-material/Help";
 import { authService } from "../../Services/authService";
+import { NavLink, useNavigate } from "react-router-dom";
+import { HelpOutlineOutlined } from "@mui/icons-material";
 
 function Header({ onMenuClick }) {
   const authStatus = useSelector((state) => state.auth.status);
   // console.log("Auth Status:", authStatus);
   const [currentUser, setCurrentUser] = useState(null);
-
   useEffect(() => {
     const fetchUser = async () => {
       const user = await authService.getCurrentUser();
@@ -30,10 +31,23 @@ function Header({ onMenuClick }) {
         {/* Left section */}
         <div className="flex items-center justify-center pr-8">
           <div className="px-2 py-1 pr-4">
-          <MenuIcon sx={{ fontSize: 28, cursor: "pointer" }} onClick={onMenuClick} />
+            <MenuIcon
+              sx={{ fontSize: 28, cursor: "pointer" }}
+              onClick={onMenuClick}
+            />
           </div>
-          <img src={personImage} alt="Person Icon" className="w-10 h-10 pr-1" />
-          <h1 className="text-2xl text-gray-600 pl-1">Contacts</h1>
+          <NavLink
+            to="/"
+            na
+            className="flex items-center justify-centerti"
+          >
+            <img
+              src={personImage}
+              alt="Person Icon"
+              className="w-10 h-10 pr-1"
+            />
+            <h1 className="text-2xl text-gray-600 pl-1">Contacts</h1>
+          </NavLink>
         </div>
 
         {/* Middle - Search */}
@@ -68,7 +82,7 @@ function Header({ onMenuClick }) {
           {authStatus && <LogoutBtn />}
 
           <div className="px-2 py-1 text-gray-600">
-            <HelpIcon sx={{ fontSize: 28 }} />
+            <HelpOutlineOutlined sx={{ fontSize: 28 }} />
           </div>
 
           <div className="px-2 py-1 text-gray-600">

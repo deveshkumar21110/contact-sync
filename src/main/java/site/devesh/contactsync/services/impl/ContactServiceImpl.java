@@ -1,4 +1,23 @@
 package site.devesh.contactsync.services.impl;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import site.devesh.contactsync.entities.AppUser;
+import site.devesh.contactsync.entities.Contact;
+import site.devesh.contactsync.mapper.ContactMapper;
+import site.devesh.contactsync.mapper.UserMapper;
+import site.devesh.contactsync.model.AppUserDto;
+import site.devesh.contactsync.model.ContactPreviewDTO;
+import site.devesh.contactsync.model.LabelDTO;
+import site.devesh.contactsync.repo.ContactRepo;
+import site.devesh.contactsync.repo.LabelRepo;
+import site.devesh.contactsync.repo.UserRepo;
+import site.devesh.contactsync.request.ContactRequestDTO;
+import site.devesh.contactsync.response.ContactResponseDTO;
+import site.devesh.contactsync.services.ContactService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +29,7 @@ import site.devesh.contactsync.entities.Label;
 import site.devesh.contactsync.mapper.ContactMapper;
 import site.devesh.contactsync.mapper.UserMapper;
 import site.devesh.contactsync.model.AppUserDto;
+import site.devesh.contactsync.model.ContactPreviewDTO;
 import site.devesh.contactsync.model.LabelDTO;
 import site.devesh.contactsync.repo.ContactRepo;
 import site.devesh.contactsync.repo.LabelRepo;
@@ -19,10 +39,12 @@ import site.devesh.contactsync.response.ContactResponseDTO;
 import site.devesh.contactsync.services.ContactService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ContactServiceImpl implements ContactService {
 
@@ -75,8 +97,26 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public List<ContactResponseDTO> getContactByUser() {
-        AppUser user = userMapper.toAppUser(userDetailsService.getCurrentUser());
-        return contactMapper.toContactResponseDTOList(contactRepo.findContactByUser(user));
+        try {
+            AppUser user = userMapper.toAppUser(userDetailsService.getCurrentUser());
+            List<Contact> contacts = contactRepo.findContactsWithAllData(user);
+            return contactMapper.toContactResponseDTOList(contacts);
+        } catch (Exception e) {
+            log.error("Error fetching contacts for user: ", e);
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ContactPreviewDTO> getContactPreviewByUser() {
+        String currentUserId = userDetailsService.getCurrentUser().getId();
+
+        // Execute all queries - Hibernate will merge them automatically
+        contactRepo.findContactsWithPhones(currentUserId);
+        List<Contact> contacts = contactRepo.findContactsWithEmails(currentUserId);
+
+        return contactMapper.toContactPreviewDTOList(contacts);
     }
 
     @Override

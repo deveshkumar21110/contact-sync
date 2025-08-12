@@ -2,6 +2,7 @@ package site.devesh.contactsync.mapper;
 
 import org.mapstruct.*;
 import site.devesh.contactsync.entities.Contact;
+import site.devesh.contactsync.model.ContactPreviewDTO;
 import site.devesh.contactsync.request.ContactRequestDTO;
 import site.devesh.contactsync.response.ContactResponseDTO;
 import java.util.List;
@@ -45,6 +46,7 @@ public interface ContactMapper {
     ContactResponseDTO toContactResponseDTO(Contact contact);
 
     List<ContactResponseDTO> toContactResponseDTOList(List<Contact> contacts);
+    List<ContactPreviewDTO> toContactPreviewDTOList(List<Contact> contacts);
 
     // Update contact basic fields only (no collections)
     @Mapping(target = "id", ignore = true)

@@ -10,12 +10,13 @@ export const STATUSES = Object.freeze({
 const initialState = {
   data: [],
   status: STATUSES.IDLE,
+  hasFetched: false,
 };
 
 // Thunks
 
 export const fetchContacts = createAsyncThunk("contact/fetch", async () => {
-  return await contactService.getContacts();
+  return await contactService.getContactsPreview();
 });
 
 export const addContact = createAsyncThunk("contact/add", async (data) => {
@@ -51,9 +52,11 @@ const contactSlice = createSlice({
       .addCase(fetchContacts.fulfilled, (state, action) => {
         state.data = action.payload;
         state.status = STATUSES.IDLE;
+        state.hasFetched = true; 
       })
       .addCase(fetchContacts.rejected, (state) => {
         state.status = STATUSES.ERROR;
+        state.hasFetched = true;
       })
 
       .addCase(addContact.fulfilled, (state, action) => {

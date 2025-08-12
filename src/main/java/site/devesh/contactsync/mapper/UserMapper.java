@@ -8,6 +8,9 @@ import site.devesh.contactsync.model.AppUserDto;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
+    @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "username", ignore = true)
     AppUser toAppUser(AppUserDto appUserDto);
 
 }

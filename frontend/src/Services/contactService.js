@@ -13,6 +13,16 @@ export const contactService = {
             throw error;
         }
     },
+    getContactsPreview: async () =>{
+        try{
+            const response = await api.get("/api/v1/contact/preview/all");
+            // console.log("Contact Response: "+ response);
+            return response.data;
+        } catch(error){
+            console.log("Error fetching contacts: " , error);
+            throw error;
+        }
+    },
 
     addContact : async (data) => {
         try {

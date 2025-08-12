@@ -13,13 +13,17 @@ const DEFAULT_PROFILE =
 
 function Home() {
   const dispatch = useDispatch();
-  const { data: contacts, status } = useSelector((state) => state.contact);
+  const {
+    data: contacts,
+    status,
+    hasFetched,
+  } = useSelector((state) => state.contact);
 
   useEffect(() => {
-      if (contacts.length === 0 && status === STATUSES.IDLE) {
-          dispatch(fetchContacts());
-      }
-  }, [dispatch, contacts, status]);
+    if (!hasFetched && contacts.length === 0 && status === STATUSES.IDLE) {
+      dispatch(fetchContacts());
+    }
+  }, [dispatch, hasFetched, contacts.length, status]);
 
   const handleImageError = useCallback((e) => {
     e.target.onerror = null;
@@ -41,14 +45,13 @@ function Home() {
         <CircularProgress />
       </div>
     );
+  } else if (contacts.length === 0) {
+    return (
+      <div className="flex justify-center items-center h-40 text-gray-500">
+        No contact found
+      </div>
+    );
   }
-  else if (contacts.length === 0) {
-  return (
-    <div className="flex justify-center items-center h-40 text-gray-500">
-      No contact found
-    </div>
-  );
-}
 
   return (
     <div className="w-full">
@@ -59,7 +62,7 @@ function Home() {
       <div className="overflow-x-auto w-full">
         <div className="overflow-y-auto rounded-lg w-full">
           <table className="min-w-full w-full">
-            <thead className="text-base text-gray-700 sticky top-0 z-10 bg-gray-50">
+            <thead className="text-base text-gray-700 sticky top-0 z-10 border-b border-gray-300">
               <tr>
                 <th className="px-6 py-3 text-left font-medium">Name</th>
                 <th className="px-6 py-3 text-left font-medium">Phone</th>

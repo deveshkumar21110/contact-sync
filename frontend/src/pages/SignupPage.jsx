@@ -54,6 +54,7 @@ function SignupPage() {
           type="password"
           placeholder="Password"
           value={password}
+          autoComplete="new-password"
           onChange={(e) => setPassword(e.target.value)}
           className="w-full mb-4 p-2 border rounded"
           required

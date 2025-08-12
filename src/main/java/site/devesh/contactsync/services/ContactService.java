@@ -1,6 +1,8 @@
 package site.devesh.contactsync.services;
 
 import org.springframework.stereotype.Service;
+
+import site.devesh.contactsync.model.ContactPreviewDTO;
 import site.devesh.contactsync.request.ContactRequestDTO;
 import site.devesh.contactsync.response.ContactResponseDTO;
 
@@ -12,6 +14,8 @@ public interface ContactService {
     ContactResponseDTO createContact(ContactRequestDTO contactRequestDTO);
 
     List<ContactResponseDTO> getContactByUser();
+
+    List<ContactPreviewDTO> getContactPreviewByUser();
 
     ContactResponseDTO updateContact(String id, ContactRequestDTO contactRequestDTO);
 
