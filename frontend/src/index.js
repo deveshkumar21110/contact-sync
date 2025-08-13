@@ -12,7 +12,7 @@ export { default as Select } from "./components/Select";
 export {default as AddButton} from "./components/AddButton"
 export {default as IconTextField} from "./components/IconTextField"
 export {default as AddressSection} from "./components/AddressSection"
- 
+export { SnackbarProvider, useSnackbar } from "./hooks/SnackbarProvider";
 // Pages
 export { default as CreateContactPage } from "./pages/CreateContactPage";
 export { default as HomePage } from "./pages/HomePage";

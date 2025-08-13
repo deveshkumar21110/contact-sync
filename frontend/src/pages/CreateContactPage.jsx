@@ -16,7 +16,12 @@ import { Avatar, TextField, Stack } from "@mui/material";
 import Container from "../components/Container";
 import BusinessIcon from "@mui/icons-material/Business";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
-import { AddButton, AddressSection, IconTextField } from "../index";
+import {
+  AddButton,
+  AddressSection,
+  IconTextField,
+  useSnackbar,
+} from "../index";
 import { useNavigate } from "react-router-dom";
 import { blue } from "@mui/material/colors";
 import { useDispatch } from "react-redux";
@@ -25,6 +30,7 @@ import { addContact } from "../redux/contactSlice";
 import LabelModal from "../components/Modal/LabelModal";
 
 function CreateContactPage() {
+  const { showSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
@@ -158,12 +164,25 @@ function CreateContactPage() {
       })),
     };
 
+    showSnackbar("Saving contact...", {
+      severity: "info",
+      autoHideDuration: null, // keep it open until manually replaced
+    });
+
     try {
       const response = await dispatch(addContact(payload)).unwrap();
       console.log("Add contact response:", response);
+      showSnackbar("Contact created successfully!", {
+        severity: "success",
+        autoHideDuration: 3000,
+      });
       navigate("/");
     } catch (error) {
       console.error("Error adding contact: ", error);
+      showSnackbar("Failed to create contact.", {
+        severity: "error",
+        autoHideDuration: 3000,
+      });
     }
   };
 
@@ -178,7 +197,11 @@ function CreateContactPage() {
               className="cursor-pointer"
             />
             <div className="flex gap-4 justify-center items-center">
-              <button className="p-2 rounded-full hover:rounded-full hover:bg-gray-100" type="button" onClick={handleIsFavourite}>
+              <button
+                className="p-2 rounded-full hover:rounded-full hover:bg-gray-100"
+                type="button"
+                onClick={handleIsFavourite}
+              >
                 {isFavourite ? (
                   <Star fontSize="medium" sx={{ color: blue[800] }} />
                 ) : (

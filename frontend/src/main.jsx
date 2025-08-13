@@ -10,8 +10,7 @@ import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import CreateContactPage from './pages/CreateContactPage'
-import {ProtectedRoute, AuthInitializer} from './index.js';
-
+import {ProtectedRoute, AuthInitializer,SnackbarProvider} from './index.js';
 const router = createBrowserRouter(
   createRoutesFromElements(
 
@@ -28,7 +27,9 @@ createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <StrictMode>
       <AuthInitializer>
-        <RouterProvider router={router} />
+        <SnackbarProvider>
+          <RouterProvider router={router} />
+        </SnackbarProvider>
       </AuthInitializer>
     </StrictMode>
   </Provider>
