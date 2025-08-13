@@ -15,7 +15,7 @@ export default function LabelModal({
   watch,
 }) {
   const dispatch = useDispatch();
-  const { data: labels, status } = useSelector((state) => state.label);
+  const { data: labels, status,hasFetched } = useSelector((state) => state.label);
   
   const [newLabelName, setNewLabelName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
@@ -25,10 +25,10 @@ export default function LabelModal({
 
   // Load labels on mount
   useEffect(() => {
-    if (labels.length === 0 && status === STATUSES.IDLE) {
+    if (!hasFetched && status === STATUSES.IDLE) {
       dispatch(fetchLabels());
     }
-  }, [dispatch, labels.length, status]);
+  }, [dispatch, hasFetched, status]);
 
   // Handle label selection toggle
   const handleLabelToggle = (labelId) => {

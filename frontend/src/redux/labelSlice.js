@@ -11,8 +11,8 @@ export const STATUSES = Object.freeze({
 const initialState = {
   data: [],
   status: STATUSES.IDLE,
-  // Track contact-label associations for instant updates
-  contactLabels: {}, // { contactId: [labelId1, labelId2, ...] }
+  contactLabels: {}, 
+  hasFetched: false,
 };
 
 // Existing Thunks
@@ -88,16 +88,17 @@ const labelSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      // Existing cases
       .addCase(fetchLabels.pending, (state) => {
         state.status = STATUSES.LOADING;
       })
       .addCase(fetchLabels.fulfilled, (state, action) => {
         state.data = action.payload;
         state.status = STATUSES.IDLE;
+        state.hasFetched = true;
       })
       .addCase(fetchLabels.rejected, (state) => {
         state.status = STATUSES.ERROR;
+        state.hasFetched = true;
       })
 
       .addCase(addLabel.fulfilled, (state, action) => {

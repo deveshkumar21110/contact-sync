@@ -19,15 +19,15 @@ import { fetchLabels, STATUSES } from "../../redux/labelSlice";
 const Sidebar = ({ isOpen = true }) => {
   const contactCount = useSelector((state) => state.contact?.data?.length);
   const dispatch = useDispatch();
-  const { data: labels, status } = useSelector((state) => state.label);
+  const { data: labels, status, hasFetched } = useSelector((state) => state.label);
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (labels.length === 0 && status === STATUSES.IDLE) {
+    if (!hasFetched && status === STATUSES.IDLE) {
       dispatch(fetchLabels());
     }
-  }, [dispatch, labels.length, status]);
+  }, [dispatch,hasFetched, status]);
 
   return (
     <div
