@@ -13,8 +13,10 @@ export {default as AddButton} from "./components/AddButton"
 export {default as IconTextField} from "./components/IconTextField"
 export {default as AddressSection} from "./components/AddressSection"
 export { SnackbarProvider, useSnackbar } from "./hooks/SnackbarProvider";
+export {default as ContactHeader} from "./components/person/ContactHeader"
 // Pages
 export { default as CreateContactPage } from "./pages/CreateContactPage";
 export { default as HomePage } from "./pages/HomePage";
 export { default as LoginPage } from "./pages/LoginPage";
 export { default as SignupPage } from "./pages/SignupPage";
+export {default as Person} from "./pages/PersonContact"

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Header, Sidebar } from "./index";
 import { Outlet, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 function Layout() {
   const location = useLocation();
@@ -10,6 +11,10 @@ function Layout() {
   const hideHeader = noHeaderRoutes.includes(location.pathname);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);

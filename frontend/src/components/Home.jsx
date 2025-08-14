@@ -7,17 +7,19 @@ import {
   toggleFavourite,
   STATUSES,
 } from "../redux/contactSlice";
+import { Link, useNavigate } from "react-router-dom";
 
 const DEFAULT_PROFILE =
   "/contacts_product_24dp_0158CC_FILL0_wght400_GRAD0_opsz24.svg";
 
 function Home() {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
     data: contacts,
     status,
     hasFetched,
-  } = useSelector((state) => state.contact);
+  } = useSelector((state) => state.contacts);
 
   useEffect(() => {
     if (!hasFetched && contacts.length === 0 && status === STATUSES.IDLE) {
@@ -31,12 +33,19 @@ function Home() {
   }, []);
 
   const handleFavouriteToggle = useCallback(
-    (contactId, currentStatus) => {
+    (e,contactId, currentStatus) => {
+      e.stopPropagation();
       dispatch(
         toggleFavourite({ contactId, newFavouriteStatus: !currentStatus })
       );
     },
     [dispatch]
+  );
+  const handleSelectedContact = useCallback(
+    (contactId) => {
+      navigate(`/person/${contactId}`);
+    },
+    [navigate]
   );
 
   if (status === STATUSES.LOADING) {
@@ -74,7 +83,11 @@ function Home() {
             </thead>
             <tbody className="bg-white cursor-pointer">
               {contacts.map((contact) => (
-                <tr key={contact.id} className="hover:bg-gray-100 group">
+                <tr
+                  key={contact.id}
+                  className="hover:bg-gray-100 group"
+                  onClick={() => handleSelectedContact(contact.id)}
+                >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
@@ -105,8 +118,9 @@ function Home() {
                         .join(", ")}
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-4">
                         <IconButton
-                          onClick={() =>
+                          onClick={(e) =>
                             handleFavouriteToggle(
+                              e,
                               contact.id,
                               contact.isFavourite
                             )

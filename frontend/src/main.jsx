@@ -10,7 +10,7 @@ import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import CreateContactPage from './pages/CreateContactPage'
-import {ProtectedRoute, AuthInitializer,SnackbarProvider} from './index.js';
+import {ProtectedRoute, AuthInitializer,SnackbarProvider, Person} from './index.js';
 const router = createBrowserRouter(
   createRoutesFromElements(
 
@@ -19,6 +19,7 @@ const router = createBrowserRouter(
       <Route path='login' element={<LoginPage/>} />
       <Route path='signup' element={<SignupPage/>} />
       <Route path='new' element={<ProtectedRoute> <CreateContactPage /></ProtectedRoute>} />
+      <Route path="person/:id/*" element={<ProtectedRoute><Person /></ProtectedRoute>} />
     </Route>
   )
 )
