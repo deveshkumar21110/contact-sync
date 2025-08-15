@@ -2,6 +2,7 @@ package site.devesh.contactsync.services.impl;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,9 +12,9 @@ import org.springframework.stereotype.Service;
 import site.devesh.contactsync.entities.AppUser;
 import site.devesh.contactsync.entities.UserRole;
 import site.devesh.contactsync.enums.RoleType;
+import site.devesh.contactsync.exceptions.UnauthorizedException;
 import site.devesh.contactsync.model.AppUserDto;
 import site.devesh.contactsync.repo.UserRepo;
-import site.devesh.contactsync.request.AuthRequestDTO;
 import site.devesh.contactsync.request.SignUpRequestDto;
 import site.devesh.contactsync.services.UserService;
 
@@ -31,8 +32,6 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
     @Autowired
     private PasswordEncoder encoder;
 
-    @Autowired
-    private ModelMapper modelMapper;
 
     @Override
     public CustomUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -48,7 +47,6 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
                 .map(CustomUserDetails::new) // UserInfo → CustomUserDetails
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
     }
-
 
     public AppUser checkUserAlreadyExist(SignUpRequestDto signUpRequestDto) {
         return userRepo.findByEmail(signUpRequestDto.getEmail());
@@ -90,25 +88,29 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
         return true;
     }
 
-
     public List<AppUser> findAllUsers() {
         return userRepo.findAll();
     }
 
-
     @Override
     public AppUserDto getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && !authentication.isAuthenticated()) {
-            throw new RuntimeException("User not logged in");
+
+        // Check authentication
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new UnauthorizedException("User not authenticated");
         }
 
-        assert authentication != null;
-        if (authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
-            String email = userDetails.getEmail();
-            AppUser user = userRepo.findByEmail(email);
-            return modelMapper.map(user, AppUserDto.class);
+        // Check for anonymous users
+        if (authentication instanceof AnonymousAuthenticationToken) {
+            throw new UnauthorizedException("Anonymous user cannot access this resource");
         }
-        return null;
+
+        // Extract and return user data
+        if (authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
+            return userDetails.toAppUserDto(); // THIS WAS MISSING IN YOUR CODE
+        }
+
+        throw new UnauthorizedException("Invalid authentication principal type");
     }
 }

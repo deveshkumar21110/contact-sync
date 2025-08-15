@@ -1,6 +1,5 @@
 package site.devesh.contactsync.model;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.AllArgsConstructor;

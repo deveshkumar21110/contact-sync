@@ -14,6 +14,8 @@ export {default as IconTextField} from "./components/IconTextField"
 export {default as AddressSection} from "./components/AddressSection"
 export { SnackbarProvider, useSnackbar } from "./hooks/SnackbarProvider";
 export {default as ContactHeader} from "./components/person/ContactHeader"
+export {default as ContactActions} from "./components/person/ContactActions"
+export {default as LabelModal} from "./components/Modal/LabelModal"
 // Pages
 export { default as CreateContactPage } from "./pages/CreateContactPage";
 export { default as HomePage } from "./pages/HomePage";

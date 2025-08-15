@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
-import PersonIcon from "@mui/icons-material/Person";
 import personImage from "/contacts_product_24dp_0158CC_FILL0_wght400_GRAD0_opsz24.svg";
 import SearchIcon from "@mui/icons-material/Search";
-import { Box } from "@mui/material";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import { useSelector } from "react-redux";
 import LogoutBtn from "./LogoutBtn";
-import HelpIcon from "@mui/icons-material/Help";
 import { authService } from "../../Services/authService";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { HelpOutlineOutlined } from "@mui/icons-material";
 
 function Header({ onMenuClick }) {
@@ -38,8 +35,7 @@ function Header({ onMenuClick }) {
           </div>
           <NavLink
             to="/"
-            na
-            className="flex items-center justify-centerti"
+            className="flex items-center justify-center"
           >
             <img
               src={personImage}

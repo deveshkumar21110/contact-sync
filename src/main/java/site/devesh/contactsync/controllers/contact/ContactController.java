@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import site.devesh.contactsync.model.ContactPreviewDTO;
+import site.devesh.contactsync.model.LabelDTO;
 import site.devesh.contactsync.request.ContactRequestDTO;
 import site.devesh.contactsync.response.ContactResponseDTO;
 import site.devesh.contactsync.services.ContactService;
@@ -70,6 +71,19 @@ public class ContactController {
     ) {
         try {
             ContactResponseDTO responseDTO = contactService.updateContact(id, contactRequestDTO);
+            return ResponseEntity.ok().body(responseDTO);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/label/update/{contactId}")
+    public ResponseEntity<?> updateContactLabelOfCurrentUser(
+        @PathVariable String contactId,
+        @RequestBody List<LabelDTO> labelDTOs
+    ) {
+        try {
+            ContactResponseDTO responseDTO = contactService.updateContactLabel(id, contactRequestDTO);
             return ResponseEntity.ok().body(responseDTO);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();

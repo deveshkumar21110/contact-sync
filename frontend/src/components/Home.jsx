@@ -19,7 +19,7 @@ function Home() {
     data: contacts,
     status,
     hasFetched,
-  } = useSelector((state) => state.contacts);
+  } = useSelector((state) => state.contact);
 
   useEffect(() => {
     if (!hasFetched && contacts.length === 0 && status === STATUSES.IDLE) {
@@ -33,7 +33,7 @@ function Home() {
   }, []);
 
   const handleFavouriteToggle = useCallback(
-    (e,contactId, currentStatus) => {
+    (e, contactId, currentStatus) => {
       e.stopPropagation();
       dispatch(
         toggleFavourite({ contactId, newFavouriteStatus: !currentStatus })
@@ -93,7 +93,7 @@ function Home() {
                       <div className="flex-shrink-0 h-10 w-10">
                         <img
                           className="h-10 w-10 rounded-full object-cover"
-                          src={contact.imageUrl || DEFAULT_PROFILE}
+                          src={contact.imageUrl || `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(contact.displayName)}`}
                           alt={contact.displayName}
                           onError={handleImageError}
                         />

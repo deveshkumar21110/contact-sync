@@ -17,19 +17,19 @@ public interface ContactRepo extends JpaRepository<Contact, String> {
     Contact getContactById(String id);
 
     // Repository methods - one collection per query
-    @EntityGraph(attributePaths = {"phoneNumbers"})
+    @EntityGraph(attributePaths = { "phoneNumbers" })
     @Query("SELECT c FROM Contact c WHERE c.user.id = :userId")
     List<Contact> findContactsWithPhones(@Param("userId") String userId);
 
-    @EntityGraph(attributePaths = {"emails"})
+    @EntityGraph(attributePaths = { "emails" })
     @Query("SELECT c FROM Contact c WHERE c.user.id = :userId")
     List<Contact> findContactsWithEmails(@Param("userId") String userId);
 
-    @EntityGraph(attributePaths = {"addresses"})
+    @EntityGraph(attributePaths = { "addresses" })
     @Query("SELECT c FROM Contact c WHERE c.user.id = :userId")
     List<Contact> findContactsWithAddresses(@Param("userId") String userId);
 
-    @EntityGraph(attributePaths = {"labels"})
+    @EntityGraph(attributePaths = { "labels" })
     @Query("SELECT c FROM Contact c WHERE c.user.id = :userId")
     List<Contact> findContactsWithLabels(@Param("userId") String userId);
 
@@ -40,13 +40,17 @@ public interface ContactRepo extends JpaRepository<Contact, String> {
     List<Contact> findContactsByUserId(@Param("userId") String userId);
 
     // For full contact details - fetch everything
-    @Query("SELECT DISTINCT c FROM Contact c " +
-           "LEFT JOIN FETCH c.phoneNumbers " +
-           "LEFT JOIN FETCH c.emails " +
-           "LEFT JOIN FETCH c.addresses " +
-           "LEFT JOIN FETCH c.websites " +
-           "LEFT JOIN FETCH c.significantDates " +
-           "LEFT JOIN FETCH c.labels " +
-           "WHERE c.user = :user")
+    // @Query("SELECT DISTINCT c FROM Contact c " +
+    // "LEFT JOIN FETCH c.phoneNumbers " +
+    // "LEFT JOIN FETCH c.emails " +
+    // "LEFT JOIN FETCH c.addresses " +
+    // "LEFT JOIN FETCH c.websites " +
+    // "LEFT JOIN FETCH c.significantDates " +
+    // "LEFT JOIN FETCH c.labels " +
+    // "WHERE c.user = :user")
+    // List<Contact> findContactsWithAllData(@Param("user") AppUser user);
+    
+    @Query("SELECT DISTINCT c FROM Contact c WHERE c.user = :user")
     List<Contact> findContactsWithAllData(@Param("user") AppUser user);
+
 }

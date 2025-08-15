@@ -11,12 +11,13 @@ const initialState = {
   data: [],
   status: STATUSES.IDLE,
   hasFetched: false,
+  error: null,
 };
 
 // Thunks
 
 export const fetchContacts = createAsyncThunk("contact/fetch", async () => {
-  return await contactService.getContactsPreview();
+  return await contactService.getContacts();
 });
 
 export const addContact = createAsyncThunk("contact/add", async (data) => {
@@ -39,6 +40,14 @@ export const toggleFavourite = createAsyncThunk(
   }
 );
 
+export const updateContactLabels = createAsyncThunk(
+  "contact/updateLabels",
+  async ({ contactId, labels }) => {
+    const updatedContact = await contactService.updateLabels(contactId, labels);
+    return updatedContact; // should return full updated contact from backend
+  }
+);
+
 const contactSlice = createSlice({
   name: "contact",
   initialState: initialState,
@@ -48,19 +57,28 @@ const contactSlice = createSlice({
     builder
       .addCase(fetchContacts.pending, (state) => {
         state.status = STATUSES.LOADING;
+        state.error = null;
       })
       .addCase(fetchContacts.fulfilled, (state, action) => {
         state.data = action.payload;
         state.status = STATUSES.IDLE;
-        state.hasFetched = true; 
+        state.hasFetched = true;
       })
-      .addCase(fetchContacts.rejected, (state) => {
+      .addCase(fetchContacts.rejected, (state, action) => {
         state.status = STATUSES.ERROR;
         state.hasFetched = true;
+        state.error = action.error.message || "Failed to fetch contacts";
       })
 
       .addCase(addContact.fulfilled, (state, action) => {
         state.data.push(action.payload);
+      })
+      .addCase(addContact.rejected, (state, action) => {
+        state.status = STATUSES.ERROR;
+        state.error = action.error.message || "Failed to add contact";
+      })
+      .addCase(addContact.pending, (state) => {
+        state.status = STATUSES.LOADING;
       })
 
       .addCase(updateContact.fulfilled, (state, action) => {
@@ -71,7 +89,6 @@ const contactSlice = createSlice({
         }
       })
 
-      
       .addCase(toggleFavourite.pending, (state, action) => {
         const { contactId, newFavouriteStatus } = action.meta.arg;
         const contact = state.data.find((c) => c.id === contactId);
@@ -93,9 +110,32 @@ const contactSlice = createSlice({
         if (contact) {
           contact.isFavourite = newFavouriteStatus;
         }
-      });
+      })
+      // update contact's label
+      .addCase(updateContactLabels.pending, (state) => {
+        state.status = STATUSES.LOADING;
+      })
+      .addCase(updateContactLabels.fulfilled, (state, action) => {
+        state.status = STATUSES.IDLE;
+        const updatedContact = action.payload;
+        const index = state.data.findIndex(c => c.id === updatedContact.id);
+        if (index !== -1) {
+          state.data[index] = updatedContact;
+        }
+      })
+      .addCase(updateContactLabels.rejected, (state, action) => {
+        state.status = STATUSES.ERROR;
+        state.error = action.error.message || "Failed to update contact labels";
+      })
   },
 });
 
-// export const { setContacts, setStatus } = contactSlice.actions;
 export default contactSlice.reducer;
+
+export const selectHasFetched = (state) => state.contact.hasFetched;
+export const selectContacts = (state) => state.contact.data;
+export const selectFavouriteContacts = (state) =>
+  state.contact.data.filter((contact) => contact.isFavourite);
+export const selectContactsStatus = (state) => state.contact.status;
+export const selectContactById = (state, contactId) =>
+  state.contact.data.find((c) => c.id === contactId);

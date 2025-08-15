@@ -1,4 +1,5 @@
 package site.devesh.contactsync.services.impl;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -151,6 +152,29 @@ public class ContactServiceImpl implements ContactService {
 
         contact.setIsFavourite(isFavourite);
         Contact savedContact = contactRepo.save(contact);
+        return contactMapper.toContactResponseDTO(savedContact);
+    }
+
+    @Override
+    @Transactional
+    public ContactResponseDTO updateContactLabel(String id, List<LabelDTO> labelDTOs) {
+        // 1. Find the contact
+        Contact contact = contactRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Contact not found with id: " + id));
+
+        // 2. Verify the contact belongs to the current user
+        AppUserDto currentUser = userDetailsService.getCurrentUser();
+        if (!contact.getUser().getEmail().equals(currentUser.getEmail())) {
+            throw new RuntimeException("Unauthorized to update labels for this contact");
+        }
+
+        // 3. Update labels
+        handleLabels(contact, labelDTOs);
+
+        // 4. Save changes
+        Contact savedContact = contactRepo.save(contact);
+
+        // 5. Convert back to DTO and return
         return contactMapper.toContactResponseDTO(savedContact);
     }
 

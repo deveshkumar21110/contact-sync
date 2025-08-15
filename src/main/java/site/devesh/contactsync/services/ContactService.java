@@ -3,6 +3,7 @@ package site.devesh.contactsync.services;
 import org.springframework.stereotype.Service;
 
 import site.devesh.contactsync.model.ContactPreviewDTO;
+import site.devesh.contactsync.model.LabelDTO;
 import site.devesh.contactsync.request.ContactRequestDTO;
 import site.devesh.contactsync.response.ContactResponseDTO;
 
@@ -22,4 +23,6 @@ public interface ContactService {
     ContactResponseDTO getContactById(String id);
 
     ContactResponseDTO updateFavouriteStatus(String id, Boolean isFavourite);
+
+    ContactResponseDTO updateContactLabel(String id, List<LabelDTO> labelDTOs);
 }

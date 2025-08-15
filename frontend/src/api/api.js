@@ -18,13 +18,13 @@ const api = axios.create({
 // Request Interceptor – add Authorization token if available
 api.interceptors.request.use(
   async (config) => {
-    console.log("==== OUTGOING REQUEST ====");
-    console.log("URL:", config.url);
-    console.log("Method:", config.method);
-    console.log("Headers:", config.headers);
-    console.log("Params:", config.params);
-    console.log("Data (body):", config.data);
-    console.log("==========================");
+    // console.log("==== OUTGOING REQUEST ====");
+    // console.log("URL:", config.url);
+    // console.log("Method:", config.method);
+    // console.log("Headers:", config.headers);
+    // console.log("Params:", config.params);
+    // console.log("Data (body):", config.data);
+    // console.log("==========================");
 
     const noAuthEndpoints = [
       "/auth/v1/login",

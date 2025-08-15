@@ -1,7 +1,6 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Popover from "@mui/material/Popover";
 import { CircularProgress, TextField, Checkbox } from "@mui/material";
 import { LabelOutlined, Add } from "@mui/icons-material";
 import { fetchLabels, addLabel, STATUSES } from "../../redux/labelSlice";
@@ -15,13 +14,46 @@ export default function LabelModal({
   watch,
 }) {
   const dispatch = useDispatch();
-  const { data: labels, status,hasFetched } = useSelector((state) => state.label);
+  const { data: labels, status, hasFetched } = useSelector((state) => state.label);
   
   const [newLabelName, setNewLabelName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const dropdownRef = useRef(null);
+  const textFieldRef = useRef(null);
 
   // Watch the current form value for labels
   const currentLabels = watch("labels") || [];
+
+  // Calculate position based on anchor element
+  useEffect(() => {
+    if (open && anchorEl) {
+      const rect = anchorEl.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+      });
+    }
+  }, [open, anchorEl]);
+
+  // Handle click outside to close
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current && 
+        !dropdownRef.current.contains(event.target) &&
+        anchorEl && 
+        !anchorEl.contains(event.target)
+      ) {
+        handleClose();
+      }
+    };
+
+    if (open) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [open, handleClose, anchorEl]);
 
   // Load labels on mount
   useEffect(() => {
@@ -29,6 +61,15 @@ export default function LabelModal({
       dispatch(fetchLabels());
     }
   }, [dispatch, hasFetched, status]);
+
+  // Focus text field when modal opens
+  useEffect(() => {
+    if (open && textFieldRef.current) {
+      setTimeout(() => {
+        textFieldRef.current?.focus();
+      }, 100);
+    }
+  }, [open]);
 
   // Handle label selection toggle
   const handleLabelToggle = (labelId) => {
@@ -76,6 +117,9 @@ export default function LabelModal({
       e.preventDefault();
       handleCreateLabel();
     }
+    if (e.key === "Escape") {
+      handleClose();
+    }
   };
 
   // Check if a label is selected
@@ -85,100 +129,107 @@ export default function LabelModal({
     );
   };
 
-  if (status === STATUSES.LOADING) {
-    return (
-      <Popover
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-      >
+  if (!open) return null;
+
+  return (
+    <div 
+      ref={dropdownRef}
+      className="fixed bg-white shadow-lg rounded-lg border border-gray-200 overflow-hidden"
+      style={{
+        top: position.top,
+        left: position.left,
+        width: '288px',
+        maxHeight: '320px',
+        zIndex: 9999,
+      }}
+    >
+      {status === STATUSES.LOADING ? (
         <div className="flex justify-center items-center p-8">
           <CircularProgress size={24} />
         </div>
-      </Popover>
-    );
-  }
+      ) : (
+        <>
+          {/* Header */}
+          <div className="px-4 py-3 border-b bg-gray-50">
+            <h3 className="text-sm font-medium text-gray-900">Select Labels</h3>
+          </div>
 
-  return (
-    <Popover
-      open={open}
-      anchorEl={anchorEl}
-      onClose={handleClose}
-      anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-      transformOrigin={{ vertical: "top", horizontal: "left" }}
-    >
-      <div className="w-72 max-h-80 bg-white shadow-lg rounded-lg overflow-hidden">
-        {/* Header */}
-        <div className="px-4 py-3 border-b bg-gray-50">
-          <h3 className="text-sm font-medium text-gray-900">Select Labels</h3>
-        </div>
-
-        {/* Labels List */}
-        <div className="max-h-48 overflow-y-auto">
-          {labels.length === 0 ? (
-            <div className="px-4 py-6 text-center text-gray-500 text-sm">
-              No labels yet. Create your first label below.
-            </div>
-          ) : (
-            labels.map((label) => (
-              <div
-                key={label.id}
-                className="flex items-center px-4 py-2 hover:bg-gray-50 cursor-pointer"
-                onClick={() => handleLabelToggle(label.id)}
-              >
-                <LabelOutlined 
-                  className="mx-2 text-gray-800" 
-                  fontSize="small" 
-                />
-                <span className="text-sm text-gray-700 flex-1">
-                  {label.name}
-                </span>
-                <Checkbox
-                  checked={isLabelSelected(label.id)}
-                  onChange={() => handleLabelToggle(label.id)}
-                  size="small"
-                  color="primary"
-                />
+          {/* Labels List */}
+          <div className="max-h-48 overflow-y-auto">
+            {labels.length === 0 ? (
+              <div className="px-4 py-6 text-center text-gray-500 text-sm">
+                No labels yet. Create your first label below.
               </div>
-            ))
-          )}
-        </div>
-
-        {/* Create New Label */}
-        <div className="border-t bg-gray-50 px-4 py-3">
-          <div className="flex items-center space-x-2">
-            <TextField
-              size="small"
-              placeholder="Create new label"
-              value={newLabelName}
-              onChange={(e) => setNewLabelName(e.target.value)}
-              onKeyDown={handleKeyPress}
-              disabled={isCreating}
-              sx={{ flexGrow: 1 }}
-            />
-            <button
-              type="button"
-              onClick={handleCreateLabel}
-              disabled={!newLabelName.trim() || isCreating}
-              className="flex items-center justify-center w-8 h-8 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
-            >
-              {isCreating ? (
-                <CircularProgress size={16} color="inherit" />
-              ) : (
-                <Add fontSize="small" />
-              )}
-            </button>
+            ) : (
+              labels.map((label) => (
+                <div
+                  key={label.id}
+                  className="flex items-center px-4 py-2 hover:bg-gray-50 cursor-pointer"
+                  onClick={() => handleLabelToggle(label.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleLabelToggle(label.id);
+                    }
+                  }}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Toggle ${label.name} label`}
+                >
+                  <LabelOutlined 
+                    className="mx-2 text-gray-800" 
+                    fontSize="small" 
+                  />
+                  <span className="text-sm text-gray-700 flex-1">
+                    {label.name}
+                  </span>
+                  <Checkbox
+                    checked={isLabelSelected(label.id)}
+                    onChange={() => handleLabelToggle(label.id)}
+                    size="small"
+                    color="primary"
+                    tabIndex={-1}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </div>
+              ))
+            )}
           </div>
-        </div>
 
-        {/* Selected Count */}
-        {/* {currentLabels.length > 0 && (
-          <div className="px-4 py-2 bg-blue-50 border-t text-xs text-blue-600">
-            {currentLabels.length} label{currentLabels.length !== 1 ? 's' : ''} selected
+          {/* Create New Label */}
+          <div className="border-t bg-gray-50 px-4 py-3">
+            <div className="flex items-center space-x-2">
+              <TextField
+                ref={textFieldRef}
+                size="small"
+                placeholder="Create new label"
+                value={newLabelName}
+                onChange={(e) => setNewLabelName(e.target.value)}
+                onKeyDown={handleKeyPress}
+                disabled={isCreating}
+                sx={{ flexGrow: 1 }}
+                autoComplete="off"
+                inputProps={{
+                  'aria-label': 'New label name'
+                }}
+              />
+              <button
+                type="button"
+                onClick={handleCreateLabel}
+                disabled={!newLabelName.trim() || isCreating}
+                className="flex items-center justify-center w-8 h-8 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                aria-label="Create new label"
+              >
+                {isCreating ? (
+                  <CircularProgress size={16} color="inherit" />
+                ) : (
+                  <Add fontSize="small" />
+                )}
+              </button>
+            </div>
           </div>
-        )} */}
-      </div>
-    </Popover>
+        </>
+      )}
+    </div>
   );
 }

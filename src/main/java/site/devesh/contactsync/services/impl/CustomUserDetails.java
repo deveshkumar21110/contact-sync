@@ -15,58 +15,70 @@ import site.devesh.contactsync.response.JwtResponseDTO;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-public class CustomUserDetails extends AppUser implements UserDetails {
+public class CustomUserDetails implements UserDetails {
 
-    // three basic details - username,password,authorities/roles
-    @Setter
-    @Getter
-    private String id;
-
-    @Setter
-    @Getter
-    private String email;
-
+    // Core UserDetails fields
     private String username;
-
     private String password;
+    private Collection<? extends GrantedAuthority> authorities;
 
-    Collection<? extends GrantedAuthority> authorities;
+    // Extended user information (THIS IS THE KEY - store ALL needed data)
+    @Getter @Setter private String id;
+    @Getter @Setter private String email;
+    @Getter @Setter private String profileImageUrl;
+    @Getter @Setter private String phoneNumber;
+    @Getter @Setter private Set<UserRole> roles;
 
+    // Constructor - Load ALL user data once during authentication
+    public CustomUserDetails(AppUser user) {
+        this.id = user.getId();
+        this.username = user.getUsername();
+        this.password = user.getPassword();
+        this.email = user.getEmail();
+        this.profileImageUrl = user.getProfileImageUrl();
+        this.phoneNumber = user.getPhoneNumber();
+        this.roles = user.getRoles();
 
-
-
-    public CustomUserDetails(AppUser loadedUser){
-        this.username = loadedUser.getUsername();
-        this.password = loadedUser.getPassword();
-        this.email = loadedUser.getEmail();
-        this.id = loadedUser.getId();
-
-        List<GrantedAuthority> auths = new ArrayList<>();
-        for(UserRole userRole : loadedUser.getRoles()){
-            System.out.println("DEBUG: Adding role -> " + userRole.getName());
-            auths.add(new SimpleGrantedAuthority(userRole.getName().toString()));
-        }
-        this.authorities = auths;
-
-        System.out.println("DEBUG: Final authorities -> " + this.authorities);
+        // Build authorities from roles
+        this.authorities = user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName().toString()))
+                .collect(Collectors.toList());
     }
 
+    // ZERO DATABASE CALLS - Convert directly to DTO
+    public AppUserDto toAppUserDto() {
+        AppUserDto dto = new AppUserDto();
+        dto.setId(this.id);
+        dto.setUserName(this.username);
+        dto.setEmail(this.email);
+        dto.setProfileImageUrl(this.profileImageUrl);
+        
+        // Handle phone number conversion safely
+        dto.setPhoneNumber(parsePhoneNumber(this.phoneNumber));
+        dto.setRoles(new ArrayList<>(this.roles));
+        
+        return dto;
+    }
 
-    //    getAuthorities() returns the user's roles/permissions; List.of() means the user has none.
+    // Helper method for phone number conversion
+    private Long parsePhoneNumber(String phoneNumber) {
+        if (phoneNumber != null && !phoneNumber.trim().isEmpty()) {
+            try {
+                return Long.parseLong(phoneNumber.trim());
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    // Standard UserDetails implementation
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     @Override
@@ -75,8 +87,8 @@ public class CustomUserDetails extends AppUser implements UserDetails {
     }
 
     @Override
-    public void setPassword(String password) {
-        this.password = password;
+    public String getUsername() {
+        return username;
     }
 
     @Override
@@ -98,5 +110,4 @@ public class CustomUserDetails extends AppUser implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 }
