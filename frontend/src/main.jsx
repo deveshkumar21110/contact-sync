@@ -6,11 +6,8 @@ import { Provider } from 'react-redux'
 import { store } from './redux/store.js'
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom'
 import Layout from './Layout'
-import HomePage from './pages/HomePage'
-import LoginPage from './pages/LoginPage'
-import SignupPage from './pages/SignupPage'
-import CreateContactPage from './pages/CreateContactPage'
 import {ProtectedRoute, AuthInitializer,SnackbarProvider, Person} from './index.js';
+import {EditContactPage,CreateContactPage,SignupPage,LoginPage,HomePage} from './index'
 const router = createBrowserRouter(
   createRoutesFromElements(
 
@@ -19,7 +16,8 @@ const router = createBrowserRouter(
       <Route path='login' element={<LoginPage/>} />
       <Route path='signup' element={<SignupPage/>} />
       <Route path='new' element={<ProtectedRoute> <CreateContactPage /></ProtectedRoute>} />
-      <Route path="person/:id/*" element={<ProtectedRoute><Person /></ProtectedRoute>} />
+      <Route path="person/:id" element={<ProtectedRoute><Person /></ProtectedRoute>} />
+      <Route path="person/:id/edit" element={<ProtectedRoute><EditContactPage /></ProtectedRoute>} />
     </Route>
   )
 )

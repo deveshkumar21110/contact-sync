@@ -10,6 +10,7 @@ import site.devesh.contactsync.entities.Contact;
 import site.devesh.contactsync.model.ContactPreviewDTO;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ContactRepo extends JpaRepository<Contact, String> {
@@ -38,19 +39,30 @@ public interface ContactRepo extends JpaRepository<Contact, String> {
 
     @Query("SELECT c FROM Contact c WHERE c.user.id = :userId")
     List<Contact> findContactsByUserId(@Param("userId") String userId);
-
-    // For full contact details - fetch everything
-    // @Query("SELECT DISTINCT c FROM Contact c " +
-    // "LEFT JOIN FETCH c.phoneNumbers " +
-    // "LEFT JOIN FETCH c.emails " +
-    // "LEFT JOIN FETCH c.addresses " +
-    // "LEFT JOIN FETCH c.websites " +
-    // "LEFT JOIN FETCH c.significantDates " +
-    // "LEFT JOIN FETCH c.labels " +
-    // "WHERE c.user = :user")
-    // List<Contact> findContactsWithAllData(@Param("user") AppUser user);
     
     @Query("SELECT DISTINCT c FROM Contact c WHERE c.user = :user")
     List<Contact> findContactsWithAllData(@Param("user") AppUser user);
+
+    @Query("SELECT c FROM Contact c WHERE c.id = :id AND c.user = :user")
+    Optional<Contact> findByIdAndUser(@Param("id") String id, @Param("user") AppUser user);
+
+    // Alternative: Check if contact exists and belongs to user
+    @Query("SELECT COUNT(c) > 0 FROM Contact c WHERE c.id = :id AND c.user.id = :userId")
+    boolean existsByIdAndUserId(@Param("id") String id, @Param("userId") String userId);
+    @Query("SELECT c FROM Contact c WHERE c.id = :id AND c.user.id = :userId")
+    Optional<Contact> findByIdAndUserId(@Param("id") String id, @Param("userId") String userId);
+
+    // Check if contact exists
+    @Query("SELECT c FROM Contact c WHERE c.id = :id")
+    Optional<Contact> findContactById(@Param("id") String id);
+
+    // Get contact with user info for debugging
+    @Query("SELECT c FROM Contact c LEFT JOIN FETCH c.user WHERE c.id = :id")
+    Optional<Contact> findContactWithUser(@Param("id") String id);
+
+    // Alternative approach - check if they match by email instead of entity
+    @Query("SELECT c FROM Contact c WHERE c.id = :id AND c.user.email = :userEmail")
+    Optional<Contact> findByIdAndUserEmail(@Param("id") String id, @Param("userEmail") String userEmail);
+
 
 }

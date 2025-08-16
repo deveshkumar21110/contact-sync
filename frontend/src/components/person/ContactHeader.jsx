@@ -27,7 +27,7 @@ function ContactHeader() {
   const hasFetchedContacts = useSelector(selectHasFetched);
   const status = useSelector((state) => state.contact.status);
   const contact = useSelector((state) => selectContactById(state, contactId));
-
+  console.log(contact);
   const handleFavouriteToggle = useCallback(
     (e, contactId, currentStatus) => {
       e.stopPropagation();
@@ -73,7 +73,7 @@ function ContactHeader() {
 
   return (
     <div>
-      <div className="flex justify-between w-2/3  ">
+      <div className="flex pl-8 justify-between w-2/3  ">
         <ArrowBack className="cursor-pointer" onClick={() => navigate(-1)} />
         <div className="flex gap-4">
           <button
@@ -88,7 +88,10 @@ function ContactHeader() {
               <StarBorderOutlined fontSize="medium" />
             )}
           </button>
-          <button className="px-6 py-2 bg-blue-800 text-gray-100 rounded-full">
+          <button
+            onClick={() => navigate(`/person/${contactId}/edit`)}
+            className="px-6 py-2 bg-blue-800 text-gray-100 rounded-full"
+          >
             Edit
           </button>
           <button className="p-2 rounded-full hover:rounded-full hover:bg-gray-100">
@@ -101,8 +104,8 @@ function ContactHeader() {
       </div>
 
       {/* Image and some detail */}
-      <div className="flex flex-col pt-2 pb-4 pl-9">
-        <div className="flex gap-6 items-center">
+      <div className="flex flex-col">
+        <div className="flex pl-12 pb-4 pt-2 gap-6 items-center">
           <img
             className="h-40 w-40 rounded-full object-cover"
             src={

@@ -129,12 +129,72 @@ public class ContactServiceImpl implements ContactService {
     @Override
     @Transactional
     public ContactResponseDTO updateContact(String id, ContactRequestDTO contactRequestDTO) {
-        Contact oldContact = contactRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("contact not found with id: " + id));
+        // Validate input
+        if (id == null || id.trim().isEmpty()) {
+            throw new RuntimeException("Contact ID cannot be null or empty");
+        }
+
+        log.info("=== DEBUG: Updating contact with ID: {} ===", id);
+
+        // Get current user
+        AppUserDto currentUserDto = userDetailsService.getCurrentUser();
+        log.info("Current user DTO: {}", currentUserDto.getEmail());
+
+        AppUser currentUser = userRepo.findByEmail(currentUserDto.getEmail());
+        if (currentUser == null) {
+            throw new RuntimeException("Current user not found");
+        }
+
+        log.info("Current user from DB: ID={}, Email={}", currentUser.getId(), currentUser.getEmail());
+
+        // Step 1: Check if contact exists at all
+        Optional<Contact> contactExists = contactRepo.findById(id);
+        if (contactExists.isEmpty()) {
+            log.error("Contact with ID {} does not exist in database", id);
+            throw new RuntimeException("Contact not found with id: " + id);
+        }
+
+        Contact existingContact = contactExists.get();
+        log.info("Contact found: ID={}, DisplayName={}, OwnerID={}, OwnerEmail={}",
+                existingContact.getId(),
+                existingContact.getDisplayName(),
+                existingContact.getUser().getId(),
+                existingContact.getUser().getEmail());
+
+        // Step 2: Check ownership
+        if (!existingContact.getUser().getId().equals(currentUser.getId())) {
+            log.error("Ownership mismatch! Contact owner: {} (ID: {}), Current user: {} (ID: {})",
+                    existingContact.getUser().getEmail(),
+                    existingContact.getUser().getId(),
+                    currentUser.getEmail(),
+                    currentUser.getId());
+            throw new RuntimeException("Unauthorized: Contact belongs to different user");
+        }
+
+        log.info("Ownership verified. Proceeding with update...");
+
+        // Step 3: Try the combined query as fallback verification
+        Optional<Contact> oldContactOpt = contactRepo.findByIdAndUser(id, currentUser);
+        if (oldContactOpt.isEmpty()) {
+            log.error("findByIdAndUser returned empty - there might be an issue with the custom query");
+            // Use the contact we already found and verified
+        }
+
+        Contact oldContact = existingContact; // Use the verified contact
+
+        // Update the contact
         contactMapper.updateContactFromDto(contactRequestDTO, oldContact);
+
+        // Re-link child entities after mapping
+        linkChildEntities(oldContact);
+
         // Handle labels separately
         handleLabels(oldContact, contactRequestDTO.getLabels());
+
+        // Save and return
         Contact saved = contactRepo.save(oldContact);
+        log.info("Contact successfully updated: {}", saved.getId());
+
         return contactMapper.toContactResponseDTO(saved);
     }
 

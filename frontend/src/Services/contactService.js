@@ -69,7 +69,7 @@ export const contactService = {
   updateLabels: async (contactId, labels) => {
     try {
       const response = await api.put(
-        `/api/v1/contact/label/${contactId}`,
+        `/api/v1/contact/label/update/${contactId}`,
         labels
       );
       return response.data;

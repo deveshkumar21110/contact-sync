@@ -27,6 +27,7 @@ export const addContact = createAsyncThunk("contact/add", async (data) => {
 export const updateContact = createAsyncThunk(
   "contact/update",
   async (data) => {
+    console.log("Payload being sent:", data);
     return await contactService.updateContact(data);
   }
 );

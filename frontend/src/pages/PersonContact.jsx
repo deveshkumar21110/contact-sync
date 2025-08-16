@@ -1,20 +1,20 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSelector, useDispatch } from "react-redux";
-import { ContactActions, ContactHeader, Container, LabelModal } from "../index";
-import { STATUSES, selectContactById } from "../redux/contactSlice";
+import { ContactActions, ContactDetails, ContactHeader, Container, LabelModal } from "../index";
+import { STATUSES, selectContactById, updateContactLabels } from "../redux/contactSlice";
 import { CircularProgress } from "@mui/material";
 import { Add, EditOutlined, LabelOutlined } from "@mui/icons-material";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 function PersonContact() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const {id:contactId} = useParams();
   const status = useSelector((state) => state.contact.data.status);
   const [anchorEl, setAnchorEl] = useState(null);
   const openLabel = Boolean(anchorEl);
   const contact = useSelector((state) => selectContactById(state,contactId));
-  const updateContactLabels = dispatch()
 
   // Initialize react-hook-form with current contact data
   const { control, setValue, watch, getValues } = useForm({
@@ -23,7 +23,7 @@ function PersonContact() {
     },
   });
   const selectedLabels = watch("labels") || [];
-  // console.log(selectedLabels);
+  // console.log(contact);
 
   const openLabelModal = (event) => {
     setAnchorEl(event.currentTarget);
@@ -58,11 +58,11 @@ function PersonContact() {
 
   return (
     <Container>
-      <div className="pl-6 pt-8 bg-white">
+      <div className="pt-8 bg-white">
         <ContactHeader />
 
         {/* Labels Section */}
-        <div className="flex items-center flex-wrap gap-2 pr-6">
+        <div className="flex items-center flex-wrap gap-2  pl-8">
           {/* Selected Labels Display */}
           {selectedLabels.length > 0 &&
             selectedLabels.map((label, index) => (
@@ -77,10 +77,10 @@ function PersonContact() {
                 {label.name}
                 <button
                   type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removeLabel(index);
-                  }}
+                  // onClick={(e) => {
+                  //   e.stopPropagation();
+                  //   removeLabel(index);
+                  // }}
                   className="ml-2 text-blue-600 hover:text-blue-800 font-bold"
                 >
                   ×
@@ -89,7 +89,7 @@ function PersonContact() {
             ))}
 
           {/* Edit Button */}
-          <button
+          {/* <button
             type="button"
             onClick={openLabelModal}
             className=" items-center px-2 py-1 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -101,7 +101,7 @@ function PersonContact() {
             ) : (
               <EditOutlined fontSize="small" className="mr-2 text-blue-600" />
             )}
-          </button>
+          </button> */}
         </div>
 
         {/* Label Modal */}
@@ -113,6 +113,9 @@ function PersonContact() {
           setValue={setValue}
           watch={watch}
         />
+        <div className="pl-8">
+          <ContactDetails />
+        </div>
       </div>
     </Container>
   );

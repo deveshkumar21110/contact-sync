@@ -25,7 +25,7 @@ function ContactActions() {
 
   return (
     <div>
-      <div className="mt-8 flex gap-8">
+      <div className="mt-8 pl-8 pb-8 flex gap-8">
         {/* Email */}
         <div>
           <div

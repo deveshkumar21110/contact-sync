@@ -83,7 +83,7 @@ public class ContactController {
         @RequestBody List<LabelDTO> labelDTOs
     ) {
         try {
-            ContactResponseDTO responseDTO = contactService.updateContactLabel(id, contactRequestDTO);
+            ContactResponseDTO responseDTO = contactService.updateContactLabel(contactId, labelDTOs);
             return ResponseEntity.ok().body(responseDTO);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();

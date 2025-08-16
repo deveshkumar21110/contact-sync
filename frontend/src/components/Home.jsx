@@ -88,12 +88,17 @@ function Home() {
                   className="hover:bg-gray-100 group"
                   onClick={() => handleSelectedContact(contact.id)}
                 >
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap rounded-l-lg hover:bg-gray-100">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
                         <img
                           className="h-10 w-10 rounded-full object-cover"
-                          src={contact.imageUrl || `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(contact.displayName)}`}
+                          src={
+                            contact.imageUrl ||
+                            `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(
+                              contact.displayName
+                            )}`
+                          }
                           alt={contact.displayName}
                           onError={handleImageError}
                         />
@@ -105,13 +110,13 @@ function Home() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
                     {contact.phoneNumbers?.[0]?.number || ""}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
                     {contact.emails?.[0]?.email || ""}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 relative">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 relative rounded-r-lg hover:bg-gray-100">
                     <div className="flex items-center justify-between">
                       {[contact.jobTitle, contact.company]
                         .filter(Boolean)
