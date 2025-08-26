@@ -19,6 +19,7 @@ import site.devesh.contactsync.services.ContactService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -287,4 +289,77 @@ public class ContactServiceImpl implements ContactService {
         contact.setLabels(labels);
     }
 
+    @Override
+    @Transactional
+    public void deleteContact(String contactId) {
+        if (contactId == null || contactId.trim().isEmpty()) {
+            throw new RuntimeException("Contact ID cannot be null or empty");
+        }
+
+        AppUser currentUser = getCurrentUserEntity();
+
+        Contact contact = contactRepo.findByIdAndUser(contactId, currentUser)
+                .orElseThrow(() -> new RuntimeException("Contact not found or unauthorized"));
+
+        contactRepo.delete(contact); 
+
+        log.info("Contact deleted successfully: {}", contactId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteContactsByIds(List<String> contactIds) {
+        // Validate input early
+        if (contactIds == null || contactIds.isEmpty()) {
+            throw new RuntimeException("Contact IDs list cannot be null or empty");
+        }
+
+        // Remove duplicates and null values
+        List<String> cleanContactIds = contactIds.stream()
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(id -> !id.isEmpty())
+                .distinct()
+                .collect(Collectors.toList());
+
+        if (cleanContactIds.isEmpty()) {
+            throw new RuntimeException("No valid contact IDs provided");
+        }
+
+        // Get current user
+        AppUser currentUser = getCurrentUserEntity();
+
+        // Single optimized database operation with ownership check built-in
+        int deletedCount = contactRepo.deleteByIdsAndUsers(cleanContactIds, currentUser);
+
+        // Verify all contacts were deleted (optional - depends on your business logic)
+        if (deletedCount != cleanContactIds.size()) {
+            log.warn(
+                    "Expected to delete {} contacts, but only deleted {}. Some contacts may not exist or belong to different user.",
+                    cleanContactIds.size(), deletedCount);
+        }
+
+        log.info("Deleted {} contacts for user: {}", deletedCount, currentUser.getEmail());
+    }
+
+    @Override
+    @Transactional
+    public void deleteAllContactsForUser() {
+        // Get current user
+        AppUser currentUser = getCurrentUserEntity();
+
+        // Single database operation
+        int deletedCount = contactRepo.deleteByUser(currentUser);
+
+        log.info("Deleted all {} contacts for user: {}", deletedCount, currentUser.getEmail());
+    }
+
+    private AppUser getCurrentUserEntity() {
+        AppUserDto currentUserDto = userDetailsService.getCurrentUser();
+        AppUser currentUser = userMapper.toAppUser(currentUserDto);
+        if (currentUser == null) {
+            throw new RuntimeException("Current user not found");
+        }
+        return currentUser;
+    }
 }

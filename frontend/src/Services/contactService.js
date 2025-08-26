@@ -52,6 +52,16 @@ export const contactService = {
     }
   },
 
+  deleteContact: async (contact) => {
+    try {
+      const response = await api.delete(`/api/v1/contact/${contact.id}`);
+      return response.data;
+    } catch (error) {
+      console.log("Error in deleting contact: ", error);
+      throw error;
+    }
+  },
+
   toggleFavourite: async (contactId, newFavoriteStatus) => {
     try {
       const response = await api.patch(

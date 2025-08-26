@@ -1,10 +1,11 @@
 import React, { useEffect, useCallback } from "react";
 import { CircularProgress, IconButton } from "@mui/material";
-import { StarBorder, Star } from "@mui/icons-material";
+import { StarBorder, Star, DeleteOutlineOutlined } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchContacts,
   toggleFavourite,
+  deleteContact,
   STATUSES,
 } from "../redux/contactSlice";
 import { Link, useNavigate } from "react-router-dom";
@@ -37,6 +38,15 @@ function Home() {
       e.stopPropagation();
       dispatch(
         toggleFavourite({ contactId, newFavouriteStatus: !currentStatus })
+      );
+    },
+    [dispatch]
+  );
+  const handleDelete = useCallback(
+    (e, contact) => {
+      e.stopPropagation();
+      dispatch(
+        deleteContact(contact )
       );
     },
     [dispatch]
@@ -137,6 +147,17 @@ function Home() {
                           ) : (
                             <StarBorder fontSize="medium" />
                           )}
+                        </IconButton>
+                        <IconButton
+                          onClick={(e) =>
+                            handleDelete(
+                              e,
+                              contact
+                            )
+                          }
+                          size="large"
+                        >
+                          <DeleteOutlineOutlined fontSize="medium" sx={{ color: "blue" }} />
                         </IconButton>
                       </div>
                     </div>

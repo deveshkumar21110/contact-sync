@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.persistence.PrePersist;
+
 import java.util.UUID;
 
 @Entity
@@ -26,7 +26,7 @@ public class Address {
     private String state;
 
     @ManyToOne()
-    @JoinColumn(name = "contact_id")
+    @JoinColumn(name = "contact_id", nullable = false) // The nullable = false ensures that Hibernate won’t just try to SET contact_id = NULL
     private Contact contact;
 
     @PrePersist

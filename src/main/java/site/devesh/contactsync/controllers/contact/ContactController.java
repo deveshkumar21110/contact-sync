@@ -24,7 +24,7 @@ public class ContactController {
     private final UserService userService;
 
     @PostMapping("/add")
-    public ResponseEntity<ContactResponseDTO> addContact(@RequestBody ContactRequestDTO contactRequestDTO){
+    public ResponseEntity<ContactResponseDTO> addContact(@RequestBody ContactRequestDTO contactRequestDTO) {
         try {
             ContactResponseDTO response = contactService.createContact(contactRequestDTO);
             return ResponseEntity.ok(response);
@@ -35,40 +35,39 @@ public class ContactController {
     }
 
     @GetMapping("/{contactId}")
-    public ResponseEntity<?> getContactById(@PathVariable String contactId){
-        try{
+    public ResponseEntity<?> getContactById(@PathVariable String contactId) {
+        try {
             ContactResponseDTO contactResponseDTO = contactService.getContactById(contactId);
             return ResponseEntity.ok(contactResponseDTO);
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @GetMapping("/all")
-    public ResponseEntity<?> getAllContactsOfUser(){
-        try{
+    public ResponseEntity<?> getAllContactsOfUser() {
+        try {
             List<ContactResponseDTO> contactResponseDTOS = contactService.getContactByUser();
             return ResponseEntity.ok(contactResponseDTOS);
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @GetMapping("/preview/all")
-    public ResponseEntity<?> getAllContactsPreviewOfUser(){
-        try{
+    public ResponseEntity<?> getAllContactsPreviewOfUser() {
+        try {
             List<ContactPreviewDTO> contactPreviewDTOs = contactService.getContactPreviewByUser();
             return ResponseEntity.ok(contactPreviewDTOs);
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateContact(
-        @PathVariable String id,
-        @RequestBody ContactRequestDTO contactRequestDTO
-    ) {
+            @PathVariable String id,
+            @RequestBody ContactRequestDTO contactRequestDTO) {
         try {
             ContactResponseDTO responseDTO = contactService.updateContact(id, contactRequestDTO);
             return ResponseEntity.ok().body(responseDTO);
@@ -79,9 +78,8 @@ public class ContactController {
 
     @PutMapping("/label/update/{contactId}")
     public ResponseEntity<?> updateContactLabelOfCurrentUser(
-        @PathVariable String contactId,
-        @RequestBody List<LabelDTO> labelDTOs
-    ) {
+            @PathVariable String contactId,
+            @RequestBody List<LabelDTO> labelDTOs) {
         try {
             ContactResponseDTO responseDTO = contactService.updateContactLabel(contactId, labelDTOs);
             return ResponseEntity.ok().body(responseDTO);
@@ -93,18 +91,40 @@ public class ContactController {
     @PatchMapping("/{contactId}/favourite")
     public ResponseEntity<?> toggleFavourite(
             @PathVariable String contactId,
-            @RequestBody Map<String,Boolean> favouriteStatus
+            @RequestBody Map<String, Boolean> favouriteStatus
 
     ) {
         try {
             Boolean isFavourite = favouriteStatus.get("isFavourite");
-            if(isFavourite == null) return ResponseEntity.badRequest().build();
+            if (isFavourite == null)
+                return ResponseEntity.badRequest().build();
 
-            ContactResponseDTO updatedContact = contactService.updateFavouriteStatus(contactId,isFavourite);
+            ContactResponseDTO updatedContact = contactService.updateFavouriteStatus(contactId, isFavourite);
             return ResponseEntity.ok().body(updatedContact);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
+    @DeleteMapping("/{contactId}")
+    public ResponseEntity<?> deleteContact(@PathVariable String contactId) {
+        try {
+            contactService.deleteContact(contactId);
+            return ResponseEntity.ok("Contact deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error deleting contact: "+ e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/batch")
+    public ResponseEntity<Void> deleteContacts(@RequestBody List<String> contactIds) {
+        contactService.deleteContactsByIds(contactIds);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/all")
+    public ResponseEntity<Void> deleteAllContacts() {
+        contactService.deleteAllContactsForUser();
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -25,4 +25,10 @@ public interface ContactService {
     ContactResponseDTO updateFavouriteStatus(String id, Boolean isFavourite);
 
     ContactResponseDTO updateContactLabel(String id, List<LabelDTO> labelDTOs);
+
+    void deleteContact(String contactId);
+
+    void deleteAllContactsForUser();
+
+    void deleteContactsByIds(List<String> contactIds);
 }

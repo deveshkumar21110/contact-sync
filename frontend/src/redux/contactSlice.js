@@ -32,6 +32,13 @@ export const updateContact = createAsyncThunk(
   }
 );
 
+export const deleteContact = createAsyncThunk(
+  "contact/delete",
+  async (contact) => {
+    return await contactService.deleteContact(contact);
+  }
+);
+
 export const toggleFavourite = createAsyncThunk(
   "contact/toggleFavourite",
   async ({ contactId, newFavouriteStatus }) => {
@@ -119,7 +126,7 @@ const contactSlice = createSlice({
       .addCase(updateContactLabels.fulfilled, (state, action) => {
         state.status = STATUSES.IDLE;
         const updatedContact = action.payload;
-        const index = state.data.findIndex(c => c.id === updatedContact.id);
+        const index = state.data.findIndex((c) => c.id === updatedContact.id);
         if (index !== -1) {
           state.data[index] = updatedContact;
         }
@@ -128,6 +135,20 @@ const contactSlice = createSlice({
         state.status = STATUSES.ERROR;
         state.error = action.error.message || "Failed to update contact labels";
       })
+      .addCase(deleteContact.fulfilled, (state, action) => {
+        state.status = STATUSES.IDLE;
+        const deletedContact = action.payload;
+        state.data = state.data.filter((c) => c.id !== deletedContact.id);
+      })
+      .addCase(deleteContact.pending, (state, action) => {
+        const deletedContact = action.meta.arg;
+        state.data = state.data.filter((c) => c.id !== deletedContact.id);
+      })
+      .addCase(deleteContact.rejected, (state, action) => {
+        state.status = STATUSES.ERROR;
+        const deletedContact = action.meta.arg; // full contact
+        state.data.push(deletedContact); 
+      });
   },
 });
 
