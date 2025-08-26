@@ -13,11 +13,12 @@ import {
   selectContactById,
   selectHasFetched,
   toggleFavourite,
+  deleteContact,
   STATUSES,
 } from "../../redux/contactSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, IconButton } from "@mui/material";
 
 function ContactHeader() {
   const navigate = useNavigate();
@@ -36,6 +37,14 @@ function ContactHeader() {
       );
     },
     [dispatch]
+  );
+  const handleDelete = useCallback(
+    (e, contactId) => {
+      e.stopPropagation();
+      dispatch(deleteContact(contactId));
+      navigate(-1); 
+    },
+    [dispatch, navigate]
   );
 
   useEffect(() => {
@@ -94,9 +103,9 @@ function ContactHeader() {
           >
             Edit
           </button>
-          <button className="p-2 rounded-full hover:rounded-full hover:bg-gray-100">
-            <DeleteOutlineOutlined fontSize="medium" />
-          </button>
+          <IconButton onClick={(e) => handleDelete(e, contact)} size="large">
+            <DeleteOutlineOutlined fontSize="medium" sx={{ color: "blue" }} />
+          </IconButton>
           <button className="p-2 rounded-full hover:rounded-full hover:bg-gray-100">
             <MoreVertOutlined fontSize="medium" />
           </button>
