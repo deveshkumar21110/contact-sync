@@ -84,6 +84,7 @@ public class JwtService {
     }
 
     public String generateToken(String email) {
+        logger.info("JWT expiration property (ms): {}", expiration);
         Map<String, Object> claims = new HashMap<>();
         
         // Get UserDetailsService lazily to avoid circular dependency
@@ -99,7 +100,7 @@ public class JwtService {
                 .claims().add(claims)
                 .subject(userDetails.getId())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + Duration.ofDays(1).toMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expiration))
                 .and()
                 .signWith(getKey())
                 .compact();

@@ -2,33 +2,33 @@ import Cookies from "js-cookie";
 import api from "../api/api";
 import { jwtDecode } from "jwt-decode";
 
-const TOKEN_KEY = "access_token";
+const ACCESS_TOKEN = "access_token";
+const REFRESH_TOKEN = "refresh_token";
+
 let cachedRoles = null;
 
 export const authService = {
   // store tokens in cookies
-  setToken: (token) => {
-    Cookies.set(TOKEN_KEY, token, {
-      expires: 7, // valid for 7 days only
+  setToken: (accessToken, refreshToken) => {
+    const { exp } = jwtDecode(accessToken);
+    const expiryDate = new Date(exp * 1000);
+
+    Cookies.set(ACCESS_TOKEN, accessToken, {
+      expires: expiryDate, // from backend
       secure: true, // HTTPS only (set false if localhost)
-      sameSite: "Lax", // 'Strict' or 'None' depending on your needs
+      sameSite: "Lax",
     });
+    Cookies.set(REFRESH_TOKEN, refreshToken, {
+      expires: 30,
+      secure: true,
+      sameSite: "Lax",
+    });
+
+    api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
   },
 
-  // Get Current Token
-  // getCurrentToken: async () => {
-  //   // const response = await api.get("/auth/v1/refreshToken");
-  //   const response = await api.get("/auth/v1/refreshToken", null, {
-  //     headers: { Authorization: `Bearer ${TOKEN_KEY}` },
-  //   });
-  //   if(response.data){
-  //     return response.data.token;
-  //   }
-  //   return null;
-  // },
-
-  getCurrentToken: async () => {
-    const token = Cookies.get(TOKEN_KEY);
+  getCurrentToken: () => {
+    const token = Cookies.get(ACCESS_TOKEN);
     if (token) {
       // console.log("Current token:", token);
       return token;
@@ -37,35 +37,31 @@ export const authService = {
   },
 
   getRefreshToken: () => {
-    return Cookies.get("refresh_token");
+    return Cookies.get(REFRESH_TOKEN);
   },
 
   // Remove token on logout
   logout: async () => {
-    Cookies.remove("access_token");
-    Cookies.remove("refresh_token");
+    Cookies.remove(ACCESS_TOKEN);
+    Cookies.remove(REFRESH_TOKEN);
     delete api.defaults.headers.common["Authorization"];
     cachedRoles = null;
   },
 
   refreshToken: async () => {
     try {
-      const refreshToken = Cookies.get("refresh_token");
+      const refreshToken = Cookies.get(REFRESH_TOKEN);
       if (!refreshToken) throw new Error("No refresh token available");
 
       const response = await api.post("/auth/v1/refreshToken", {
         token: refreshToken,
       });
 
-      const newToken = response.data?.accessToken;
-      if (!newToken) throw new Error("Invalid refresh token response");
+      const { accessToken, token: newRefreshToken } = response.data;
+      if (!accessToken) throw new Error("Invalid refresh token response");
 
-      Cookies.set(TOKEN_KEY, newToken, {
-        expires: 7,
-        secure: true,
-        sameSite: "Lax",
-      });
-      return newToken;
+      authService.setToken(accessToken, newRefreshToken);
+      return accessToken;
     } catch (err) {
       const errorMessage =
         err.response?.data?.error ||
@@ -78,31 +74,16 @@ export const authService = {
 
   login: async (Credentials) => {
     try {
-      console.log("Login...");
-      console.log("credentials", Credentials);
+      // console.log("Login...");
+      // console.log("credentials", Credentials);
       const response = await api.post("/auth/v1/login", Credentials);
-      console.log("Login response:", response.data);
+      // console.log("Login response:", response.data);
 
       if (response.data) {
         // const { token, roles, email, name, userId } = response.data;
-        const { accessToken, token } = response.data;
+        const { accessToken, token: refreshToken } = response.data;
 
-        // Store accessToken (short-lived)
-        Cookies.set("access_token", accessToken, {
-          expires: 0.0105, // ~15 minutes = 15/1440  , 60*24
-          secure: true,
-          sameSite: "Lax",
-        });
-
-        // Store refresh token in cookies
-        Cookies.set("refresh_token", token, {
-          expires: 30, // usually longer than access token
-          secure: true,
-          sameSite: "Lax",
-        });
-
-        // set token in axios header for future request
-        api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+        authService.setToken(accessToken, refreshToken);
         return response.data;
       }
     } catch (error) {
@@ -115,22 +96,11 @@ export const authService = {
   signup: async (Credentials) => {
     try {
       const response = await api.post("/auth/v1/signup", Credentials);
-      console.log("SignUp response: ", response.data);
+      // console.log("SignUp response: ", response.data);
       if (response.data) {
-        const { accessToken, token } = response.data;
-        Cookies.set("access_token", accessToken, {
-          expires: 0.0105,
-          secure: true,
-          sameSite: "Lax",
-        });
-        Cookies.set("refresh_token", token, {
-          expires: 30, // usually longer than access token
-          secure: true,
-          sameSite: "Lax",
-        });
+        const { accessToken, token: refreshToken } = response.data;
+        authService.setToken(accessToken, refreshToken);
 
-        // set token in axios header for future request
-        api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
         return response.data;
       }
     } catch (error) {
@@ -143,7 +113,7 @@ export const authService = {
   getUserRoles: () => {
     if (cachedRoles) return cachedRoles;
 
-    const token = Cookies.get("access_token");
+    const token = Cookies.get(ACCESS_TOKEN);
     if (!token) return [];
 
     try {
@@ -160,13 +130,24 @@ export const authService = {
   },
 
   isAuthenticated: async () => {
-    const token = Cookies.get("access_token");
+    const token = Cookies.get(ACCESS_TOKEN);
     if (!token) return false;
 
     try {
       const { exp } = jwtDecode(token);
-      console.log("isAuthenticated : ", exp * 1000 > Date.now());
-      return exp * 1000 > Date.now(); // check if still valid
+      // console.log("isAuthenticated : ", exp * 1000 > Date.now());
+      if (exp * 1000 > Date.now()) {
+        return true;
+      }
+
+      // expired -> try refresh
+      try {
+        const newToken = await authService.refreshToken();
+        return !!newToken;
+      } catch {
+        await authService.logout();
+        return false;
+      }
     } catch {
       return false;
     }
