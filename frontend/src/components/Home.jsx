@@ -45,9 +45,7 @@ function Home() {
   const handleDelete = useCallback(
     (e, contact) => {
       e.stopPropagation();
-      dispatch(
-        deleteContact(contact )
-      );
+      dispatch(deleteContact(contact));
     },
     [dispatch]
   );
@@ -79,7 +77,7 @@ function Home() {
       </h1>
 
       <div className="overflow-x-auto w-full">
-        <div className="overflow-y-auto rounded-lg w-full">
+        <div className="overflow-y-auto rounded-lg w-full hidden md:flex">
           <table className="min-w-full w-full">
             <thead className="text-base text-gray-700 sticky top-0 z-10 border-b border-gray-300">
               <tr>
@@ -149,15 +147,13 @@ function Home() {
                           )}
                         </IconButton>
                         <IconButton
-                          onClick={(e) =>
-                            handleDelete(
-                              e,
-                              contact
-                            )
-                          }
+                          onClick={(e) => handleDelete(e, contact)}
                           size="large"
                         >
-                          <DeleteOutlineOutlined fontSize="medium" sx={{ color: "blue" }} />
+                          <DeleteOutlineOutlined
+                            fontSize="medium"
+                            sx={{ color: "blue" }}
+                          />
                         </IconButton>
                       </div>
                     </div>
@@ -166,6 +162,32 @@ function Home() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile view */}
+        <div className="md:hidden">
+          {contacts.map((contact) => (
+            <div className="flex items-center mt-2 px-4 py-2 whitespace-nowrap rounded-lg bg-gray-200">
+              <div className="flex-shrink-0 h-10 w-10">
+                <img
+                  className="h-10 w-10 rounded-full object-cover"
+                  src={
+                    contact.imageUrl ||
+                    `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(
+                      contact.displayName
+                    )}`
+                  }
+                  alt={contact.displayName}
+                  onError={handleImageError}
+                />
+              </div>
+              <div className="ml-4">
+                <div className="text-lg font-medium text-gray-900">
+                  {contact.displayName}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
