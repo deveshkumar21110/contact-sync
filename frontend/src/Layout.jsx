@@ -10,7 +10,14 @@ function Layout() {
   const hideSidebar = noSidebarRoutes.includes(location.pathname);
   const hideHeader = noHeaderRoutes.includes(location.pathname);
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    // open sidebar only if screen is >= 1024px (lg in Tailwind)
+    if (window.innerWidth >= 1024) {
+      setIsSidebarOpen(true);
+    }
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);

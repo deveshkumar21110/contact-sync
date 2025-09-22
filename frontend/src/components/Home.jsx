@@ -73,7 +73,7 @@ function Home() {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full mt-2">
       <h1 className="text-2xl mb-2">
         Contacts <span className="text-base">({contacts.length})</span>
       </h1>
