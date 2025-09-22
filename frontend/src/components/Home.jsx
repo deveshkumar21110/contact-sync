@@ -167,7 +167,11 @@ function Home() {
         {/* Mobile view */}
         <div className="md:hidden">
           {contacts.map((contact) => (
-            <div className="flex items-center mt-2 px-4 py-2 whitespace-nowrap rounded-lg bg-gray-200">
+            <div
+              key={contact.id}
+              onClick={() => handleSelectedContact(contact.id)}
+              className="flex items-center mt-2 px-4 py-2 whitespace-nowrap rounded-lg bg-gray-100"
+            >
               <div className="flex-shrink-0 h-10 w-10">
                 <img
                   className="h-10 w-10 rounded-full object-cover"

@@ -91,7 +91,7 @@ function Header({ onMenuClick }) {
       {/* Mobile/Tablet Header - NEW SECTION */}
       <div className="w-full bg-white flex flex-col fixed top-0 left-0 z-50 lg:hidden">
         {/* Status bar space */}
-        <div className="h-6 bg-white"></div>
+        <div className="bg-white"></div>
 
         {/* Main header content */}
         <div className="bg-white px-4 py-3">
