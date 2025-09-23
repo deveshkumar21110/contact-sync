@@ -170,11 +170,11 @@ function Home() {
             <div
               key={contact.id}
               onClick={() => handleSelectedContact(contact.id)}
-              className="flex items-center mt-2 px-4 py-2 whitespace-nowrap rounded-lg shadow-md bg-gray-100"
+              className="flex items-center mt-2 px-4 py-2 whitespace-nowrap rounded-lg border-gray-300 border"
             >
               <div className="flex-shrink-0 ">
                 <img
-                  className="h-14 w-14 rounded-full object-cover"
+                  className="h-10 w-10 rounded-full object-cover"
                   src={
                     contact.imageUrl ||
                     `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(
@@ -186,7 +186,7 @@ function Home() {
                 />
               </div>
               <div className="ml-4">
-                <div className="text-xl font-medium text-gray-900">
+                <div className="text-base font-normal text-gray-800">
                   {contact.displayName}
                 </div>
               </div>

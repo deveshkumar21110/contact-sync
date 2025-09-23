@@ -11,6 +11,7 @@ import {
   LinkOutlined,
   LabelOutlined,
   PermIdentityOutlined,
+  EditOutlined,
 } from "@mui/icons-material";
 import { Avatar, TextField, Stack } from "@mui/material";
 import Container from "../components/Container";
@@ -188,7 +189,7 @@ function CreateContactPage() {
 
   return (
     <Container>
-      <div className="pl-6 w-1/2 bg-white">
+      <div className="md:pl-6 p-2 md:w-1/2 bg-white">
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Header */}
           <div className="bg-white flex justify-between items-center">
@@ -218,22 +219,26 @@ function CreateContactPage() {
           </div>
 
           {/* Avatar */}
-          <div className="relative inline-block my-4 pb-4">
-            <Avatar
-              src={watch("imageUrl") || ""}
-              sx={{ width: 128, height: 128 }}
-              onClick={openModal}
-              className="cursor-pointer"
-            />
+          <div className="relative flex justify-center md:justify-normal my-4 pb-4">
+            {/* Avatar + button wrapper */}
+            <div className="relative">
+              <Avatar
+                src={watch("imageUrl") || ""}
+                sx={{ width: 128, height: 128 }}
+                onClick={openModal}
+                className="cursor-pointer"
+              />
 
-            <button
-              type="button"
-              onClick={openModal}
-              className="absolute bottom-1 right-1 bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center ring-4 ring-white"
-              title="Add photo"
-            >
-              +
-            </button>
+              <button
+                type="button"
+                onClick={openModal}
+                className="absolute bottom-1 right-1 bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center ring-4 ring-white"
+                title="Add photo"
+              >
+                +
+              </button>
+            </div>
+
             <BasicModal
               open={open}
               handleClose={closeModal}
@@ -245,54 +250,65 @@ function CreateContactPage() {
           {/* Form Fields */}
           <div className="flex flex-col gap-4">
             {/* Labels Section */}
-            <div className="space-y-2">
+            <div className="">
               {/* Label Button */}
-              <button
-                type="button"
-                onClick={openLabelModal}
-                className="inline-flex items-center px-2 py-1 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <Add className="w-2 h-2 mr-2" />
-                {selectedLabels.length === 0
-                  ? "Label"
-                  : `Labels (${selectedLabels.length})`}
-              </button>
-
-              {/* Selected Labels Display */}
-              {selectedLabels.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {selectedLabels.map((label, index) => (
-                    <span
-                      key={label.id || index}
-                      onClick={() => removeLabel(index)}
-                      className="inline-flex cursor-pointer items-center px-2 py-1 text-xs font-medium  text-blue-800 rounded-lg border-2 mt-1 border-black"
-                    >
-                      <LabelOutlined
-                        className="mx-2 text-gray-400"
-                        fontSize="small"
-                      />
-                      {label.name}
-                      <button
-                        type="button"
+              <div className="flex md:justify-normal justify-center w-full">
+                {/* Selected Labels Display */}
+                {selectedLabels.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mr-3">
+                    {selectedLabels.map((label, index) => (
+                      <span
+                        key={label.id || index}
                         onClick={() => removeLabel(index)}
-                        className="ml-2 text-blue-600 hover:text-blue-800"
+                        className="inline-flex cursor-pointer items-center px-2 py-1 text-xs md:font-medium  text-gray-800 rounded-lg border-2 mt-1 border-black"
                       >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
+                        <LabelOutlined
+                          className="md:mx-2 text-gray-400"
+                          fontSize="small"
+                        />
+                        {label.name}
+                        <button
+                          type="button"
+                          onClick={() => removeLabel(index)}
+                          className="ml-2 text-blue-600 hover:text-blue-800"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
 
-              {/* Label Modal - Pass react-hook-form props */}
-              <LabelModal
-                anchorEl={anchorEl}
-                open={openLabel}
-                handleClose={closeLabelModal}
-                control={control}
-                setValue={setValue}
-                watch={watch}
-              />
+                {selectedLabels.length > 0 ? (
+                  <button
+                    onClick={openLabelModal}
+                    className="flex justify-center items-center border rounded-full px-1 "
+                  >
+                    <EditOutlined fontSize="medium" sx={{ color: "blue" }} />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={openLabelModal}
+                    className="inline-flex items-center px-2 py-1 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <Add className="w-2 h-2 mr-2" />
+                    {selectedLabels.length === 0
+                      ? "Label"
+                      : `Labels (${selectedLabels.length})`}
+                  </button>
+                )}
+
+                {/* Label Modal - Pass react-hook-form props */}
+                <LabelModal
+                  anchorEl={anchorEl}
+                  open={openLabel}
+                  handleClose={closeLabelModal}
+                  control={control}
+                  setValue={setValue}
+                  watch={watch}
+                />
+              </div>
             </div>
 
             {/* Name */}

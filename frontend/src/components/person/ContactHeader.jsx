@@ -135,7 +135,7 @@ function ContactHeader() {
             }
             alt="Contact"
           />
-          <div>
+          <div className="flex-col items-center justify-center text-center md:text-left">
             <div className="text-3xl">{contact.displayName}</div>
             <div>
               {contact.jobTitle && <span>{contact.jobTitle}</span>}

@@ -250,7 +250,7 @@ function EditContactPage() {
 
   return (
     <Container>
-      <div className="pl-6 w-1/2 bg-white">
+      <div className="md:pl-6 md:w-1/2 bg-white">
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Header */}
           <div className="bg-white flex justify-between items-center">
