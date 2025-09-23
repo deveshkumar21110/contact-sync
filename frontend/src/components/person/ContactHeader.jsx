@@ -1,6 +1,7 @@
 import {
   ArrowBack,
   DeleteOutlineOutlined,
+  EditOutlined,
   MoreVertOutlined,
   Star,
   StarBorderOutlined,
@@ -42,7 +43,7 @@ function ContactHeader() {
     (e, contactId) => {
       e.stopPropagation();
       dispatch(deleteContact(contactId));
-      navigate(-1); 
+      navigate(-1);
     },
     [dispatch, navigate]
   );
@@ -82,14 +83,14 @@ function ContactHeader() {
 
   return (
     <div>
-      <div className="flex pl-8 justify-between w-2/3  ">
+      <div className="flex items-center md:pl-8 justify-between md:w-2/3  ">
         <ArrowBack className="cursor-pointer" onClick={() => navigate(-1)} />
-        <div className="flex gap-4">
+        <div className="flex items-center gap-">
           <button
             onClick={(e) =>
               handleFavouriteToggle(e, contact.id, contact.isFavourite)
             }
-            className=" p-2 rounded-full hover:rounded-full hover:bg-gray-100"
+            className="p-2 rounded-full hover:rounded-full hover:bg-gray-100"
           >
             {contact.isFavourite ? (
               <Star fontSize="medium" sx={{ color: "blue" }} />
@@ -99,12 +100,21 @@ function ContactHeader() {
           </button>
           <button
             onClick={() => navigate(`/person/${contactId}/edit`)}
-            className="px-6 py-2 bg-blue-800 text-gray-100 rounded-full"
+            className="hidden md:flex px-6 py-2 bg-blue-800 text-gray-100 rounded-full"
           >
             Edit
           </button>
+          <div className="md:hidden">
+            <IconButton
+              onClick={() => navigate(`/person/${contactId}/edit`)}
+              size="large"
+            >
+              <EditOutlined fontSize="medium" sx={{ color: "black" }} />
+            </IconButton>
+          </div>
+
           <IconButton onClick={(e) => handleDelete(e, contact)} size="large">
-            <DeleteOutlineOutlined fontSize="medium" sx={{ color: "blue" }} />
+            <DeleteOutlineOutlined fontSize="medium" sx={{ color: "black" }} />
           </IconButton>
           <button className="p-2 rounded-full hover:rounded-full hover:bg-gray-100">
             <MoreVertOutlined fontSize="medium" />
@@ -114,7 +124,7 @@ function ContactHeader() {
 
       {/* Image and some detail */}
       <div className="flex flex-col">
-        <div className="flex pl-12 pb-4 pt-2 gap-6 items-center">
+        <div className="flex flex-col md:pl-12 pb-4 pt-2 gap-6 items-center md:flex-row">
           <img
             className="h-40 w-40 rounded-full object-cover"
             src={
@@ -127,7 +137,7 @@ function ContactHeader() {
           />
           <div>
             <div className="text-3xl">{contact.displayName}</div>
-            <div className="">
+            <div>
               {contact.jobTitle && <span>{contact.jobTitle}</span>}
               {contact.jobTitle && contact.company && (
                 <span className="text-3xl"> . </span>

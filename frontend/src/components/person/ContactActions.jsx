@@ -25,7 +25,7 @@ function ContactActions() {
 
   return (
     <div>
-      <div className="mt-8 pl-8 pb-8 flex gap-8">
+      <div className="md:mt-8 mt-2 md:pl-8 md:pb-8 pb-6 flex justify-center md:justify-normal gap-8">
         {/* Email */}
         <div>
           <div

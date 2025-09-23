@@ -62,7 +62,7 @@ function PersonContact() {
         <ContactHeader />
 
         {/* Labels Section */}
-        <div className="flex items-center flex-wrap gap-2  pl-8">
+        <div className="flex items-center flex-wrap gap-2 md:pl-8 justify-center md:justify-normal">
           {/* Selected Labels Display */}
           {selectedLabels.length > 0 &&
             selectedLabels.map((label, index) => (
@@ -113,7 +113,7 @@ function PersonContact() {
           setValue={setValue}
           watch={watch}
         />
-        <div className="pl-8">
+        <div className="md:pl-8">
           <ContactDetails />
         </div>
       </div>

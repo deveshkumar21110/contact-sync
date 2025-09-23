@@ -15,7 +15,7 @@ function ContactDetails() {
   const contact = useSelector((state) => selectContactById(state, contactId));
 
   return (
-    <div className="flex flex-col gap-3 p-4 mt-4 mb-4 bg-gray-100 h-2/4 w-2/5 rounded-3xl">
+    <div className="flex flex-col gap-3 p-4 mt-4 mb-4 bg-gray-100 md:h-2/4 md:w-2/5 rounded-3xl">
       <div className="text-lg">Contact Details</div>
 
       {/* Emails */}
