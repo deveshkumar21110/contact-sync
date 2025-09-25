@@ -103,7 +103,7 @@ const Sidebar = ({ isOpen = true }) => {
             onClick={() => navigate(`/label/${label.id}`)}
           >
             <Label className="text-gray-700" fontSize="medium" />
-            <span className="pl-3 text-base font-medium flex-1">{label.name}</span>
+            <span className="md:pl-3 text-base font-medium flex-1">{label.name}</span>
           </div>
         ))}
       </div>

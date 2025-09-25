@@ -43,7 +43,7 @@ function Header({ onMenuClick }) {
                 alt="Person Icon"
                 className="w-10 h-10 pr-1"
               />
-              <h1 className="text-2xl text-gray-600 pl-1">Contacts</h1>
+              <h1 className="text-2xl text-gray-600 md:pl-1">Contacts</h1>
             </NavLink>
           </div>
 
@@ -94,15 +94,15 @@ function Header({ onMenuClick }) {
         <div className="bg-white"></div>
 
         {/* Main header content */}
-        <div className="flex bg-pink-100 px-4 py-3">
-          <div className="p-3 rounded-full hover:rounded-full ">
+        <div className="flex items-center p-4 bg-pink-100 ">
+          <div className="rounded-full pr-2 hover:rounded-full ">
               <MenuIcon
                 sx={{ fontSize: 28, cursor: "pointer", color: "#818589" }}
                 onClick={onMenuClick}
               />
             </div>
           {/* Search bar with profile */}
-          <div className="flex items-center w-full bg-pink-200 rounded-full h-12 px-4 mb-4">
+          <div className="flex items-center w-full bg-pink-200 rounded-full h-12 px-4 md:mb-4">
             <SearchIcon className="text-gray-500 mr-3" sx={{ fontSize: 20 }} />
             <input
               type="text"
