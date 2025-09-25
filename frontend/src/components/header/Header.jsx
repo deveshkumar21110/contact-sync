@@ -89,10 +89,11 @@ function Header({ onMenuClick }) {
         </div>
       </div>
       {/* Mobile/Tablet Header - NEW SECTION */}
-      <div className="fixed top-0 left-0 right-0 w-full z-50 bg-white flex flex-col lg:hidden overflow-hidden">
+      <div className="fixed top-0 left-0 right-0 w-full z-50 bg-white flex flex-col lg:hidden">
   {/* Main header content */}
-  <div className="flex items-center px-3 py-2 bg-pink-100">
-    <div className="pr-2">
+  <div className="flex items-center px-3 py-2 bg-pink-100 w-full">
+    {/* Menu icon */}
+    <div className="pr-2 flex-shrink-0">
       <MenuIcon
         sx={{ fontSize: 28, cursor: "pointer", color: "#818589" }}
         onClick={onMenuClick}
@@ -100,19 +101,19 @@ function Header({ onMenuClick }) {
     </div>
 
     {/* Search bar */}
-    <div className="flex items-center flex-1 bg-pink-200 rounded-full h-12 px-3">
-      <SearchIcon className="text-gray-500 mr-2" sx={{ fontSize: 20 }} />
+    <div className="flex items-center bg-pink-200 rounded-full h-12 px-3 w-full">
+      <SearchIcon className="text-gray-500 mr-2 flex-shrink-0" sx={{ fontSize: 20 }} />
       <input
         type="text"
         placeholder="Search contacts"
-        className="flex-1 bg-transparent outline-none text-gray-700 placeholder:text-gray-500 text-sm"
+        className="flex-1 bg-transparent outline-none text-gray-700 placeholder:text-gray-500 text-sm min-w-0"
       />
       <div className="ml-2 flex-shrink-0">
         {currentUser?.profile_image_url ? (
           <img
             src={currentUser.profile_image_url}
             alt="Profile"
-            className="w-8 h-8 rounded-full"
+            className="w-8 h-8 rounded-full object-cover"
           />
         ) : (
           <AccountCircleOutlinedIcon sx={{ fontSize: 32, color: "#666" }} />
@@ -121,6 +122,7 @@ function Header({ onMenuClick }) {
     </div>
   </div>
 </div>
+
 
     </>
   );
