@@ -16,7 +16,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchLabels, STATUSES } from "../../redux/labelSlice";
 
-const Sidebar = ({ isOpen = true }) => {
+const Sidebar = ({ isOpen = true, toggleSidebar }) => {
   const contactCount = useSelector((state) => state.contact?.data?.length);
   const dispatch = useDispatch();
   const { data: labels, status, hasFetched } = useSelector((state) => state.label);
@@ -29,9 +29,16 @@ const Sidebar = ({ isOpen = true }) => {
     }
   }, [dispatch,hasFetched, status]);
 
+  const handleNavClick = (path) => {
+    navigate(path);
+    if (window.innerWidth < 1024) {
+      toggleSidebar?.(); // close sidebar on mobile
+    }
+  };
+
   return (
     <div
-      className={`fixed top-20 left-0 w-72 h-screen md:bg-gray-50  p-6 flex flex-col z-40 transition-transform duration-300
+      className={`fixed top-20 left-0 w-72 h-screen md:bg-gray-50 bg-pink-100 p-6 flex flex-col z-40 transition-transform duration-300
         ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
     >
       <div>
@@ -54,7 +61,7 @@ const Sidebar = ({ isOpen = true }) => {
               boxShadow: "none",
             },
           }}
-          onClick={() => navigate("/new")}
+          onClick={() => handleNavClick("/new")}
         >
           Create contact
         </Button>
@@ -67,6 +74,7 @@ const Sidebar = ({ isOpen = true }) => {
               label="Contacts"
               badge={contactCount}
               active={location.pathname === "/"}
+              onClick={() => handleNavClick("/")}
             />
           </Link>
         </div>
@@ -78,16 +86,19 @@ const Sidebar = ({ isOpen = true }) => {
             icon={<HandymanOutlined />}
             label="Merge & fix"
             active={location.pathname === "/merge-fix"}
+            onClick={() => handleNavClick("/")}
           />
           <SidebarItem
             icon={<FileDownloadOutlined />}
             label="Import"
             active={location.pathname === "/import"}
+            onClick={() => handleNavClick("/import")}
           />
           <SidebarItem
             icon={<DeleteOutlineOutlined />}
             label="Trash"
             active={location.pathname === "/trash"}
+            onClick={() => handleNavClick("/trash")}
           />
         </div>
 
@@ -100,7 +111,7 @@ const Sidebar = ({ isOpen = true }) => {
               ${location.pathname === `/label/${label.id}`
                 ? "bg-blue-100 text-blue-700"
                 : "hover:bg-blue-100 hover:text-blue-700 text-gray-700"}`}
-            onClick={() => navigate(`/label/${label.id}`)}
+            onClick={() => handleNavClick(`/label/${label.id}`)}
           >
             <Label className="text-gray-700" fontSize="medium" />
             <span className="md:pl-3 text-base font-medium flex-1">{label.name}</span>

@@ -188,11 +188,11 @@ function CreateContactPage() {
   };
 
   return (
-    <Container>
-      <div className="md:pl-6 p-2 md:w-1/2 bg-white">
+    <Container className="bg-pink-100 md:bg-white">
+      <div className="md:pl-6 p-2 md:w-1/2 bg-pink-100 md:bg-white">
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Header */}
-          <div className="bg-white flex justify-between items-center">
+          <div className="bg-pink-100 md:bg-white flex justify-between items-center">
             <ArrowBack
               onClick={() => navigate(-1)}
               className="cursor-pointer"

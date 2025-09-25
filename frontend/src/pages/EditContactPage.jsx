@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import {
   ArrowBack,
@@ -11,27 +10,27 @@ import {
   LinkOutlined,
   LabelOutlined,
   PermIdentityOutlined,
+  EditOutlined,
 } from "@mui/icons-material";
 import { Avatar, TextField, Stack } from "@mui/material";
-import Container from "../components/Container";
 import BusinessIcon from "@mui/icons-material/Business";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
+import { blue } from "@mui/material/colors";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
+// Import from index.js
 import {
+  Container,
   AddButton,
   AddressSection,
   IconTextField,
   useSnackbar,
+  LabelModal,
 } from "../index";
-import { useNavigate, useParams } from "react-router-dom";
-import { blue } from "@mui/material/colors";
-import { useDispatch, useSelector } from "react-redux";
+
 import BasicModal from "../components/BasicModal";
-import {
-  addContact,
-  selectContactById,
-  updateContact,
-} from "../redux/contactSlice";
-import LabelModal from "../components/Modal/LabelModal";
+import { selectContactById, updateContact } from "../redux/contactSlice";
 
 function EditContactPage() {
   const { showSnackbar } = useSnackbar();
@@ -44,27 +43,11 @@ function EditContactPage() {
 
   const openLabel = Boolean(anchorEl);
 
-  const openModal = () => {
-    setOpen(true);
-  };
-
-  const openLabelModal = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
+  const openModal = () => setOpen(true);
+  const openLabelModal = (event) => setAnchorEl(event.currentTarget);
   const closeModal = () => setOpen(false);
+  const closeLabelModal = () => setAnchorEl(null);
 
-  const closeLabelModal = () => {
-    setAnchorEl(null);
-  };
-
-  const handleIsFavourite = () => {
-    const currentValue = getValues("isFavourite");
-    const newValue = !currentValue;
-    setValue("isFavourite", newValue);
-  };
-
-  // React Hook Form setup with labels included
   const { register, setValue, getValues, handleSubmit, control, watch } =
     useForm({
       defaultValues: {
@@ -114,52 +97,28 @@ function EditContactPage() {
   const isFavourite = watch("isFavourite");
   const selectedLabels = watch("labels") || [];
 
-  // Field arrays for dynamic form sections
   const { fields: emailFields, append: appendEmail } = useFieldArray({
     control,
     name: "emails",
   });
-
   const { fields: phoneFields, append: appendPhone } = useFieldArray({
     control,
     name: "phoneNumbers",
   });
-
   const { fields: addressFields, append: appendAddress } = useFieldArray({
     control,
     name: "addresses",
   });
-
   const { fields: websiteFields, append: appendWebsite } = useFieldArray({
     control,
     name: "websites",
   });
 
-  // Add field functions
-  const addEmailField = () => {
-    appendEmail({ email: "" });
+  const handleIsFavourite = () => {
+    const currentValue = getValues("isFavourite");
+    setValue("isFavourite", !currentValue);
   };
 
-  const addPhoneField = () => {
-    appendPhone({ countryCode: "+91", number: "" });
-  };
-
-  const addAddressField = () => {
-    appendAddress({
-      country: "",
-      streetAddress: "",
-      streetAddress2: "",
-      city: "",
-      pincode: "",
-      state: "",
-    });
-  };
-
-  const addWebsiteField = () => {
-    appendWebsite({ url: "" });
-  };
-
-  // Remove label function
   const removeLabel = (indexToRemove) => {
     const updatedLabels = selectedLabels.filter(
       (_, index) => index !== indexToRemove
@@ -168,24 +127,19 @@ function EditContactPage() {
   };
 
   const onSubmit = async (data) => {
-    // Clean up the data before sending
     const payload = {
-      // id: contact?.id, // important for update
       firstName: data.firstName,
       lastName: data.lastName,
       jobTitle: data.jobTitle || "",
       company: data.company,
       imageUrl: data.imageUrl || "",
       isFavourite: data.isFavourite,
-
-      // preserve IDs for backend
       emails: data.emails
         .filter((email) => email.email.trim() !== "")
         .map((e, idx) => ({
           id: e.id || contact?.emails?.[idx]?.id,
           email: e.email,
         })),
-
       phoneNumbers: data.phoneNumbers
         .filter((phone) => phone.number.trim() !== "")
         .map((p, idx) => ({
@@ -193,7 +147,6 @@ function EditContactPage() {
           countryCode: p.countryCode,
           number: p.number,
         })),
-
       addresses: data.addresses
         .filter(
           (addr) =>
@@ -210,16 +163,13 @@ function EditContactPage() {
           pincode: a.pincode,
           state: a.state,
         })),
-
       websites: data.websites
         .filter((website) => website.url.trim() !== "")
         .map((w, idx) => ({
           id: w.id || contact?.websites?.[idx]?.id,
           url: w.url,
         })),
-
       significantDates: [],
-
       labels: data.labels.map((label) => ({
         id: label.id,
         name: label.name,
@@ -228,20 +178,19 @@ function EditContactPage() {
 
     showSnackbar("Saving contact...", {
       severity: "info",
-      autoHideDuration: null, // keep it open until manually replaced
+      autoHideDuration: null,
     });
 
     try {
-      const response = await dispatch(updateContact(payload)).unwrap();
-      console.log("Add contact response:", response);
+      await dispatch(updateContact(payload)).unwrap();
       showSnackbar("Contact updated successfully!", {
         severity: "success",
         autoHideDuration: 3000,
       });
       navigate(`/person/${contactId}`);
     } catch (error) {
-      console.error("Error adding contact: ", error);
-      showSnackbar("Failed to create contact.", {
+      console.error("Error updating contact: ", error);
+      showSnackbar("Failed to update contact.", {
         severity: "error",
         autoHideDuration: 3000,
       });
@@ -249,18 +198,18 @@ function EditContactPage() {
   };
 
   return (
-    <Container>
-      <div className="md:pl-6 md:w-1/2 bg-white">
+    <Container className="bg-pink-100 md:bg-white">
+      <div className="md:pl-6 p-2 md:w-1/2 bg-pink-100 md:bg-white">
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Header */}
-          <div className="bg-white flex justify-between items-center">
+          <div className="bg-pink-100 md:bg-white flex justify-between items-center">
             <ArrowBack
               onClick={() => navigate(-1)}
               className="cursor-pointer"
             />
             <div className="flex gap-4 justify-center items-center">
               <button
-                className="p-2 rounded-full hover:rounded-full hover:bg-gray-100"
+                className="p-2 rounded-full hover:bg-gray-100"
                 type="button"
                 onClick={handleIsFavourite}
               >
@@ -280,22 +229,23 @@ function EditContactPage() {
           </div>
 
           {/* Avatar */}
-          <div className="relative inline-block my-4 pb-4">
-            <Avatar
-              src={watch("imageUrl") || ""}
-              sx={{ width: 128, height: 128 }}
-              onClick={openModal}
-              className="cursor-pointer"
-            />
-
-            <button
-              type="button"
-              onClick={openModal}
-              className="absolute bottom-1 right-1 bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center ring-4 ring-white"
-              title="Add photo"
-            >
-              +
-            </button>
+          <div className="relative flex justify-center md:justify-normal my-4 pb-4">
+            <div className="relative">
+              <Avatar
+                src={watch("imageUrl") || ""}
+                sx={{ width: 128, height: 128 }}
+                onClick={openModal}
+                className="cursor-pointer"
+              />
+              <button
+                type="button"
+                onClick={openModal}
+                className="absolute bottom-1 right-1 bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center ring-4 ring-white"
+                title="Add photo"
+              >
+                +
+              </button>
+            </div>
             <BasicModal
               open={open}
               handleClose={closeModal}
@@ -307,54 +257,62 @@ function EditContactPage() {
           {/* Form Fields */}
           <div className="flex flex-col gap-4">
             {/* Labels Section */}
-            <div className="space-y-2">
-              {/* Label Button */}
-              <button
-                type="button"
-                onClick={openLabelModal}
-                className="inline-flex items-center px-2 py-1 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <Add className="w-2 h-2 mr-2" />
-                {selectedLabels.length === 0
-                  ? "Label"
-                  : `Labels (${selectedLabels.length})`}
-              </button>
-
-              {/* Selected Labels Display */}
-              {selectedLabels.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {selectedLabels.map((label, index) => (
-                    <span
-                      key={label.id || index}
-                      onClick={() => removeLabel(index)}
-                      className="inline-flex cursor-pointer items-center px-2 py-1 text-xs font-medium  text-blue-800 rounded-lg border-2 mt-1 border-black"
-                    >
-                      <LabelOutlined
-                        className="mx-2 text-gray-400"
-                        fontSize="small"
-                      />
-                      {label.name}
-                      <button
-                        type="button"
+            <div className="">
+              <div className="flex md:justify-normal justify-center w-full">
+                {selectedLabels.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mr-3">
+                    {selectedLabels.map((label, index) => (
+                      <span
+                        key={label.id || index}
                         onClick={() => removeLabel(index)}
-                        className="ml-2 text-blue-600 hover:text-blue-800"
+                        className="inline-flex cursor-pointer items-center px-2 py-1 text-xs md:font-medium text-gray-800 rounded-lg border-2 mt-1 border-black"
                       >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
+                        <LabelOutlined
+                          className="md:mx-2 text-gray-400"
+                          fontSize="small"
+                        />
+                        {label.name}
+                        <button
+                          type="button"
+                          onClick={() => removeLabel(index)}
+                          className="ml-2 text-blue-600 hover:text-blue-800"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
 
-              {/* Label Modal - Pass react-hook-form props */}
-              <LabelModal
-                anchorEl={anchorEl}
-                open={openLabel}
-                handleClose={closeLabelModal}
-                control={control}
-                setValue={setValue}
-                watch={watch}
-              />
+                {selectedLabels.length > 0 ? (
+                  <button
+                    onClick={openLabelModal}
+                    className="flex justify-center items-center border rounded-full px-1 "
+                  >
+                    <EditOutlined fontSize="medium" sx={{ color: "blue" }} />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={openLabelModal}
+                    className="inline-flex items-center px-2 py-1 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <Add className="w-2 h-2 mr-2" />
+                    {selectedLabels.length === 0
+                      ? "Label"
+                      : `Labels (${selectedLabels.length})`}
+                  </button>
+                )}
+
+                <LabelModal
+                  anchorEl={anchorEl}
+                  open={openLabel}
+                  handleClose={closeLabelModal}
+                  control={control}
+                  setValue={setValue}
+                  watch={watch}
+                />
+              </div>
             </div>
 
             {/* Name */}
@@ -366,7 +324,7 @@ function EditContactPage() {
                 register={register}
               />
               <IconTextField
-                icon={<div />} // empty placeholder to keep alignment
+                icon={<div />}
                 label="Last name"
                 name="lastName"
                 register={register}
@@ -417,7 +375,7 @@ function EditContactPage() {
                 <AddButton
                   label="Add email"
                   icon={<Add />}
-                  onClick={addEmailField}
+                  onClick={() => appendEmail({ email: "" })}
                 />
               </Stack>
             </Stack>
@@ -443,7 +401,9 @@ function EditContactPage() {
                 <AddButton
                   label="Add phone"
                   icon={<Add />}
-                  onClick={addPhoneField}
+                  onClick={() =>
+                    appendPhone({ countryCode: "+91", number: "" })
+                  }
                 />
               </Stack>
             </Stack>
@@ -467,12 +427,21 @@ function EditContactPage() {
                 <AddButton
                   label="Add address"
                   icon={<LocationOnOutlined />}
-                  onClick={addAddressField}
+                  onClick={() =>
+                    appendAddress({
+                      country: "",
+                      streetAddress: "",
+                      streetAddress2: "",
+                      city: "",
+                      pincode: "",
+                      state: "",
+                    })
+                  }
                 />
               </Stack>
             </Stack>
 
-            {/* Website Link */}
+            {/* Website */}
             <Stack spacing={2}>
               {websiteFields.map((field, index) => (
                 <IconTextField
@@ -493,7 +462,7 @@ function EditContactPage() {
                 <AddButton
                   label="Add website"
                   icon={<Add />}
-                  onClick={addWebsiteField}
+                  onClick={() => appendWebsite({ url: "" })}
                 />
               </Stack>
             </Stack>
