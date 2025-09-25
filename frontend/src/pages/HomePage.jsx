@@ -5,7 +5,7 @@ import Home from "../components/Home";
 
 function HomePage() {
   return (
-    <Container className="min-h-screen bg-pink-200 md:bg-white">
+    <Container className="min-h-screen bg-pink-100 md:bg-white">
       <Home />
     </Container>
   );
