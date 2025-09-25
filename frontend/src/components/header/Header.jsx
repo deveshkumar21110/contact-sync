@@ -88,25 +88,25 @@ function Header({ onMenuClick }) {
           </div>
         </div>
       </div>
-      {/* Mobile/Tablet Header - NEW SECTION */}
-      <div className="fixed top-0 left-0 right-0 w-full z-50 bg-white flex flex-col lg:hidden">
-  {/* Main header content */}
-  <div className="flex items-center px-3 py-2 bg-pink-100 w-full">
-    {/* Menu icon */}
-    <div className="pr-2 flex-shrink-0">
-      <MenuIcon
-        sx={{ fontSize: 28, cursor: "pointer", color: "#818589" }}
-        onClick={onMenuClick}
-      />
-    </div>
+      {/* Mobile - NEW SECTION */}
+      {/* Mobile Header */}
+<div className="fixed top-0 left-0 right-0 w-full z-50 bg-white lg:hidden">
+  <div className="flex items-center bg-pink-100 px-2 py-2 w-full">
+    {/* Menu Icon */}
+    <button
+      onClick={onMenuClick}
+      className="flex-shrink-0 p-1"
+    >
+      <MenuIcon sx={{ fontSize: 28, color: "#818589" }} />
+    </button>
 
-    {/* Search bar */}
-    <div className="flex items-center bg-pink-200 rounded-full h-12 px-3 w-full">
+    {/* Search Bar */}
+    <div className="flex items-center bg-pink-200 rounded-full h-12 px-3 ml-2 w-0 flex-1 min-w-0">
       <SearchIcon className="text-gray-500 mr-2 flex-shrink-0" sx={{ fontSize: 20 }} />
       <input
         type="text"
         placeholder="Search contacts"
-        className="flex-1 bg-transparent outline-none text-gray-700 placeholder:text-gray-500 text-sm min-w-0"
+        className="w-0 flex-1 min-w-0 bg-transparent outline-none text-gray-700 placeholder:text-gray-500 text-sm"
       />
       <div className="ml-2 flex-shrink-0">
         {currentUser?.profile_image_url ? (
@@ -122,6 +122,7 @@ function Header({ onMenuClick }) {
     </div>
   </div>
 </div>
+
 
 
     </>
