@@ -89,7 +89,7 @@ function Header({ onMenuClick }) {
         </div>
       </div>
       {/* Mobile/Tablet Header - NEW SECTION */}
-      <div className="w-full bg-white flex flex-col fixed top-0 left-0 z-50 lg:hidden">
+      <div className="left-0 right-0 bg-white flex flex-col fixed top-0 z-50 lg:hidden">
         {/* Status bar space */}
         <div className="bg-white"></div>
 
@@ -102,7 +102,7 @@ function Header({ onMenuClick }) {
               />
             </div>
           {/* Search bar with profile */}
-          <div className="flex items-center w-full bg-pink-200 rounded-full h-12 px-4 md:mb-4">
+          <div className="flex items-center flex-1 bg-pink-200 rounded-full h-12 px-4">
             <SearchIcon className="text-gray-500 mr-3" sx={{ fontSize: 20 }} />
             <input
               type="text"
@@ -110,7 +110,7 @@ function Header({ onMenuClick }) {
               className="flex-1 bg-transparent outline-none text-gray-700 placeholder:text-gray-500 text-sm"
             />
             {/* Profile in search bar */}
-            <div className="ml-3">
+            <div className="ml-3 flex-shrink-0">
               {currentUser?.profile_image_url ? (
                 <img
                   src={currentUser.profile_image_url}
