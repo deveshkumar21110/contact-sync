@@ -89,13 +89,9 @@ function Header({ onMenuClick }) {
         </div>
       </div>
       {/* Mobile/Tablet Header - NEW SECTION */}
-      <div className="fixed top-0 inset-x-0 z-50 bg-white flex flex-col lg:hidden">
-  {/* Status bar safe area (for iOS/Android notch) */}
-  <div className="bg-white" style={{ paddingTop: "env(safe-area-inset-top)" }} />
-
-  {/* Main header */}
+      <div className="fixed top-0 left-0 right-0 w-full z-50 bg-white flex flex-col lg:hidden overflow-hidden">
+  {/* Main header content */}
   <div className="flex items-center px-3 py-2 bg-pink-100">
-    {/* Menu button */}
     <div className="pr-2">
       <MenuIcon
         sx={{ fontSize: 28, cursor: "pointer", color: "#818589" }}
@@ -104,7 +100,7 @@ function Header({ onMenuClick }) {
     </div>
 
     {/* Search bar */}
-    <div className="flex items-center flex-1 bg-pink-200 rounded-full h-12 px-3 overflow-hidden">
+    <div className="flex items-center flex-1 bg-pink-200 rounded-full h-12 px-3">
       <SearchIcon className="text-gray-500 mr-2" sx={{ fontSize: 20 }} />
       <input
         type="text"
