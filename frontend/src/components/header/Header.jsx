@@ -89,61 +89,43 @@ function Header({ onMenuClick }) {
         </div>
       </div>
       {/* Mobile/Tablet Header - NEW SECTION */}
-      <div className="left-0 right-0 bg-white flex flex-col fixed top-0 z-50 lg:hidden">
-        {/* Status bar space */}
-        <div className="bg-white"></div>
+      <div className="fixed top-0 inset-x-0 z-50 bg-white flex flex-col lg:hidden">
+  {/* Status bar safe area (for iOS/Android notch) */}
+  <div className="bg-white" style={{ paddingTop: "env(safe-area-inset-top)" }} />
 
-        {/* Main header content */}
-        <div className="flex items-center p-4 bg-pink-100 ">
-          <div className="rounded-full pr-2 hover:rounded-full ">
-              <MenuIcon
-                sx={{ fontSize: 28, cursor: "pointer", color: "#818589" }}
-                onClick={onMenuClick}
-              />
-            </div>
-          {/* Search bar with profile */}
-          <div className="flex items-center flex-1 bg-pink-200 rounded-full h-12 px-4">
-            <SearchIcon className="text-gray-500 mr-3" sx={{ fontSize: 20 }} />
-            <input
-              type="text"
-              placeholder="Search contacts"
-              className="flex-1 bg-transparent outline-none text-gray-700 placeholder:text-gray-500 text-sm"
-            />
-            {/* Profile in search bar */}
-            <div className="ml-3 flex-shrink-0">
-              {currentUser?.profile_image_url ? (
-                <img
-                  src={currentUser.profile_image_url}
-                  alt="Profile"
-                  className="w-8 h-8 rounded-full"
-                />
-              ) : (
-                <AccountCircleOutlinedIcon
-                  sx={{ fontSize: 32, color: "#666" }}
-                />
-              )}
-            </div>
-          </div>
+  {/* Main header */}
+  <div className="flex items-center px-3 py-2 bg-pink-100">
+    {/* Menu button */}
+    <div className="pr-2">
+      <MenuIcon
+        sx={{ fontSize: 28, cursor: "pointer", color: "#818589" }}
+        onClick={onMenuClick}
+      />
+    </div>
 
-          {/* <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <MenuIcon
-                sx={{ fontSize: 20, color: "#666", marginRight: 1 }}
-                onClick={onMenuClick}
-              />
-              <span className="text-gray-700 text-sm font-medium mr-1">
-                All contacts
-              </span>
-              <KeyboardArrowDownIcon sx={{ fontSize: 20, color: "#666" }} />
-            </div>
-
-            <div className="flex items-center gap-3">
-              <ChatBubbleOutlineIcon sx={{ fontSize: 22, color: "#666" }} />
-              <TuneIcon sx={{ fontSize: 22, color: "#666" }} />
-            </div>
-          </div> */}
-        </div>
+    {/* Search bar */}
+    <div className="flex items-center flex-1 bg-pink-200 rounded-full h-12 px-3 overflow-hidden">
+      <SearchIcon className="text-gray-500 mr-2" sx={{ fontSize: 20 }} />
+      <input
+        type="text"
+        placeholder="Search contacts"
+        className="flex-1 bg-transparent outline-none text-gray-700 placeholder:text-gray-500 text-sm"
+      />
+      <div className="ml-2 flex-shrink-0">
+        {currentUser?.profile_image_url ? (
+          <img
+            src={currentUser.profile_image_url}
+            alt="Profile"
+            className="w-8 h-8 rounded-full"
+          />
+        ) : (
+          <AccountCircleOutlinedIcon sx={{ fontSize: 32, color: "#666" }} />
+        )}
       </div>
+    </div>
+  </div>
+</div>
+
     </>
   );
 }
