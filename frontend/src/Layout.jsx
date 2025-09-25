@@ -51,9 +51,9 @@ function Layout() {
       >
         {!hideHeader && <Header onMenuClick={toggleSidebar} />}
         <main
-          className={`${
-            !hideHeader ? "mt-20" : ""
-          } bg-gray-50 transition-all duration-300 min-h-screen`}
+          className={`bg-gray-50 transition-all duration-300 min-h-screen ${
+            !hideHeader ? "mt-20 lg:mt-20" : ""
+          }`}
         >
           <Outlet />
         </main>

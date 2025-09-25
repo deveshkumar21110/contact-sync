@@ -90,41 +90,40 @@ function Header({ onMenuClick }) {
       </div>
       {/* Mobile - NEW SECTION */}
       {/* Mobile Header */}
-<div className="fixed top-0 left-0 right-0 w-full z-50 bg-white lg:hidden">
-  <div className="flex items-center bg-pink-100 px-2 py-2 w-full">
-    {/* Menu Icon */}
-    <button
-      onClick={onMenuClick}
-      className="flex-shrink-0 p-1"
-    >
-      <MenuIcon sx={{ fontSize: 28, color: "#818589" }} />
-    </button>
+      <div className="fixed top-0 left-0 right-0 w-full z-50 bg-white lg:hidden h-20">
+        <div className="flex items-center bg-pink-100 px-2 w-full h-full">
+          {/* Menu Icon */}
+          <button onClick={onMenuClick} className="flex-shrink-0 p-1">
+            <MenuIcon sx={{ fontSize: 28, color: "#818589" }} />
+          </button>
 
-    {/* Search Bar */}
-    <div className="flex items-center bg-pink-200 rounded-full h-12 px-3 ml-2 w-0 flex-1 min-w-0">
-      <SearchIcon className="text-gray-500 mr-2 flex-shrink-0" sx={{ fontSize: 20 }} />
-      <input
-        type="text"
-        placeholder="Search contacts"
-        className="w-0 flex-1 min-w-0 bg-transparent outline-none text-gray-700 placeholder:text-gray-500 text-sm"
-      />
-      <div className="ml-2 flex-shrink-0">
-        {currentUser?.profile_image_url ? (
-          <img
-            src={currentUser.profile_image_url}
-            alt="Profile"
-            className="w-8 h-8 rounded-full object-cover"
-          />
-        ) : (
-          <AccountCircleOutlinedIcon sx={{ fontSize: 32, color: "#666" }} />
-        )}
+          {/* Search Bar */}
+          <div className="flex items-center bg-pink-200 rounded-full h-12 px-3 ml-2 w-0 flex-1 min-w-0">
+            <SearchIcon
+              className="text-gray-500 mr-2 flex-shrink-0"
+              sx={{ fontSize: 20 }}
+            />
+            <input
+              type="text"
+              placeholder="Search contacts"
+              className="w-0 flex-1 min-w-0 bg-transparent outline-none text-gray-700 placeholder:text-gray-500 text-sm"
+            />
+            <div className="ml-2 flex-shrink-0">
+              {currentUser?.profile_image_url ? (
+                <img
+                  src={currentUser.profile_image_url}
+                  alt="Profile"
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+              ) : (
+                <AccountCircleOutlinedIcon
+                  sx={{ fontSize: 32, color: "#666" }}
+                />
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
-
-
-
     </>
   );
 }

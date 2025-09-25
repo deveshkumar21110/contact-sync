@@ -57,8 +57,8 @@ function PersonContact() {
   }
 
   return (
-    <Container>
-      <div className="pt-8 bg-white">
+    <Container className="bg-pink-100 md:bg-white">
+      <div className="md:pt-8 md:bg-white bg-pink-100">
         <ContactHeader />
 
         {/* Labels Section */}

@@ -31,7 +31,7 @@ const Sidebar = ({ isOpen = true }) => {
 
   return (
     <div
-      className={`fixed top-20 left-0 w-72 h-screen bg-gray-50 p-6 flex flex-col z-40 transition-transform duration-300
+      className={`fixed top-20 left-0 w-72 h-screen md:bg-gray-50  p-6 flex flex-col z-40 transition-transform duration-300
         ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
     >
       <div>
