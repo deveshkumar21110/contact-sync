@@ -94,7 +94,7 @@ function Header({ onMenuClick }) {
         <div className="bg-white"></div>
 
         {/* Main header content */}
-        <div className="flex bg-white px-4 py-3">
+        <div className="flex bg-pink-200 px-4 py-3">
           <div className="p-3 rounded-full hover:rounded-full ">
               <MenuIcon
                 sx={{ fontSize: 28, cursor: "pointer", color: "#818589" }}
@@ -102,7 +102,7 @@ function Header({ onMenuClick }) {
               />
             </div>
           {/* Search bar with profile */}
-          <div className="flex items-center w-full bg-gray-100 rounded-full h-12 px-4 mb-4">
+          <div className="flex items-center w-full bg-rose-200 rounded-full h-12 px-4 mb-4">
             <SearchIcon className="text-gray-500 mr-3" sx={{ fontSize: 20 }} />
             <input
               type="text"

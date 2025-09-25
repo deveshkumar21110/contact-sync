@@ -166,13 +166,16 @@ function Home() {
 
         {/* Mobile view */}
         <div className="md:hidden">
-          {contacts.map((contact) => (
+          {contacts.map((contact, index) => (
             <div
               key={contact.id}
               onClick={() => handleSelectedContact(contact.id)}
-              className="flex items-center mt-2 px-4 py-2 whitespace-nowrap rounded-lg border-gray-300 border"
+              className={`flex items-center px-4 py-2 whitespace-nowrap bg-gray-50 border border-gray-300 
+        ${index === 0 ? "rounded-t-2xl" : ""} 
+        ${index === contacts.length - 1 ? "rounded-b-2xl" : ""} 
+        `}
             >
-              <div className="flex-shrink-0 ">
+              <div className="flex-shrink-0">
                 <img
                   className="h-10 w-10 rounded-full object-cover"
                   src={
@@ -186,7 +189,7 @@ function Home() {
                 />
               </div>
               <div className="ml-4">
-                <div className="text-base font-normal text-gray-800">
+                <div className="text-base font-medium text-gray-800">
                   {contact.displayName}
                 </div>
               </div>
