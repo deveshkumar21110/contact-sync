@@ -60,7 +60,14 @@ const contactSlice = createSlice({
   name: "contact",
   initialState: initialState,
 
-  reducers: {},
+  reducers: {
+    resetContacts: (state) => {
+      state.data = [];
+      state.status = STATUSES.IDLE;
+      state.hasFetched = false;
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchContacts.pending, (state) => {
@@ -161,3 +168,4 @@ export const selectFavouriteContacts = (state) =>
 export const selectContactsStatus = (state) => state.contact.status;
 export const selectContactById = (state, contactId) =>
   state.contact.data.find((c) => c.id === contactId);
+export const { resetContacts } = contactSlice.actions;

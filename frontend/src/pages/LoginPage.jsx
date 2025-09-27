@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { authService } from "../Services/authService";
 import { login } from "../redux/authSlice";
+import { resetContacts } from "../redux/contactSlice";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -21,6 +22,7 @@ function LoginPage() {
       // const userData = await authService.getCurrentUser();
       // console.log("User Data", userData);
       dispatch(login({email, password}));
+      dispatch(resetContacts()); 
       navigate("/");
     } catch (err) {
       setError("Invalid credentials");

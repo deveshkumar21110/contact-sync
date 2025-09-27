@@ -4,6 +4,7 @@ import { authService } from "../Services/authService";
 import { login, logout } from "../redux/authSlice";
 import { useState } from "react";
 import { PulseLoader, ScaleLoader } from "react-spinners";
+import { resetContacts } from "../redux/contactSlice";
 
 const AuthInitializer = ({ children }) => {
   const dispatch = useDispatch();
@@ -24,18 +25,23 @@ const AuthInitializer = ({ children }) => {
             if (token) {
               // Update Redux state with correct payload structure
               dispatch(login({ userData }));
+              dispatch(resetContacts()); 
             } else {
               dispatch(logout());
+              dispatch(resetContacts());
             }
           } else {
             dispatch(logout());
+            dispatch(resetContacts());  
           }
         } else {
           dispatch(logout());
+          dispatch(resetContacts());  
         }
       } catch (error) {
         console.error("Error initializing auth:", error);
         dispatch(logout());
+        dispatch(resetContacts());  
       } finally {
         setIsInitializing(false);
       }
