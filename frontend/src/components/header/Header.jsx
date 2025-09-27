@@ -27,7 +27,7 @@ function Header({ onMenuClick }) {
 
   return (
     <>
-      <div className="w-full bg-slate-50 h-20 items-center fixed top-0 left-0 z-50 hidden lg:flex">
+      <div className="w-full bg-slate-50 h-20 items-center fixed top-0 left-0 z-50 hidden md:flex">
         <div className="flex gap-4 px-4 py-2 w-full justify-between">
           {/* Left section */}
           <div className="flex items-center justify-center pr-8">
