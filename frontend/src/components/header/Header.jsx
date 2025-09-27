@@ -90,7 +90,7 @@ function Header({ onMenuClick }) {
       </div>
       {/* Mobile - NEW SECTION */}
       {/* Mobile Header */}
-      <div className="fixed top-0 left-0 right-0 w-full z-50 bg-white lg:hidden h-20">
+      <div className="fixed top-0 left-0 right-0 w-full z-50 bg-white md:hidden h-20">
         <div className="flex items-center bg-pink-100 px-2 w-full h-full">
           {/* Menu Icon */}
           <button onClick={onMenuClick} className="flex-shrink-0 p-1">
