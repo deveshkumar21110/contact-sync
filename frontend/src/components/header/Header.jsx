@@ -31,7 +31,7 @@ function Header({ onMenuClick }) {
         <div className="flex gap-4 px-4 py-2 w-full justify-between">
           {/* Left section */}
           <div className="flex items-center justify-center pr-8">
-            <div className="p-3 rounded-full hover:rounded-full hover:bg-gray-200">
+            <div className="p-3 rounded-full hover:rounded-full hover:bg-gray-200 cursor-pointer">
               <MenuIcon
                 sx={{ fontSize: 28, cursor: "pointer", color: "#818589" }}
                 onClick={onMenuClick}

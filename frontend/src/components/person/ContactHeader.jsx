@@ -29,7 +29,7 @@ function ContactHeader() {
   const hasFetchedContacts = useSelector(selectHasFetched);
   const status = useSelector((state) => state.contact.status);
   const contact = useSelector((state) => selectContactById(state, contactId));
-  console.log(contact);
+  // console.log(contact);
   const handleFavouriteToggle = useCallback(
     (e, contactId, currentStatus) => {
       e.stopPropagation();
@@ -147,7 +147,7 @@ function ContactHeader() {
           </div>
         </div>
         <div>
-          <ContactActions />
+          <ContactActions contact={contact}/>
         </div>
       </div>
     </div>
