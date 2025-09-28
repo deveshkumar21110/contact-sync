@@ -6,14 +6,6 @@ import {
 import React from "react";
 
 function ContactActions({ contact }) {
-  const handleEmailClick = () => {
-    console.log(contact);
-    console.log("Hello");
-    // window.open(
-    //   `https://mail.google.com/mail/?view=cm&fs=1&to=${contact.mail}`,
-    //   "_blank"
-    // );
-  };
   // const handleChatClick = () => console.log("Chat clicked");
   // const handleVideoClick = () => console.log("Video call clicked");
 
@@ -47,8 +39,7 @@ function ContactActions({ contact }) {
             onMouseLeave={(e) =>
               (e.currentTarget.style.backgroundColor = "#B3D7EF")
             }
-            onClick={handleEmailClick()}
-            href={`https://mail.google.com/mail/?view=cm&fs=1&to=${contact.email}`}
+            href={`https://mail.google.com/mail/?view=cm&fs=1&to=${contact.emails[0].email}`}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -59,7 +50,7 @@ function ContactActions({ contact }) {
 
         {/* Chat */}
         <div>
-          <div
+          <a
             style={iconStyle}
             onMouseEnter={(e) =>
               (e.currentTarget.style.backgroundColor =
@@ -68,16 +59,21 @@ function ContactActions({ contact }) {
             onMouseLeave={(e) =>
               (e.currentTarget.style.backgroundColor = "#B3D7EF")
             }
-            // onClick={handleChatClick}
+            href={`https://wa.me/${contact.phoneNumbers[0].countryCode.replace(
+              "+",
+              ""
+            )}${contact.phoneNumbers[0].number}`}
+            target="_blank"
+            rel="noopener noreferrer"
           >
             <ChatOutlined fontSize="medium" />
-          </div>
+          </a>
           <div className="text-sm font-medium pt-1">Chat</div>
         </div>
 
         {/* Video */}
         <div>
-          <div
+          <a
             style={iconStyle}
             onMouseEnter={(e) =>
               (e.currentTarget.style.backgroundColor =
@@ -86,10 +82,12 @@ function ContactActions({ contact }) {
             onMouseLeave={(e) =>
               (e.currentTarget.style.backgroundColor = "#B3D7EF")
             }
-            // onClick={handleVideoClick}
+            href={`https://meet.google.com/new?calleeId=${contact.emails[0].email}`}
+            target="_blank"
+            rel="noopener noreferrer"
           >
             <VideocamOutlined fontSize="medium" />
-          </div>
+          </a>
           <div className="text-sm font-medium pt-1">Video</div>
         </div>
       </div>
