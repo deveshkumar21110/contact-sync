@@ -39,7 +39,7 @@ function ContactActions({ contact }) {
             onMouseLeave={(e) =>
               (e.currentTarget.style.backgroundColor = "#B3D7EF")
             }
-            href={`https://mail.google.com/mail/?view=cm&fs=1&to=${contact.emails[0].email}`}
+            href={`https://mail.google.com/mail/?view=cm&fs=1&to=${contact.emails[0]?.email}`}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -59,7 +59,7 @@ function ContactActions({ contact }) {
             onMouseLeave={(e) =>
               (e.currentTarget.style.backgroundColor = "#B3D7EF")
             }
-            href={`https://wa.me/${contact.phoneNumbers[0].countryCode.replace(
+            href={`https://wa.me/${contact.phoneNumbers[0]?.countryCode.replace(
               "+",
               ""
             )}${contact.phoneNumbers[0].number}`}
@@ -82,7 +82,7 @@ function ContactActions({ contact }) {
             onMouseLeave={(e) =>
               (e.currentTarget.style.backgroundColor = "#B3D7EF")
             }
-            href={`https://meet.google.com/new?calleeId=${contact.emails[0].email}`}
+            href={`https://meet.google.com/new?calleeId=${contact.emails[0]?.email}`}
             target="_blank"
             rel="noopener noreferrer"
           >

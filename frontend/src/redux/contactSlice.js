@@ -87,6 +87,8 @@ const contactSlice = createSlice({
 
       .addCase(addContact.fulfilled, (state, action) => {
         state.data.push(action.payload);
+        state.hasFetched = true;
+        state.status = STATUSES.IDLE;
       })
       .addCase(addContact.rejected, (state, action) => {
         state.status = STATUSES.ERROR;
