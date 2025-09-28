@@ -62,7 +62,7 @@ function ContactActions({ contact }) {
             href={`https://wa.me/${contact.phoneNumbers[0]?.countryCode.replace(
               "+",
               ""
-            )}${contact.phoneNumbers[0].number}`}
+            )}${contact.phoneNumbers[0]?.number}`}
             target="_blank"
             rel="noopener noreferrer"
           >

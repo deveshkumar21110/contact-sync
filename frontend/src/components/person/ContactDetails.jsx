@@ -1,13 +1,15 @@
 import {
+  ContentCopyOutlined,
   EmailOutlined,
   LinkOutlined,
   LocationOnOutlined,
   PhoneOutlined,
 } from "@mui/icons-material";
-import { selectContactById} from "../../redux/contactSlice";
+import { selectContactById } from "../../redux/contactSlice";
 import React from "react";
-import {useSelector } from "react-redux";
-import {useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { CopyIcon } from "../../index";
 
 function ContactDetails() {
   const { id: contactId } = useParams();
@@ -26,7 +28,15 @@ function ContactDetails() {
             <div className="flex flex-col gap-2 pl-2">
               {contact.emails.map(
                 (email, index) =>
-                  email.email && <span key={index}>{email.email}</span>
+                  email.email && (
+                    <span
+                      key={index}
+                      className="group flex items-center hover:text-blue-600"
+                    >
+                      {email.email}
+                      <CopyIcon value={email.email} />
+                    </span>
+                  )
               )}
             </div>
           </div>
@@ -41,7 +51,15 @@ function ContactDetails() {
             <div className="flex flex-col gap-2 pl-2">
               {contact.phoneNumbers.map(
                 (phone, index) =>
-                  phone.number && <span key={index}>{phone.number}</span>
+                  phone.number && (
+                    <span
+                      key={index}
+                      className="group flex items-center hover:text-blue-600"
+                    >
+                      {phone.number}
+                      <CopyIcon value={phone.number} />
+                    </span>
+                  )
               )}
             </div>
           </div>
@@ -62,7 +80,7 @@ function ContactDetails() {
                       href={sites.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600"
+                      className="group flex items-center hover:text-blue-600"
                     >
                       {sites.url}
                     </a>
@@ -80,9 +98,11 @@ function ContactDetails() {
             <LocationOnOutlined sx={{ color: "#444746" }} />
             <div className="flex flex-col gap-1 pl-2">
               {contact.addresses.map((address, index) => (
-                <div key={index} className="flex flex-col">
+                <div key={index} className="flex flex-col group">
                   {address.streetAddress && <div>{address.streetAddress}</div>}
-                  {address.streetAddress2 && <div>{address.streetAddress2}</div>}
+                  {address.streetAddress2 && (
+                    <div>{address.streetAddress2}</div>
+                  )}
                   {(address.city || address.state || address.pincode) && (
                     <div>
                       {address.city && `${address.city}, `}
@@ -91,6 +111,13 @@ function ContactDetails() {
                     </div>
                   )}
                   {address.country && <div>{address.country}</div>}
+                  <CopyIcon
+                    value={`${address.streetAddress || ""} ${
+                      address.streetAddress2 || ""
+                    } ${address.city || ""} ${address.state || ""} ${
+                      address.pincode || ""
+                    } ${address.country || ""}`.trim()}
+                  />
                 </div>
               ))}
             </div>
