@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Search, X } from "lucide-react";
+import SearchIcon from "@mui/icons-material/Search";
+import CloseIcon from "@mui/icons-material/Close";
 import { useSelector } from "react-redux";
 import { selectContacts } from "../../redux/contactSlice";
 
@@ -101,9 +102,9 @@ const ContactSearchModal = ({ isOpen, onClose, onSelectContact }) => {
 
   // Generate a DiceBear avatar URL from name
   const getDicebearUrl = (name) => {
-  return `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(
-    name
-  )}`;
+    return `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(
+      name
+    )}`;
   };
 
   if (!isOpen) return null;
@@ -122,7 +123,7 @@ const ContactSearchModal = ({ isOpen, onClose, onSelectContact }) => {
           {/* Search Input */}
           <div className="bg-white rounded-lg shadow-xl">
             <div className="flex items-center h-14 border-b border-gray-200 px-4">
-              <Search className="text-gray-600 w-5 h-5 mr-3 flex-shrink-0" />
+              <SearchIcon className="text-gray-600 w-5 h-5 mr-3 flex-shrink-0" />
               <input
                 ref={inputRef}
                 type="text"
@@ -138,7 +139,7 @@ const ContactSearchModal = ({ isOpen, onClose, onSelectContact }) => {
                   className="ml-2 p-1 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
                   aria-label="Clear search"
                 >
-                  <X className="w-5 h-5 text-gray-600" />
+                  <CloseIcon className="w-5 h-5 text-gray-600" />
                 </button>
               )}
             </div>
