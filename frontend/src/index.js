@@ -17,6 +17,7 @@ export {default as ContactHeader} from "./components/person/ContactHeader"
 export {default as ContactActions} from "./components/person/ContactActions"
 export {default as ContactDetails} from "./components/person/ContactDetails"
 export {default as LabelModal} from "./components/Modal/LabelModal"
+export {default as ContactSearchModal} from "./components/Modal/ContactSearchModal"
 export {default as CopyIcon} from "./components/CopyIcon"
 // Pages
 export { default as CreateContactPage } from "./pages/CreateContactPage";

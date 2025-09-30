@@ -7,16 +7,16 @@ import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined
 import { useSelector } from "react-redux";
 import LogoutBtn from "./LogoutBtn";
 import { authService } from "../../Services/authService";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { HelpOutlineOutlined } from "@mui/icons-material";
-import TuneIcon from "@mui/icons-material/Tune";
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import { ContactSearchModal } from "../../index";
 
 function Header({ onMenuClick }) {
   const authStatus = useSelector((state) => state.auth.status);
-  // console.log("Auth Status:", authStatus);
   const [currentUser, setCurrentUser] = useState(null);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchUser = async () => {
       const user = await authService.getCurrentUser();
@@ -24,6 +24,12 @@ function Header({ onMenuClick }) {
     };
     fetchUser();
   }, [authStatus]);
+
+  const handleSelectContact = (contact) => {
+    // Navigate to contact detail page or handle selection
+    console.log("Selected contact:", contact);
+    navigate(`/person/${contact.id}`);
+  };
 
   return (
     <>
@@ -50,14 +56,16 @@ function Header({ onMenuClick }) {
           {/* Middle - Search */}
           <div className="flex items-center gap-4 w-[45%] justify-end">
             <div
-              className="flex items-center bg-gray-200 h-12 w-full rounded-lg"
+              className="flex items-center bg-gray-200 h-12 w-full rounded-lg cursor-pointer hover:bg-gray-300 transition-colors"
               style={{ padding: "0px 30px 0px 10px" }}
+              onClick={() => setIsSearchModalOpen(true)}
             >
               <SearchIcon className="text-gray-600 mr-2" />
               <input
                 type="text"
                 placeholder="Search"
-                className="w-full bg-transparent outline-none text-gray-700 placeholder:text-gray-500"
+                className="w-full bg-transparent outline-none text-gray-700 placeholder:text-gray-500 pointer-events-none"
+                readOnly
               />
             </div>
           </div>
@@ -88,7 +96,7 @@ function Header({ onMenuClick }) {
           </div>
         </div>
       </div>
-      {/* Mobile - NEW SECTION */}
+
       {/* Mobile Header */}
       <div className="fixed top-0 left-0 right-0 w-full z-50 bg-white md:hidden h-20">
         <div className="flex items-center bg-pink-100 px-2 w-full h-full">
@@ -98,7 +106,10 @@ function Header({ onMenuClick }) {
           </button>
 
           {/* Search Bar */}
-          <div className="flex items-center bg-pink-200 rounded-full h-12 px-3 ml-2 w-0 flex-1 min-w-0">
+          <div 
+            className="flex items-center bg-pink-200 rounded-full h-12 px-3 ml-2 w-0 flex-1 min-w-0 cursor-pointer"
+            onClick={() => setIsSearchModalOpen(true)}
+          >
             <SearchIcon
               className="text-gray-500 mr-2 flex-shrink-0"
               sx={{ fontSize: 20 }}
@@ -106,7 +117,8 @@ function Header({ onMenuClick }) {
             <input
               type="text"
               placeholder="Search contacts"
-              className="w-0 flex-1 min-w-0 bg-transparent outline-none text-gray-700 placeholder:text-gray-500 text-sm"
+              className="w-0 flex-1 min-w-0 bg-transparent outline-none text-gray-700 placeholder:text-gray-500 text-sm pointer-events-none"
+              readOnly
             />
             <div className="ml-2 flex-shrink-0">
               {currentUser?.profile_image_url ? (
@@ -124,6 +136,13 @@ function Header({ onMenuClick }) {
           </div>
         </div>
       </div>
+
+      {/* Search Modal - Works for both desktop and mobile */}
+      <ContactSearchModal
+        isOpen={isSearchModalOpen}
+        onClose={() => setIsSearchModalOpen(false)}
+        onSelectContact={handleSelectContact}
+      />
     </>
   );
 }
