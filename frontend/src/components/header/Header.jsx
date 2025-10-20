@@ -72,15 +72,17 @@ function Header({ onMenuClick }) {
 
           {/* Right - Profile, Help, Settings */}
           <div className="flex items-center gap-4 justify-end">
-            <div className="px-2 py-1 text-gray-600">
+            <div className="text-gray-600 p-1 rounded-full hover:rounded-full hover:bg-gray-200 cursor-pointer"
+              onClick={() => navigate("/account")}
+            >
               {currentUser?.profile_image_url ? (
                 <img
                   src={currentUser.profile_image_url}
                   alt="Profile"
-                  className="w-8 h-8 rounded-full"
+                  className="w-10 h-10 rounded-full"
                 />
               ) : (
-                <AccountCircleOutlinedIcon sx={{ fontSize: 28 }} />
+                <AccountCircleOutlinedIcon sx={{ fontSize: 38 }} />
               )}
             </div>
 

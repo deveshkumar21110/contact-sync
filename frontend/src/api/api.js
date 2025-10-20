@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 import API_BASE_URL from "../conf/config";
 import { authService } from "../Services/authService";
 
-const TOKEN_KEY = "access_token"; // Fixed to match authService
+const TOKEN_KEY = "access_token";
 
 // Create Axios instance
 const api = axios.create({
@@ -15,27 +15,45 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Request Interceptor – add Authorization token if available
+// ===== Refresh Token Queue Logic =====
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, newToken = null) => {
+  failedQueue.forEach((p) => {
+    if (error) p.reject(error);
+    else p.resolve(newToken);
+  });
+  failedQueue = [];
+};
+
+// ===== Request Interceptor =====
 api.interceptors.request.use(
   async (config) => {
-    // console.log("==== OUTGOING REQUEST ====");
-    // console.log("URL:", config.url);
-    // console.log("Method:", config.method);
-    // console.log("Headers:", config.headers);
-    // console.log("Params:", config.params);
-    // console.log("Data (body):", config.data);
-    // console.log("==========================");
-
     const noAuthEndpoints = [
       "/auth/v1/login",
       "/auth/v1/signup",
-      "/auth/v1/refreshToken"
+      "/auth/v1/refreshToken",
     ];
-    const isNoAuth = noAuthEndpoints.some(endpoint =>
+
+    const isNoAuth = noAuthEndpoints.some((endpoint) =>
       config.url.endsWith(endpoint)
     );
+
     if (!isNoAuth) {
-      const token = await authService.getCurrentToken();
+      let token = await authService.getCurrentToken();
+
+      // If no access token, but refresh token exists → try refreshing
+      if (!token && authService.hasRefreshToken()) {
+        try {
+          token = await authService.refreshToken();
+          Cookies.set(TOKEN_KEY, token);
+        } catch (err) {
+          console.error("Token refresh failed (request interceptor):", err);
+          return config; // send request without token, backend will handle
+        }
+      }
+
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -49,29 +67,13 @@ api.interceptors.request.use(
   }
 );
 
-
-// ===== Refresh Token Logic ===== //
-let isRefreshing = false;
-let failedQueue = [];
-
-const processQueue = (error, newToken = null) => {
-  failedQueue.forEach((p) => {
-    if (error) {
-      p.reject(error);
-    } else {
-      p.resolve(newToken);
-    }
-  });
-  failedQueue = [];
-};
-
-// Response Interceptor – auto refresh on 401
+// ===== Response Interceptor =====
 api.interceptors.response.use(
-  (response) => response, // Pass through successful responses
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Skip if already retried once
+    // Retry on 401 (expired access token)
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
@@ -89,7 +91,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const newToken = await authService.refreshToken(); // Fixed method name
+        const newToken = await authService.refreshToken();
         Cookies.set(TOKEN_KEY, newToken);
         api.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
         originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
@@ -97,8 +99,7 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        // Don't automatically logout and redirect, let the component handle it
-        console.error("Token refresh failed:", refreshError);
+        console.error("Token refresh failed (response interceptor):", refreshError);
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

@@ -26,3 +26,5 @@ export { default as HomePage } from "./pages/HomePage";
 export { default as LoginPage } from "./pages/LoginPage";
 export { default as SignupPage } from "./pages/SignupPage";
 export {default as Person} from "./pages/PersonContact"
+export {default as FavoritesPage} from "./pages/FavoritesPage"
+export {default as UserAccountPage} from "./pages/UserAccountPage"

@@ -9,15 +9,19 @@ import {
   FileDownloadDoneOutlined,
   FileDownloadOutlined,
   DeleteOutlineOutlined,
+  Star,
 } from "@mui/icons-material";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchLabels, STATUSES } from "../../redux/labelSlice";
+import { selectFavouriteContacts } from "../../redux/contactSlice";
+
 
 const Sidebar = ({ isOpen = true, toggleSidebar }) => {
   const contactCount = useSelector((state) => state.contact?.data?.length);
+  const favouriteCount = useSelector((state) => selectFavouriteContacts(state).length);
   const dispatch = useDispatch();
   const { data: labels, status, hasFetched } = useSelector((state) => state.label);
   const location = useLocation();
@@ -58,7 +62,6 @@ const Sidebar = ({ isOpen = true, toggleSidebar }) => {
             fontSize: "0.95rem",
             "&:hover": {
               backgroundColor: "#A0D7FF",
-              boxShadow: "none",
             },
           }}
           onClick={() => handleNavClick("/new")}
@@ -75,6 +78,17 @@ const Sidebar = ({ isOpen = true, toggleSidebar }) => {
               badge={contactCount}
               active={location.pathname === "/"}
               onClick={() => handleNavClick("/")}
+            />
+          </Link>
+        </div>
+        <div className="space-y-1 pt-4">
+          <Link to="/favorites">
+            <SidebarItem
+              icon={<Star />}
+              label="Favorites"
+              badge={favouriteCount}
+              active={location.pathname === "/favorites"}
+              onClick={() => handleNavClick("/favorites")}
             />
           </Link>
         </div>

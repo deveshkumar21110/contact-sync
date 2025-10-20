@@ -13,7 +13,7 @@ import { Link, useNavigate } from "react-router-dom";
 const DEFAULT_PROFILE =
   "/contacts_product_24dp_0158CC_FILL0_wght400_GRAD0_opsz24.svg";
 
-function Home() {
+function Home({showFavorites = false}) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
@@ -70,10 +70,14 @@ function Home() {
     );
   }
 
+  const displayedContacts = showFavorites
+    ? contacts.filter((c) => c.isFavourite)
+    : contacts;
+
   return (
     <div className="w-full mt-2">
       <h1 className="text-2xl mb-2">
-        Contacts <span className="text-base">({contacts.length})</span>
+        {showFavorites ? "Favorites" : "Contacts"}{" "} <span className="text-base">({displayedContacts.length})</span>
       </h1>
 
       <div className="overflow-x-auto w-full">
@@ -90,7 +94,7 @@ function Home() {
               </tr>
             </thead>
             <tbody className="bg-white cursor-pointer">
-              {contacts.map((contact) => (
+              {displayedContacts.map((contact) => (
                 <tr
                   key={contact.id}
                   className="hover:bg-gray-100 group"
@@ -166,13 +170,13 @@ function Home() {
 
         {/* Mobile view */}
         <div className="md:hidden">
-          {contacts.map((contact, index) => (
+          {displayedContacts.map((contact, index) => (
             <div
               key={contact.id}
               onClick={() => handleSelectedContact(contact.id)}
               className={`flex items-center px-4 py-2 whitespace-nowrap bg-gray-50 border border-gray-300 
         ${index === 0 ? "rounded-t-2xl" : ""} 
-        ${index === contacts.length - 1 ? "rounded-b-2xl" : ""} 
+        ${index === displayedContacts.length - 1 ? "rounded-b-2xl" : ""} 
         `}
             >
               <div className="flex-shrink-0">
