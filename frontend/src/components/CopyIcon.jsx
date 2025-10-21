@@ -1,13 +1,21 @@
 import React from "react";
 import { ContentCopyOutlined } from "@mui/icons-material";
+import { useSnackbar } from "../index";
 
 const CopyIcon = ({ value, className = "" }) => {
+  const { showSnackbar } = useSnackbar();
 
-    const handleCopy = () => {
-        if( !value ) return ;
-        navigator.clipboard.writeText(value)
-        .catch((err) => console.error("Failed to copy!", err))
-    }
+  const handleCopy = () => {
+    if (!value) return;
+    navigator.clipboard
+      .writeText(value)
+      .catch((err) => console.error("Failed to copy!", err));
+
+    showSnackbar("Copied", {
+      severity: "info",
+      autoHideDuration: null, 
+    });
+  };
 
   return (
     <span
