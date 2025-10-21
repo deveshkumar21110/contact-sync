@@ -28,3 +28,4 @@ export { default as SignupPage } from "./pages/SignupPage";
 export {default as Person} from "./pages/PersonContact"
 export {default as FavoritesPage} from "./pages/FavoritesPage"
 export {default as UserAccountPage} from "./pages/UserAccountPage"
+export {default as LabelFilterPage} from "./pages/LabelFilterPage"

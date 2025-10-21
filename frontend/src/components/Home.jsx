@@ -13,7 +13,7 @@ import { Link, useNavigate } from "react-router-dom";
 const DEFAULT_PROFILE =
   "/contacts_product_24dp_0158CC_FILL0_wght400_GRAD0_opsz24.svg";
 
-function Home({showFavorites = false}) {
+function Home({ showFavorites = false, filterLabel = null }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
@@ -70,14 +70,28 @@ function Home({showFavorites = false}) {
     );
   }
 
-  const displayedContacts = showFavorites
-    ? contacts.filter((c) => c.isFavourite)
-    : contacts;
+  let displayedContacts = contacts;
+  if (showFavorites) {
+    displayedContacts = displayedContacts.filter((c) => c.isFavourite);
+  }
+
+  if (filterLabel) {
+    displayedContacts = displayedContacts.filter((c) =>
+      c.labels?.some(label => label.id == filterLabel)
+    );
+  } else if (displayedContacts.length === "0") {
+    return (
+      <div className="flex justify-center items-center h-40 text-gray-500">
+        No contacts found with this filter
+      </div>
+    );
+  }
 
   return (
     <div className="w-full mt-2">
       <h1 className="text-2xl mb-2">
-        {showFavorites ? "Favorites" : "Contacts"}{" "} <span className="text-base">({displayedContacts.length})</span>
+        {showFavorites ? "Favorites" : "Contacts"}{" "}
+        <span className="text-base">({displayedContacts.length})</span>
       </h1>
 
       <div className="overflow-x-auto w-full">

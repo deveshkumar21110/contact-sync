@@ -6,7 +6,7 @@ import { Provider } from 'react-redux'
 import { store } from './redux/store.js'
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom'
 import Layout from './Layout'
-import {ProtectedRoute, AuthInitializer,SnackbarProvider, Person, UserAccountPage} from './index.js';
+import {ProtectedRoute, AuthInitializer,SnackbarProvider, Person, UserAccountPage, LabelFilterPage} from './index.js';
 import {EditContactPage,CreateContactPage,SignupPage,LoginPage,HomePage,FavoritesPage} from './index'
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -20,6 +20,7 @@ const router = createBrowserRouter(
       <Route path="person/:id/edit" element={<ProtectedRoute><EditContactPage /></ProtectedRoute>} />
       <Route path="favorites" element={<ProtectedRoute> <FavoritesPage showFavorites /> </ProtectedRoute>} />
       <Route path="account" element={<ProtectedRoute> <UserAccountPage /> </ProtectedRoute>} />
+      <Route path="label/:id" element={<ProtectedRoute> <LabelFilterPage /> </ProtectedRoute>} />
     </Route>
   )
 )
