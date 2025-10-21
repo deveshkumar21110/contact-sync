@@ -16,7 +16,7 @@ function Header({ onMenuClick }) {
   const authStatus = useSelector((state) => state.auth.status);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const navigate = useNavigate();
-  const currentUser = useSelector(selectUser)
+  const currentUser = useSelector(selectUser);
 
   const handleSelectContact = (contact) => {
     // Navigate to contact detail page or handle selection
@@ -65,7 +65,8 @@ function Header({ onMenuClick }) {
 
           {/* Right - Profile, Help, Settings */}
           <div className="flex items-center gap-4 justify-end">
-            <div className="text-gray-600 p-1 rounded-full hover:rounded-full hover:bg-gray-200 cursor-pointer"
+            <div
+              className="text-gray-600 p-1 rounded-full hover:rounded-full hover:bg-gray-200 cursor-pointer"
               onClick={() => navigate("/account")}
             >
               {currentUser?.profile_image_url ? (
@@ -101,7 +102,7 @@ function Header({ onMenuClick }) {
           </button>
 
           {/* Search Bar */}
-          <div 
+          <div
             className="flex items-center bg-pink-200 rounded-full h-12 px-3 ml-2 w-0 flex-1 min-w-0 cursor-pointer"
             onClick={() => setIsSearchModalOpen(true)}
           >
@@ -120,12 +121,19 @@ function Header({ onMenuClick }) {
                 <img
                   src={currentUser.profile_image_url}
                   alt="Profile"
-                  className="w-8 h-8 rounded-full object-cover"
-                  onClick={() => navigate("/account")}
+                  className="w-8 h-8 rounded-full object-cover cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent parent onClick from firing
+                    navigate("/account");
+                  }}
                 />
               ) : (
                 <AccountCircleOutlinedIcon
-                  sx={{ fontSize: 32, color: "#666" }}
+                  sx={{ fontSize: 32, color: "#666", cursor: "pointer" }}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent parent onClick from firing
+                    navigate("/account");
+                  }}
                 />
               )}
             </div>
