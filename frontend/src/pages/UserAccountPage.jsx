@@ -32,7 +32,7 @@ function UserAccountPage() {
   const { register, setValue, getValue, handleSubmit, watch, control } =
     useForm({
       defaultValues: {
-        user_name: currentUser?.user_name || "",
+        username: currentUser?.username || "",
         phone_number: currentUser?.phone_number || "",
         email: currentUser?.email || "",
         profile_image_url: currentUser?.profile_image_url || "",
@@ -118,7 +118,7 @@ function UserAccountPage() {
               <IconTextField
                 icon={<PermIdentityOutlined />}
                 label="Username"
-                name="user_name"
+                name="username"
                 register={register}
               />
             </Stack>

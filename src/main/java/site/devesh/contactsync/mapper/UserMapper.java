@@ -16,10 +16,10 @@ public interface UserMapper {
     AppUser toAppUser(AppUserDto appUserDto);
 
     // Convert from AppUser entity to DTO
-    @Mapping(source = "username", target = "userName")
+    @Mapping(source = "username", target = "username")
     AppUserDto toAppUserDto(AppUser appUser);
 
     // Convert from CustomUserDetails to DTO 
-    @Mapping(source = "username", target = "userName")
+    @Mapping(source = "username", target = "username")
     AppUserDto customUserDetailsToDto(CustomUserDetails userDetails);
 }

@@ -17,11 +17,10 @@ function SignupPage() {
     setError("");
     setSuccess("");
     try {
-      // You may need to adjust the endpoint and payload according to your backend
-      await authService.signup({ name, email, password });
+  await authService.signup({ username: name, email, password });
       setSuccess("Signup successful! Please login.");
       setTimeout(() => navigate("/login"), 1500);
-    } catch (err) {
+    } catch {
       setError("Signup failed. Try again.");
     } finally {
       setLoading(false);

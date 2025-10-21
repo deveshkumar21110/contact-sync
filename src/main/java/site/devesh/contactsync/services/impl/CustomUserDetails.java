@@ -46,7 +46,7 @@ public class CustomUserDetails implements UserDetails {
     public AppUserDto toAppUserDto() {
         AppUserDto dto = new AppUserDto();
         dto.setId(this.id);
-        dto.setUserName(this.username);
+        dto.setUsername(this.username);
         dto.setEmail(this.email);
         dto.setProfileImageUrl(this.profileImageUrl);
         

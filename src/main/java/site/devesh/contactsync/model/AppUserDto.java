@@ -21,7 +21,7 @@ public class AppUserDto {
 
     private String id;
 
-    private String userName;
+    private String username;
 
     private String phoneNumber;
 

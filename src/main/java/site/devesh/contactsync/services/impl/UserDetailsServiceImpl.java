@@ -125,8 +125,8 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
         AppUser existingUser = userRepo.findById(currentUserId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (appUserDto.getUserName() != null)
-            existingUser.setUsername(appUserDto.getUserName());
+        if (appUserDto.getUsername() != null)
+            existingUser.setUsername(appUserDto.getUsername());
         if (appUserDto.getEmail() != null)
             existingUser.setEmail(appUserDto.getEmail());
         if (appUserDto.getPhoneNumber() != null)
@@ -139,7 +139,7 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
         AppUserDto updatedAppUserDto = AppUserDto.builder()
                 .id(updatedUser.getId())
                 .email(updatedUser.getEmail())
-                .userName(updatedUser.getUsername())
+                .username(updatedUser.getUsername())
                 .roles(updatedUser.getRoles())
                 .phoneNumber(updatedUser.getPhoneNumber())
                 .profileImageUrl(updatedUser.getProfileImageUrl())
