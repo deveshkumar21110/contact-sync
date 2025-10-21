@@ -44,7 +44,7 @@ api.interceptors.request.use(
       let token = await authService.getCurrentToken();
 
       // If no access token, but refresh token exists → try refreshing
-      if (!token && authService.hasRefreshToken()) {
+      if (!token && authService.refreshToken()) {
         try {
           token = await authService.refreshToken();
           Cookies.set(TOKEN_KEY, token);

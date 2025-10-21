@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, useSnackbar, IconTextField } from "../index";
+import { Container, useSnackbar, IconTextField, LogoutBtn } from "../index";
 import BasicModal from "../components/BasicModal";
 import { selectUser, updateCurrentUser } from "../redux/userSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,6 +16,7 @@ import {
   LabelOutlined,
   PermIdentityOutlined,
   EditOutlined,
+  LogoutOutlined,
 } from "@mui/icons-material";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Avatar, TextField, Stack } from "@mui/material";
@@ -142,6 +143,9 @@ function UserAccountPage() {
             </Stack>
           </div>
         </form>
+        <div className="mt-16 ml-6 inline-block ">
+          <LogoutBtn />
+        </div>
       </div>
     </Container>
   );

@@ -3,6 +3,7 @@ import {useDispatch} from 'react-redux'
 import {authService} from "../../Services/authService"; 
 import {logout} from '../../redux/authSlice'
 import { useNavigate } from 'react-router-dom';
+import { LogoutOutlined } from '@mui/icons-material';
 
 function LogoutBtn() {
     const dispatch = useDispatch();
@@ -20,9 +21,11 @@ function LogoutBtn() {
     }
 
   return (
-    <button className='bg-blue-700 text-white rounded-3xl py-2 px-3' onClick={logoutHandler}>
-        Logout
+    <button className='px-3 py-2 border rounded-lg  text-red-600 hover:shadow-xl cursor-pointer border-red-500' onClick={logoutHandler}>
+       <LogoutOutlined />
+          <span className="pl-2">Logout</span>
     </button>
+    
   )
 }
 

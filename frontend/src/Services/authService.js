@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+import { scheduleTokenRefresh } from "./tokenManager";
 import api from "../api/api";
 import { jwtDecode } from "jwt-decode";
 
@@ -56,7 +57,7 @@ export const authService = {
       const response = await api.post("/auth/v1/refreshToken", {
         token: refreshToken,
       });
-
+      console.log("Access Token after refresh: " , response)
       const { accessToken, token: newRefreshToken } = response.data;
       if (!accessToken) throw new Error("Invalid refresh token response");
 
@@ -84,6 +85,7 @@ export const authService = {
         const { accessToken, token: refreshToken } = response.data;
 
         authService.setToken(accessToken, refreshToken);
+        scheduleTokenRefresh(accessToken);
         return response.data;
       }
     } catch (error) {

@@ -244,6 +244,7 @@ function CreateContactPage() {
               handleClose={closeModal}
               register={register}
               setValue={setValue}
+              fieldName={"imageUrl"}
             />
           </div>
 
