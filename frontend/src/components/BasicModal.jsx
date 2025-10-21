@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Modal from "@mui/material/Modal";
 import DevicesIcon from "@mui/icons-material/Devices";
-import { Avatar,CircularProgress, Button } from "@mui/material";
+import { Avatar, CircularProgress, Button } from "@mui/material";
 
 // Hardcoded avatar styles
 const avatarStyles = [
@@ -25,7 +25,13 @@ const avatarStyles = [
   { name: "shapes", version: "9.x" },
 ];
 
-export default function BasicModal({ open, handleClose, register, setValue }) {
+export default function BasicModal({
+  open,
+  handleClose,
+  register,
+  fieldName,
+  setValue,
+}) {
   const [selectedImage, setSelectedImage] = useState(null);
   const [activeTab, setActiveTab] = useState(null);
   const fileInputRef = useRef(null);
@@ -85,7 +91,7 @@ export default function BasicModal({ open, handleClose, register, setValue }) {
 
   const handleClick = (uri) => {
     setSelectedImage(uri);
-    setValue("imageUrl", uri);
+    setValue(fieldName, uri);
     console.log(uri);
     handleClose();
   };
@@ -95,7 +101,7 @@ export default function BasicModal({ open, handleClose, register, setValue }) {
     if (file) {
       const localUrl = URL.createObjectURL(file);
       setSelectedImage(localUrl);
-      setValue("imageUrl", localUrl);
+      setValue(fieldName, localUrl);
     }
   };
 
@@ -125,7 +131,7 @@ export default function BasicModal({ open, handleClose, register, setValue }) {
             <input
               type="hidden"
               value={selectedImage || ""}
-              {...register("imageUrl")}
+              {...register(fieldName)}
             />
           </div>
 
@@ -156,7 +162,7 @@ export default function BasicModal({ open, handleClose, register, setValue }) {
             <input
               type="hidden"
               value={selectedImage || ""}
-              {...register("imageUrl")}
+              {...register(fieldName)}
             />
           </div>
 

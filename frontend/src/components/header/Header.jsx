@@ -10,20 +10,13 @@ import { authService } from "../../Services/authService";
 import { NavLink, useNavigate } from "react-router-dom";
 import { HelpOutlineOutlined } from "@mui/icons-material";
 import { ContactSearchModal } from "../../index";
+import { selectUser } from "../../redux/userSlice";
 
 function Header({ onMenuClick }) {
   const authStatus = useSelector((state) => state.auth.status);
-  const [currentUser, setCurrentUser] = useState(null);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const user = await authService.getCurrentUser();
-      setCurrentUser(user);
-    };
-    fetchUser();
-  }, [authStatus]);
+  const currentUser = useSelector(selectUser)
 
   const handleSelectContact = (contact) => {
     // Navigate to contact detail page or handle selection
@@ -128,6 +121,7 @@ function Header({ onMenuClick }) {
                   src={currentUser.profile_image_url}
                   alt="Profile"
                   className="w-8 h-8 rounded-full object-cover"
+                  onClick={() => navigate("/account")}
                 />
               ) : (
                 <AccountCircleOutlinedIcon

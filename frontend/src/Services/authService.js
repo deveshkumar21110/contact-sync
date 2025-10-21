@@ -158,6 +158,7 @@ export const authService = {
     if (isAuth) {
       try {
         const response = await api.get("/auth/v1/current-user");
+        console.log(" user details => " ,response.data);
         return response.data;
       } catch (error) {
         console.error("Error fetching current user:", error);

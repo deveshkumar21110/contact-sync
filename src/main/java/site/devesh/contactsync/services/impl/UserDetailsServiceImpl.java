@@ -9,6 +9,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import jakarta.transaction.Transactional;
 import site.devesh.contactsync.entities.AppUser;
 import site.devesh.contactsync.entities.UserRole;
 import site.devesh.contactsync.enums.RoleType;
@@ -31,7 +33,6 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 
     @Autowired
     private PasswordEncoder encoder;
-
 
     @Override
     public CustomUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -108,9 +109,42 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 
         // Extract and return user data
         if (authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
-            return userDetails.toAppUserDto(); // THIS WAS MISSING IN YOUR CODE
+            return userDetails.toAppUserDto();
         }
 
         throw new UnauthorizedException("Invalid authentication principal type");
+    }
+
+    @Override
+    @Transactional
+    public AppUserDto updateCurrentAppUserDto(AppUserDto appUserDto) {
+        AppUserDto currentUserDto = getCurrentUser();
+        String currentUserId = currentUserDto.getId();
+
+        // fetch user entity from db
+        AppUser existingUser = userRepo.findById(currentUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (appUserDto.getUserName() != null)
+            existingUser.setUsername(appUserDto.getUserName());
+        if (appUserDto.getEmail() != null)
+            existingUser.setEmail(appUserDto.getEmail());
+        if (appUserDto.getPhoneNumber() != null)
+            existingUser.setPhoneNumber(appUserDto.getPhoneNumber());
+        if (appUserDto.getProfileImageUrl() != null)
+            existingUser.setProfileImageUrl(appUserDto.getProfileImageUrl());
+
+        AppUser updatedUser = userRepo.save(existingUser);
+
+        AppUserDto updatedAppUserDto = AppUserDto.builder()
+                .id(updatedUser.getId())
+                .email(updatedUser.getEmail())
+                .userName(updatedUser.getUsername())
+                .roles(updatedUser.getRoles())
+                .phoneNumber(updatedUser.getPhoneNumber())
+                .profileImageUrl(updatedUser.getProfileImageUrl())
+                .build();
+
+        return updatedAppUserDto;
     }
 }

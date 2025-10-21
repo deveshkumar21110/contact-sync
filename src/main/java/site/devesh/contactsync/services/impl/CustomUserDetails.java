@@ -2,19 +2,14 @@ package site.devesh.contactsync.services.impl;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import site.devesh.contactsync.entities.AppUser;
 import site.devesh.contactsync.entities.UserRole;
 import site.devesh.contactsync.model.AppUserDto;
-import site.devesh.contactsync.response.JwtResponseDTO;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -48,7 +43,6 @@ public class CustomUserDetails implements UserDetails {
                 .collect(Collectors.toList());
     }
 
-    // ZERO DATABASE CALLS - Convert directly to DTO
     public AppUserDto toAppUserDto() {
         AppUserDto dto = new AppUserDto();
         dto.setId(this.id);
@@ -57,22 +51,10 @@ public class CustomUserDetails implements UserDetails {
         dto.setProfileImageUrl(this.profileImageUrl);
         
         // Handle phone number conversion safely
-        dto.setPhoneNumber(parsePhoneNumber(this.phoneNumber));
-        dto.setRoles(new ArrayList<>(this.roles));
+        dto.setPhoneNumber(this.phoneNumber);
+        dto.setRoles(this.roles);
         
         return dto;
-    }
-
-    // Helper method for phone number conversion
-    private Long parsePhoneNumber(String phoneNumber) {
-        if (phoneNumber != null && !phoneNumber.trim().isEmpty()) {
-            try {
-                return Long.parseLong(phoneNumber.trim());
-            } catch (NumberFormatException e) {
-                return null;
-            }
-        }
-        return null;
     }
 
     // Standard UserDetails implementation
