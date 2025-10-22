@@ -77,7 +77,7 @@ function Home({ showFavorites = false, filterLabel = null, trash = false }) {
       dispatch(moveToTrash(selectedContact));
       showSnackbar("Moving contact to trash...", {
         severity: "info",
-        autoHideDuration: 2000, 
+        autoHideDuration: 2000,
       });
     }
   }, [dispatch, selectedContact, showSnackbar]);
@@ -120,7 +120,7 @@ function Home({ showFavorites = false, filterLabel = null, trash = false }) {
     displayedContacts = trashContacts;
   } else {
     // For all other views, filter out trashed contacts first
-    displayedContacts = favouriteContacts;
+    displayedContacts = contacts.filter((c) => !c.isDeleted); // ← FIX: Use all non-deleted contacts
 
     if (showFavorites) {
       displayedContacts = displayedContacts.filter((c) => c.isFavourite);
