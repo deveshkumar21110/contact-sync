@@ -19,6 +19,7 @@ export {default as ContactDetails} from "./components/person/ContactDetails"
 export {default as LabelModal} from "./components/Modal/LabelModal"
 export {default as ContactSearchModal} from "./components/Modal/ContactSearchModal"
 export {default as CopyIcon} from "./components/CopyIcon"
+export {default as BasicModal2} from "./components/Modal/BasicModal2"
 // Pages
 export { default as CreateContactPage } from "./pages/CreateContactPage";
 export { default as EditContactPage } from "./pages/EditContactPage";
@@ -29,3 +30,4 @@ export {default as Person} from "./pages/PersonContact"
 export {default as FavoritesPage} from "./pages/FavoritesPage"
 export {default as UserAccountPage} from "./pages/UserAccountPage"
 export {default as LabelFilterPage} from "./pages/LabelFilterPage"
+export {default as TrashPage} from "./pages/TrashPage"

@@ -21,6 +21,7 @@ public class ContactResponseDTO {
     private String imageUrl;
     private Boolean isFavourite;
     private Boolean isDeleted;
+    private LocalDateTime deletedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

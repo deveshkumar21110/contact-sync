@@ -1,27 +1,48 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { CircularProgress, IconButton } from "@mui/material";
 import { StarBorder, Star, DeleteOutlineOutlined } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchContacts,
   toggleFavourite,
-  deleteContact,
   STATUSES,
+  moveToTrash,
+  selectTrashedContacts,
+  selectFavouriteContacts,
+  recoverContact,
 } from "../redux/contactSlice";
 import { Link, useNavigate } from "react-router-dom";
-import { selectContactLabels } from "../redux/labelSlice";
+import { BasicModal2, useSnackbar } from "..";
 
 const DEFAULT_PROFILE =
   "/contacts_product_24dp_0158CC_FILL0_wght400_GRAD0_opsz24.svg";
 
-function Home({ showFavorites = false, filterLabel = null }) {
-  const {data:allLabels} = useSelector((state) => state.label)
+function Home({ showFavorites = false, filterLabel = null, trash = false }) {
+  const { showSnackbar } = useSnackbar();
+  const [open, setOpen] = useState(false);
+  const [selectedContact, setSelectedContact] = useState(null);
+
+  const handleOpen = (e, contactId) => {
+    e.stopPropagation();
+    setSelectedContact(contactId);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedContact(null);
+  };
+
+  const { data: allLabels } = useSelector((state) => state.label);
+  const trashContacts = useSelector(selectTrashedContacts);
+  const favouriteContacts = useSelector(selectFavouriteContacts);
   let pageTitle = "Contacts";
-  if(showFavorites) pageTitle = "Favorites";
-  else if(filterLabel) {
+  if (showFavorites) pageTitle = "Favorites";
+  else if (trash) pageTitle = "Trash";
+  else if (filterLabel) {
     const label = allLabels.find((l) => l.id === filterLabel);
-    pageTitle = label?.name ;
-  } 
+    pageTitle = label?.name;
+  }
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -51,13 +72,25 @@ function Home({ showFavorites = false, filterLabel = null }) {
     },
     [dispatch]
   );
-  const handleDelete = useCallback(
-    (e, contact) => {
-      e.stopPropagation();
-      dispatch(deleteContact(contact));
-    },
-    [dispatch]
-  );
+  const handleDelete = useCallback(() => {
+    if (selectedContact) {
+      dispatch(moveToTrash(selectedContact));
+      showSnackbar("Moving contact to trash...", {
+        severity: "info",
+        autoHideDuration: 2000, 
+      });
+    }
+  }, [dispatch, selectedContact, showSnackbar]);
+
+  const handleRecover = (e, contactId) => {
+    e.stopPropagation();
+    dispatch(recoverContact(contactId));
+    showSnackbar("Recovering contact...", {
+      severity: "info",
+      autoHideDuration: 2000,
+    });
+  };
+
   const handleSelectedContact = useCallback(
     (contactId) => {
       navigate(`/person/${contactId}`);
@@ -65,30 +98,39 @@ function Home({ showFavorites = false, filterLabel = null }) {
     [navigate]
   );
 
-  if (status === STATUSES.LOADING) {
+  const isFetchingContacts = !hasFetched && status === STATUSES.LOADING;
+  if (isFetchingContacts) {
     return (
       <div className="flex justify-center items-center h-40">
         <CircularProgress />
       </div>
     );
-  } else if (contacts.length === 0) {
+  }
+  if (!contacts || contacts.length === 0) {
     return (
       <div className="flex justify-center items-center h-40 text-gray-500">
-        No contact found
+        No contacts found
       </div>
     );
   }
 
   let displayedContacts = contacts;
-  if (showFavorites) {
-    displayedContacts = displayedContacts.filter((c) => c.isFavourite);
-  }
+  if (trash) {
+    // Show only trashed contacts
+    displayedContacts = trashContacts;
+  } else {
+    // For all other views, filter out trashed contacts first
+    displayedContacts = favouriteContacts;
 
-  if (filterLabel) {
-    displayedContacts = displayedContacts.filter((c) =>
-      c.labels?.some(label => label.id == filterLabel)
-    );
-  } else if (displayedContacts.length === "0") {
+    if (showFavorites) {
+      displayedContacts = displayedContacts.filter((c) => c.isFavourite);
+    } else if (filterLabel) {
+      displayedContacts = displayedContacts.filter((c) =>
+        c.labels?.some((label) => label.id == filterLabel)
+      );
+    }
+  }
+  if (displayedContacts.length === "0") {
     return (
       <div className="flex justify-center items-center h-40 text-gray-500">
         No contacts found with this filter
@@ -109,11 +151,19 @@ function Home({ showFavorites = false, filterLabel = null }) {
             <thead className="text-base text-gray-700 sticky top-0 z-10 border-b border-gray-300">
               <tr>
                 <th className="px-6 py-3 text-left font-medium">Name</th>
-                <th className="px-6 py-3 text-left font-medium">Phone</th>
-                <th className="px-6 py-3 text-left font-medium">Email</th>
                 <th className="px-6 py-3 text-left font-medium">
-                  Job title & company
+                  {trash ? "Date" : "Phone"}
                 </th>
+                <th className="px-6 py-3 text-left font-medium">
+                  {trash ? "Time" : "Email"}
+                </th>
+                {trash ? (
+                  ""
+                ) : (
+                  <th className="px-6 py-3 text-left font-medium">
+                    Job title & company
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="bg-white cursor-pointer">
@@ -145,43 +195,89 @@ function Home({ showFavorites = false, filterLabel = null }) {
                       </div>
                     </div>
                   </td>
+                  {/* Phone Number / Deleted Date*/}
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                    {contact.phoneNumbers?.[0]?.number || ""}
+                    {trash
+                      ? (() => {
+                          if (!contact.deletedAt) return "";
+                          const dateObj = new Date(
+                            contact.deletedAt.replace(" ", "T")
+                          );
+                          return dateObj.toLocaleDateString("en-IN", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          });
+                        })()
+                      : contact.phoneNumbers?.[0]?.number || ""}
                   </td>
+                  {/* Deleted time / First Email */}
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 hover:bg-gray-100">
-                    {contact.emails?.[0]?.email || ""}
+                    {trash
+                      ? (() => {
+                          if (!contact.deletedAt) return "";
+                          const dateObj = new Date(
+                            contact.deletedAt.replace(" ", "T")
+                          );
+                          return dateObj.toLocaleTimeString("en-IN", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                          });
+                        })()
+                      : contact.emails?.[0]?.email || ""}
                   </td>
+
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 relative rounded-r-lg hover:bg-gray-100">
                     <div className="flex items-center justify-between">
                       {[contact.jobTitle, contact.company]
                         .filter(Boolean)
                         .join(", ")}
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-4">
-                        <IconButton
-                          onClick={(e) =>
-                            handleFavouriteToggle(
-                              e,
-                              contact.id,
-                              contact.isFavourite
-                            )
-                          }
-                          size="large"
-                        >
-                          {contact.isFavourite ? (
-                            <Star fontSize="medium" sx={{ color: "blue" }} />
-                          ) : (
-                            <StarBorder fontSize="medium" />
-                          )}
-                        </IconButton>
-                        <IconButton
-                          onClick={(e) => handleDelete(e, contact)}
-                          size="large"
-                        >
-                          <DeleteOutlineOutlined
-                            fontSize="medium"
-                            sx={{ color: "blue" }}
-                          />
-                        </IconButton>
+                        {trash ? (
+                          <div
+                            onClick={(e) => handleRecover(e, contact.id)}
+                            className="text-blue-700 font-medium p-2 hover:bg-gray-200 rounded-lg"
+                          >
+                            Recover
+                          </div>
+                        ) : (
+                          <>
+                            <IconButton
+                              onClick={(e) =>
+                                handleFavouriteToggle(
+                                  e,
+                                  contact.id,
+                                  contact.isFavourite
+                                )
+                              }
+                              size="large"
+                            >
+                              {contact.isFavourite ? (
+                                <Star
+                                  fontSize="medium"
+                                  sx={{ color: "blue" }}
+                                />
+                              ) : (
+                                <StarBorder fontSize="medium" />
+                              )}
+                            </IconButton>
+                            <IconButton
+                              onClick={(e) => handleOpen(e, contact.id)}
+                              size="large"
+                            >
+                              <DeleteOutlineOutlined
+                                fontSize="medium"
+                                sx={{ color: "blue" }}
+                              />
+                            </IconButton>
+                            <BasicModal2
+                              open={open}
+                              handleClose={handleClose}
+                              onConfirm={handleDelete}
+                            />
+                          </>
+                        )}
                       </div>
                     </div>
                   </td>

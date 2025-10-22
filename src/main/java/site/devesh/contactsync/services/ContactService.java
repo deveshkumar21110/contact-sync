@@ -31,4 +31,10 @@ public interface ContactService {
     void deleteAllContactsForUser();
 
     void deleteContactsByIds(List<String> contactIds);
+
+    ContactResponseDTO moveToTrash(String id);
+
+    ContactResponseDTO restoreContact(String id);
+
+    void deleteOldTrashedContacts() ;
 }

@@ -57,7 +57,7 @@ export const authService = {
       const response = await api.post("/auth/v1/refreshToken", {
         token: refreshToken,
       });
-      console.log("Access Token after refresh: " , response)
+      // console.log("Access Token after refresh: " , response)
       const { accessToken, token: newRefreshToken } = response.data;
       if (!accessToken) throw new Error("Invalid refresh token response");
 
@@ -160,7 +160,7 @@ export const authService = {
     if (isAuth) {
       try {
         const response = await api.get("/auth/v1/current-user");
-        console.log(" user details => " ,response.data);
+        // console.log(" user details => " ,response.data);
         return response.data;
       } catch (error) {
         console.error("Error fetching current user:", error);

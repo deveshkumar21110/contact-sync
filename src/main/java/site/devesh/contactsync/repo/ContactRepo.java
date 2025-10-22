@@ -10,6 +10,7 @@ import site.devesh.contactsync.entities.AppUser;
 import site.devesh.contactsync.entities.Contact;
 import site.devesh.contactsync.model.ContactPreviewDTO;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,4 +82,6 @@ public interface ContactRepo extends JpaRepository<Contact, String> {
     @Modifying
     @Query("DELETE FROM Contact c WHERE c.user = :user AND c.isFavourite = true")
     int deleteFavoriteContactsByUser(@Param("user") AppUser user);
+
+    List<Contact> findByIsDeletedTrueAndDeletedAtBefore(LocalDateTime cutOff);
 }

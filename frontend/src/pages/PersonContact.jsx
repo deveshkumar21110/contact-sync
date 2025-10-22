@@ -11,7 +11,7 @@ function PersonContact() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const {id:contactId} = useParams();
-  const status = useSelector((state) => state.contact.data.status);
+  const status = useSelector((state) => state.contact.status);
   const [anchorEl, setAnchorEl] = useState(null);
   const openLabel = Boolean(anchorEl);
   const contact = useSelector((state) => selectContactById(state,contactId));

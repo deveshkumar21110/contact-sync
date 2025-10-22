@@ -117,6 +117,26 @@ public class ContactController {
         }
     }
 
+    @PostMapping("/moveToTrash/{contactId}")
+    public ResponseEntity<?> moveToTrash(@PathVariable String contactId) {
+        try {
+            ContactResponseDTO contactResponseDTO = contactService.moveToTrash(contactId);
+            return ResponseEntity.ok().body(contactResponseDTO);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error in moving to trash: "+ e.getMessage());
+        }
+    }
+
+    @PostMapping("/restore/{contactId}")
+    public ResponseEntity<?> recoverContact(@PathVariable String contactId) {
+        try {
+            ContactResponseDTO contactResponseDTO = contactService.restoreContact(contactId);
+            return ResponseEntity.ok().body(contactResponseDTO);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error in moving to trash: "+ e.getMessage());
+        }
+    }
+
     @DeleteMapping("/batch")
     public ResponseEntity<Void> deleteContacts(@RequestBody List<String> contactIds) {
         contactService.deleteContactsByIds(contactIds);

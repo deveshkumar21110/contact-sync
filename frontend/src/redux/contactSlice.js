@@ -1,5 +1,9 @@
 import { contactService } from "../Services/contactService";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSelector,
+  createSlice,
+} from "@reduxjs/toolkit";
 
 export const STATUSES = Object.freeze({
   IDLE: "idle",
@@ -53,6 +57,20 @@ export const updateContactLabels = createAsyncThunk(
   async ({ contactId, labels }) => {
     const updatedContact = await contactService.updateLabels(contactId, labels);
     return updatedContact; // should return full updated contact from backend
+  }
+);
+
+export const moveToTrash = createAsyncThunk(
+  "contact/moveToTrash",
+  async (contactId) => {
+    return await contactService.moveToTrash(contactId);
+  }
+);
+
+export const recoverContact = createAsyncThunk(
+  "contact/recoverContact",
+  async (contactId) => {
+    return await contactService.recoverContact(contactId);
   }
 );
 
@@ -150,13 +168,64 @@ const contactSlice = createSlice({
         state.data = state.data.filter((c) => c.id !== deletedContact.id);
       })
       .addCase(deleteContact.pending, (state, action) => {
-        const deletedContact = action.meta.arg;
-        state.data = state.data.filter((c) => c.id !== deletedContact.id);
+        state.status = STATUSES.LOADING;
       })
       .addCase(deleteContact.rejected, (state, action) => {
         state.status = STATUSES.ERROR;
         const deletedContact = action.meta.arg; // full contact
-        state.data.push(deletedContact); 
+        state.data.push(deletedContact);
+      })
+
+      // Move to Trash - Optimistic
+      .addCase(moveToTrash.pending, (state, action) => {
+        state.status = STATUSES.LOADING;
+        const contactId = action.meta.arg;
+        const contact = state.data.find((c) => c.id === contactId);
+        if (contact) {
+          contact.isDeleted = true;
+          contact.deletedAt = new Date().toISOString();
+        }
+      })
+      .addCase(moveToTrash.fulfilled, (state) => {
+        state.status = STATUSES.IDLE;
+      })
+      .addCase(moveToTrash.rejected, (state, action) => {
+        state.status = STATUSES.ERROR;
+        state.error = action.error.message || "Failed to move to trash";
+
+        // rollback optimistic update
+        const contactId = action.meta.arg;
+        const contact = state.data.find((c) => c.id === contactId);
+        if (contact) {
+          contact.isDeleted = false;
+          contact.deletedAt = null;
+        }
+      })
+
+      // Recover Contact - Optimistic
+      .addCase(recoverContact.pending, (state, action) => {
+        state.status = STATUSES.LOADING;
+        const contactId = action.meta.arg;
+        const contact = state.data.find((c) => c.id === contactId);
+        if (contact) {
+          contact.isDeleted = false;
+          contact.deletedAt = null;
+        }
+      })
+      .addCase(recoverContact.fulfilled, (state) => {
+        state.status = STATUSES.IDLE;
+      })
+      .addCase(recoverContact.rejected, (state, action) => {
+        state.status = STATUSES.ERROR;
+        state.error = action.error.message || "Failed to recover contact";
+
+        // rollback optimistic update
+        const contactId = action.meta.arg;
+        const contact = state.data.find((c) => c.id === contactId);
+        if (contact) {
+          contact.isDeleted = true;
+          contact.deletedAt = new Date().toISOString();
+        }
       });
   },
 });
@@ -164,10 +233,26 @@ const contactSlice = createSlice({
 export default contactSlice.reducer;
 
 export const selectHasFetched = (state) => state.contact.hasFetched;
-export const selectContacts = (state) => state.contact.data;
-export const selectFavouriteContacts = (state) =>
-  state.contact.data.filter((contact) => contact.isFavourite);
+// export const selectContacts = (state) => state.contact.data;
+export const selectContacts = createSelector(
+  (state) => state.contact.data || [],
+  (contacts) => contacts.filter((contact) => !contact.isDeleted)
+);
+// export const selectFavouriteContacts = (state) =>
+//   state.contact.data.filter((contact) => contact.isFavourite);
+export const selectFavouriteContacts = createSelector(
+  [selectContacts],
+  (contacts) => contacts.filter((contact) => contact.isFavourite)
+);
 export const selectContactsStatus = (state) => state.contact.status;
-export const selectContactById = (state, contactId) =>
-  state.contact.data.find((c) => c.id === contactId);
+export const selectContactById = (state, contactId) => {
+  const data = state?.contact?.data;
+  if (!Array.isArray(data)) return undefined;
+  return data.find((c) => c.id === contactId);
+};
 export const { resetContacts } = contactSlice.actions;
+
+export const selectTrashedContacts = createSelector(
+  (state) => state.contact.data || [],
+  (contacts) => contacts.filter((contact) => contact.isDeleted)
+);

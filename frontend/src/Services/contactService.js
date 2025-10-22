@@ -1,3 +1,4 @@
+import { moveToTrash } from "../redux/contactSlice";
 import api from "../api/api";
 
 export const contactService = {
@@ -58,6 +59,26 @@ export const contactService = {
       return response.data;
     } catch (error) {
       console.log("Error in deleting contact: ", error);
+      throw error;
+    }
+  },
+
+  moveToTrash: async(contactId) => {
+    try {
+      const response = await api.post(`/api/v1/contact/moveToTrash/${contactId}`);
+      return response.data;
+    } catch (error) {
+      console.log("Error in moving to trash: ",error);
+      throw error;
+    }
+  },
+
+  recoverContact: async(contactId) => {
+    try {
+      const response = await api.post(`/api/v1/contact/restore/${contactId}`);
+      return response.data;
+    } catch (error) {
+      console.log("Error in recovering the contact");
       throw error;
     }
   },

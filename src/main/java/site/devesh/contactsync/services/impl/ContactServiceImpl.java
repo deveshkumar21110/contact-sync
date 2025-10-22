@@ -17,32 +17,17 @@ import site.devesh.contactsync.request.ContactRequestDTO;
 import site.devesh.contactsync.response.ContactResponseDTO;
 import site.devesh.contactsync.services.ContactService;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
-import site.devesh.contactsync.entities.AppUser;
-import site.devesh.contactsync.entities.Contact;
 import site.devesh.contactsync.entities.Label;
-import site.devesh.contactsync.mapper.ContactMapper;
-import site.devesh.contactsync.mapper.UserMapper;
-import site.devesh.contactsync.model.AppUserDto;
-import site.devesh.contactsync.model.ContactPreviewDTO;
-import site.devesh.contactsync.model.LabelDTO;
-import site.devesh.contactsync.repo.ContactRepo;
-import site.devesh.contactsync.repo.LabelRepo;
-import site.devesh.contactsync.repo.UserRepo;
-import site.devesh.contactsync.request.ContactRequestDTO;
-import site.devesh.contactsync.response.ContactResponseDTO;
-import site.devesh.contactsync.services.ContactService;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -301,7 +286,7 @@ public class ContactServiceImpl implements ContactService {
         Contact contact = contactRepo.findByIdAndUser(contactId, currentUser)
                 .orElseThrow(() -> new RuntimeException("Contact not found or unauthorized"));
 
-        contactRepo.delete(contact); 
+        contactRepo.delete(contact);
 
         log.info("Contact deleted successfully: {}", contactId);
     }
@@ -361,5 +346,29 @@ public class ContactServiceImpl implements ContactService {
             throw new RuntimeException("Current user not found");
         }
         return currentUser;
+    }
+
+    @Override
+    public ContactResponseDTO moveToTrash(String id) {
+        Contact contact = contactRepo.getContactById(id);
+        contact.setIsDeleted(true);
+        contact.setDeletedAt(LocalDateTime.now());
+        return contactMapper.toContactResponseDTO(contactRepo.save(contact));
+    }
+
+    @Override
+    public ContactResponseDTO restoreContact(String id) {
+        Contact contact = contactRepo.getContactById(id);
+        contact.setIsDeleted(false);
+        contact.setDeletedAt(null);
+        return contactMapper.toContactResponseDTO(contactRepo.save(contact));
+    }
+
+    @Override
+    @Scheduled(cron = "0 0 2 * * ?") // delete at 2 AM
+    public void deleteOldTrashedContacts() {
+        LocalDateTime cutoff = LocalDateTime.now().minusDays(30);
+        List<Contact> oldContacts = contactRepo.findByIsDeletedTrueAndDeletedAtBefore(cutoff);
+        contactRepo.deleteAll(oldContacts);
     }
 }
