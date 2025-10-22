@@ -9,11 +9,20 @@ import {
   STATUSES,
 } from "../redux/contactSlice";
 import { Link, useNavigate } from "react-router-dom";
+import { selectContactLabels } from "../redux/labelSlice";
 
 const DEFAULT_PROFILE =
   "/contacts_product_24dp_0158CC_FILL0_wght400_GRAD0_opsz24.svg";
 
 function Home({ showFavorites = false, filterLabel = null }) {
+  const {data:allLabels} = useSelector((state) => state.label)
+  let pageTitle = "Contacts";
+  if(showFavorites) pageTitle = "Favorites";
+  else if(filterLabel) {
+    const label = allLabels.find((l) => l.id === filterLabel);
+    pageTitle = label?.name ;
+  } 
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
@@ -90,7 +99,7 @@ function Home({ showFavorites = false, filterLabel = null }) {
   return (
     <div className="w-full mt-2">
       <h1 className="text-2xl mb-2">
-        {showFavorites ? "Favorites" : "Contacts"}{" "}
+        {pageTitle}{" "}
         <span className="text-base">({displayedContacts.length})</span>
       </h1>
 
