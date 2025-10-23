@@ -22,7 +22,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { CircularProgress, IconButton } from "@mui/material";
 
-function ContactHeader() {
+function ContactHeader({ isTrashView = false }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { id: contactId } = useParams();
@@ -93,44 +93,50 @@ function ContactHeader() {
       <div className="flex items-center md:pl-8 justify-between md:w-2/3  ">
         <ArrowBack className="cursor-pointer" onClick={() => navigate(-1)} />
         <div className="flex items-center gap-">
-          <button
-            onClick={(e) =>
-              handleFavouriteToggle(e, contact.id, contact.isFavourite)
-            }
-            className="p-2 rounded-full hover:rounded-full hover:bg-gray-100"
-          >
-            {contact.isFavourite ? (
-              <Star fontSize="medium" sx={{ color: "blue" }} />
-            ) : (
-              <StarBorderOutlined fontSize="medium" />
-            )}
-          </button>
-          <button
-            onClick={() => navigate(`/person/${contactId}/edit`)}
-            className="hidden md:flex px-6 py-2 bg-blue-800 text-gray-100 rounded-full"
-          >
-            Edit
-          </button>
-          <div className="md:hidden">
-            <IconButton
-              onClick={() => navigate(`/person/${contactId}/edit`)}
-              size="large"
+          {!isTrashView && (
+            <button
+              onClick={(e) =>
+                handleFavouriteToggle(e, contact.id, contact.isFavourite)
+              }
+              className="p-2 rounded-full hover:rounded-full hover:bg-gray-100"
             >
-              <EditOutlined fontSize="medium" sx={{ color: "black" }} />
-            </IconButton>
-          </div>
+              {contact.isFavourite ? (
+                <Star fontSize="medium" sx={{ color: "blue" }} />
+              ) : (
+                <StarBorderOutlined fontSize="medium" />
+              )}
+            </button>
+          )}
+          {!isTrashView && (
+            <>
+              <button
+                onClick={() => navigate(`/person/${contactId}/edit`)}
+                className="hidden md:flex px-6 py-2 bg-blue-800 text-gray-100 rounded-full"
+              >
+                Edit
+              </button>
+              <div className="md:hidden">
+                <IconButton
+                  onClick={() => navigate(`/person/${contactId}/edit`)}
+                  size="large"
+                >
+                  <EditOutlined fontSize="medium" sx={{ color: "black" }} />
+                </IconButton>
+              </div>
 
-          <IconButton onClick={() => handleOpen()} size="large">
-            <DeleteOutlineOutlined fontSize="medium" sx={{ color: "black" }} />
-          </IconButton>
-          <BasicModal2
-            open={open}
-            handleClose={handleClose}
-            onConfirm={() => handleDelete(contactId)}
-          />
-          <button className="p-2 rounded-full hover:rounded-full hover:bg-gray-100">
-            <MoreVertOutlined fontSize="medium" />
-          </button>
+              <IconButton onClick={() => handleOpen()} size="large">
+                <DeleteOutlineOutlined fontSize="medium" sx={{ color: "black" }} />
+              </IconButton>
+              <BasicModal2
+                open={open}
+                handleClose={handleClose}
+                onConfirm={() => handleDelete(contactId)}
+              />
+              <button className="p-2 rounded-full hover:rounded-full hover:bg-gray-100">
+                <MoreVertOutlined fontSize="medium" />
+              </button>
+            </>
+          )}
         </div>
       </div>
 

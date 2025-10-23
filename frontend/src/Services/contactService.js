@@ -55,8 +55,8 @@ export const contactService = {
 
   deleteContact: async (contact) => {
     try {
-      const response = await api.delete(`/api/v1/contact/${contact.id}`);
-      return response.data;
+      await api.delete(`/api/v1/contact/${contact.id}`);
+      return contact;
     } catch (error) {
       console.log("Error in deleting contact: ", error);
       throw error;

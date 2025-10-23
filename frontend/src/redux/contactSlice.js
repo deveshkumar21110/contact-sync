@@ -39,7 +39,8 @@ export const updateContact = createAsyncThunk(
 export const deleteContact = createAsyncThunk(
   "contact/delete",
   async (contact) => {
-    return await contactService.deleteContact(contact);
+    await contactService.deleteContact(contact);
+    return contact;
   }
 );
 
@@ -162,18 +163,18 @@ const contactSlice = createSlice({
         state.status = STATUSES.ERROR;
         state.error = action.error.message || "Failed to update contact labels";
       })
-      .addCase(deleteContact.fulfilled, (state, action) => {
+      .addCase(deleteContact.fulfilled, (state) => {
         state.status = STATUSES.IDLE;
-        const deletedContact = action.payload;
-        state.data = state.data.filter((c) => c.id !== deletedContact.id);
       })
       .addCase(deleteContact.pending, (state, action) => {
         state.status = STATUSES.LOADING;
+        const deletedContact = action.meta.arg;
+        state.data = state.data.filter((c) => c.id !== deletedContact.id);
       })
       .addCase(deleteContact.rejected, (state, action) => {
         state.status = STATUSES.ERROR;
         const deletedContact = action.meta.arg; // full contact
-        state.data.push(deletedContact);
+        state.data.push(deletedContact); 
       })
 
       // Move to Trash - Optimistic

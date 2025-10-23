@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSelector, useDispatch } from "react-redux";
-import { ContactActions, ContactDetails, ContactHeader, Container, LabelModal } from "../index";
+import { ContactActions, ContactDetails, ContactHeader, Container, DeleteRecover, LabelModal } from "../index";
 import { STATUSES, selectContactById, updateContactLabels } from "../redux/contactSlice";
 import { CircularProgress } from "@mui/material";
 import { Add, EditOutlined, LabelOutlined } from "@mui/icons-material";
@@ -11,6 +11,8 @@ function PersonContact() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const {id:contactId} = useParams();
+  const location = window.location;
+  const isTrashView = new URLSearchParams(location.search).get('includeTrash') === '1';
   const status = useSelector((state) => state.contact.status);
   const [anchorEl, setAnchorEl] = useState(null);
   const openLabel = Boolean(anchorEl);
@@ -59,7 +61,7 @@ function PersonContact() {
   return (
     <Container className="bg-pink-100 md:bg-white">
       <div className="md:pt-8 md:bg-white bg-pink-100">
-        <ContactHeader />
+        <ContactHeader isTrashView={isTrashView} />
 
         {/* Labels Section */}
         <div className="flex items-center flex-wrap gap-2 md:pl-8 justify-center md:justify-normal">
@@ -114,6 +116,7 @@ function PersonContact() {
           watch={watch}
         />
         <div className="md:pl-8">
+          {isTrashView && <DeleteRecover contact={contact}  />}
           <ContactDetails />
         </div>
       </div>

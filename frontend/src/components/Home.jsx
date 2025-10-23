@@ -92,8 +92,9 @@ function Home({ showFavorites = false, filterLabel = null, trash = false }) {
   };
 
   const handleSelectedContact = useCallback(
-    (contactId) => {
-      navigate(`/person/${contactId}`);
+    (contactId, isDeleted) => {
+      const url = `/person/${contactId}${isDeleted ? '?includeTrash=1' : ''}`;
+      navigate(url);
     },
     [navigate]
   );
@@ -171,7 +172,7 @@ function Home({ showFavorites = false, filterLabel = null, trash = false }) {
                 <tr
                   key={contact.id}
                   className="hover:bg-gray-100 group"
-                  onClick={() => handleSelectedContact(contact.id)}
+                  onClick={() => handleSelectedContact(contact.id, contact.isDeleted)}
                 >
                   <td className="px-6 py-4 whitespace-nowrap rounded-l-lg hover:bg-gray-100">
                     <div className="flex items-center">

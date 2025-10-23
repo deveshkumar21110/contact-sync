@@ -20,6 +20,7 @@ export {default as LabelModal} from "./components/Modal/LabelModal"
 export {default as ContactSearchModal} from "./components/Modal/ContactSearchModal"
 export {default as CopyIcon} from "./components/CopyIcon"
 export {default as BasicModal2} from "./components/Modal/BasicModal2"
+export {default as DeleteRecover} from "./components/person/DeleteRecover"
 // Pages
 export { default as CreateContactPage } from "./pages/CreateContactPage";
 export { default as EditContactPage } from "./pages/EditContactPage";
