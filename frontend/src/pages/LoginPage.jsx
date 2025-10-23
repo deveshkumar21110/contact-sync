@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { authService } from "../Services/authService";
 import { login } from "../redux/authSlice";
-import { resetContacts } from "../redux/contactSlice";
+import { fetchContacts } from "../redux/contactSlice";
+import { fetchCurrentUser } from "../redux/userSlice";
+import { fetchLabels } from "../redux/labelSlice";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -19,10 +21,14 @@ function LoginPage() {
     setError("");
     try {
       await authService.login({ email, password });
-      // const userData = await authService.getCurrentUser();
-      // console.log("User Data", userData);
-      dispatch(login({email, password}));
-      dispatch(resetContacts()); 
+      // after login, fetch current user and data
+      const userData = await authService.getCurrentUser();
+      // update auth state with actual user data object expected by app
+      dispatch(login({ userData }));
+      // populate user slice and contacts/labels
+      dispatch(fetchCurrentUser(userData));
+      dispatch(fetchContacts());
+      dispatch(fetchLabels());
       navigate("/");
     } catch (err) {
       setError("Invalid credentials");

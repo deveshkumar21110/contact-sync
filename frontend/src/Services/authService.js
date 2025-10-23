@@ -12,16 +12,18 @@ export const authService = {
   // store tokens in cookies
   setToken: (accessToken, refreshToken) => {
     const { exp } = jwtDecode(accessToken);
-    const expiryDate = new Date(exp * 1000);
+  const expiryDate = new Date(exp * 1000);
+
+    const isSecure = typeof window !== "undefined" && window.location && window.location.protocol === "https:";
 
     Cookies.set(ACCESS_TOKEN, accessToken, {
       expires: expiryDate, // from backend
-      secure: true, // HTTPS only (set false if localhost)
+      secure: isSecure, // only secure over HTTPS
       sameSite: "Lax",
     });
     Cookies.set(REFRESH_TOKEN, refreshToken, {
       expires: 30,
-      secure: true,
+      secure: isSecure,
       sameSite: "Lax",
     });
 
@@ -30,11 +32,13 @@ export const authService = {
 
   getCurrentToken: () => {
     const token = Cookies.get(ACCESS_TOKEN);
-    if (token) {
-      // console.log("Current token:", token);
-      return token;
-    }
-    console.warn("No token found");
+  if (token) return token;
+
+  // Fallback: maybe axios default header was set directly (e.g., during login)
+  const header = api && api.defaults && api.defaults.headers && api.defaults.headers.common && api.defaults.headers.common.Authorization;
+  if (header) return header.replace(/^Bearer\s+/i, "");
+
+  // nothing found
   },
 
   getRefreshToken: () => {
