@@ -6,9 +6,9 @@ import {
   Star,
   StarBorderOutlined,
 } from "@mui/icons-material";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ContactActions } from "../../index";
+import { BasicModal2, ContactActions } from "../../index";
 import {
   fetchContacts,
   selectContactById,
@@ -16,6 +16,7 @@ import {
   toggleFavourite,
   deleteContact,
   STATUSES,
+  moveToTrash,
 } from "../../redux/contactSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
@@ -25,6 +26,15 @@ function ContactHeader() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { id: contactId } = useParams();
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const hasFetchedContacts = useSelector(selectHasFetched);
   const status = useSelector((state) => state.contact.status);
@@ -39,14 +49,11 @@ function ContactHeader() {
     },
     [dispatch]
   );
-  const handleDelete = useCallback(
-    (e, contactId) => {
-      e.stopPropagation();
-      dispatch(deleteContact(contactId));
-      navigate(-1);
-    },
-    [dispatch, navigate]
-  );
+  const handleDelete = (contactId) => {
+    console.log(contactId);
+    dispatch(moveToTrash(contactId));
+    navigate(-1);
+  };
 
   useEffect(() => {
     if (contactId && !hasFetchedContacts) {
@@ -113,9 +120,14 @@ function ContactHeader() {
             </IconButton>
           </div>
 
-          <IconButton onClick={(e) => handleDelete(e, contact)} size="large">
+          <IconButton onClick={() => handleOpen()} size="large">
             <DeleteOutlineOutlined fontSize="medium" sx={{ color: "black" }} />
           </IconButton>
+          <BasicModal2
+            open={open}
+            handleClose={handleClose}
+            onConfirm={() => handleDelete(contactId)}
+          />
           <button className="p-2 rounded-full hover:rounded-full hover:bg-gray-100">
             <MoreVertOutlined fontSize="medium" />
           </button>
@@ -147,7 +159,7 @@ function ContactHeader() {
           </div>
         </div>
         <div>
-          <ContactActions contact={contact}/>
+          <ContactActions contact={contact} />
         </div>
       </div>
     </div>
