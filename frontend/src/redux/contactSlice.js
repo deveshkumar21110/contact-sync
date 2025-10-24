@@ -30,9 +30,9 @@ export const addContact = createAsyncThunk("contact/add", async (data) => {
 
 export const updateContact = createAsyncThunk(
   "contact/update",
-  async (data) => {
+  async ({data,contactId}) => {
     console.log("Payload being sent:", data);
-    return await contactService.updateContact(data);
+    return await contactService.updateContact(data,contactId);
   }
 );
 

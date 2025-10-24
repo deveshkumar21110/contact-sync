@@ -7,9 +7,10 @@ import site.devesh.contactsync.model.PhoneNumberDTO;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {})
 public interface PhoneNumberMapper {
-
+    
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "contact", ignore = true)
     PhoneNumber toEntity(PhoneNumberDTO dto);
 

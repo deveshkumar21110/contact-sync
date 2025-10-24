@@ -43,9 +43,9 @@ export const contactService = {
     }
   },
 
-  updateContact: async (data) => {
+  updateContact: async (data,id) => {
     try {
-      const response = await api.post("/api/v1/contact/update", data);
+      const response = await api.put(`/api/v1/contact/update/${id}`, data);
       return response.data;
     } catch (error) {
       console.log("Error in updating contact: ", error);

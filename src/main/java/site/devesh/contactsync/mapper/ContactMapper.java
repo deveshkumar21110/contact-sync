@@ -1,11 +1,12 @@
 package site.devesh.contactsync.mapper;
 
 import org.mapstruct.*;
-import site.devesh.contactsync.entities.Contact;
-import site.devesh.contactsync.model.ContactPreviewDTO;
+import site.devesh.contactsync.entities.*;
+import site.devesh.contactsync.model.*;
 import site.devesh.contactsync.request.ContactRequestDTO;
 import site.devesh.contactsync.response.ContactResponseDTO;
 import java.util.List;
+import java.util.ArrayList;
 
 @Mapper(componentModel = "spring", uses = {
         PhoneNumberMapper.class,
@@ -65,7 +66,7 @@ public interface ContactMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateBasicFields(ContactRequestDTO dto, @MappingTarget Contact contact);
 
-    // Complete update including collections (use with caution)
+    // Complete update including collections
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "isDeleted", ignore = true)
@@ -74,6 +75,11 @@ public interface ContactMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "displayName", ignore = true)
     @Mapping(target = "labels", ignore = true)
+    @Mapping(target = "phoneNumbers", ignore = true)
+    @Mapping(target = "emails", ignore = true)
+    @Mapping(target = "addresses", ignore = true)
+    @Mapping(target = "websites", ignore = true)
+    @Mapping(target = "significantDates", ignore = true)
     void updateContactFromDto(ContactRequestDTO dto, @MappingTarget Contact contact);
 
     @AfterMapping
@@ -82,26 +88,5 @@ public interface ContactMapper {
         String firstName = contact.getFirstName() != null ? contact.getFirstName().trim() : "";
         String lastName = contact.getLastName() != null ? contact.getLastName().trim() : "";
         contact.setDisplayName((firstName + " " + lastName).trim());
-
-        // Link child entities to parent contact
-        if (contact.getPhoneNumbers() != null) {
-            contact.getPhoneNumbers().forEach(phone -> phone.setContact(contact));
-        }
-        if (contact.getEmails() != null) {
-            contact.getEmails().forEach(email -> email.setContact(contact));
-        }
-        if (contact.getAddresses() != null) {
-            contact.getAddresses().forEach(address -> address.setContact(contact));
-        }
-        if (contact.getWebsites() != null) {
-            contact.getWebsites().forEach(website -> website.setContact(contact));
-        }
-        if (contact.getSignificantDates() != null) {
-            contact.getSignificantDates().forEach(date -> date.setContact(contact));
-        }
-        if (contact.getLabels() != null) {
-            contact.getLabels().forEach(label -> contact.addLabel(label));
-        }
-
     }
 }

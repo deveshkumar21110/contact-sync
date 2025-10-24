@@ -182,7 +182,7 @@ function EditContactPage() {
     });
 
     try {
-      await dispatch(updateContact(payload)).unwrap();
+    await dispatch(updateContact({data:payload, contactId:contact.id})).unwrap();
       showSnackbar("Contact updated successfully!", {
         severity: "success",
         autoHideDuration: 3000,
@@ -204,7 +204,7 @@ function EditContactPage() {
           {/* Header */}
           <div className="bg-pink-100 md:bg-white flex justify-between items-center">
             <ArrowBack
-              onClick={() => navigate(-1)}
+              onClick={() => navigate("/")}
               className="cursor-pointer"
             />
             <div className="flex gap-4 justify-center items-center">

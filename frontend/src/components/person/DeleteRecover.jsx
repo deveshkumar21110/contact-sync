@@ -37,7 +37,7 @@ function DeleteRecover({ contact }) {
   };
 
   return (
-    <div className="p-4 mb-4 bg-gray-100 md:h-2/4 md:w-2/5 rounded-3xl">
+    <div className="p-4 mb-4 bg-gray-100 md:h-2/4 md:w-2/5 rounded-3xl mt-4">
       <div className="flex flex-col  ">
         <div className="text-lg font-medium">Why in Trash?</div>
 

@@ -3,13 +3,10 @@ package site.devesh.contactsync.services.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import site.devesh.contactsync.entities.AppUser;
-import site.devesh.contactsync.entities.Contact;
+import site.devesh.contactsync.entities.*;
 import site.devesh.contactsync.mapper.ContactMapper;
 import site.devesh.contactsync.mapper.UserMapper;
-import site.devesh.contactsync.model.AppUserDto;
-import site.devesh.contactsync.model.ContactPreviewDTO;
-import site.devesh.contactsync.model.LabelDTO;
+import site.devesh.contactsync.model.*;
 import site.devesh.contactsync.repo.ContactRepo;
 import site.devesh.contactsync.repo.LabelRepo;
 import site.devesh.contactsync.repo.UserRepo;
@@ -134,7 +131,7 @@ public class ContactServiceImpl implements ContactService {
 
         log.info("Current user from DB: ID={}, Email={}", currentUser.getId(), currentUser.getEmail());
 
-        // Step 1: Check if contact exists at all
+        // Step 1: Check if contact exists 
         Optional<Contact> contactExists = contactRepo.findById(id);
         if (contactExists.isEmpty()) {
             log.error("Contact with ID {} does not exist in database", id);
@@ -169,11 +166,71 @@ public class ContactServiceImpl implements ContactService {
 
         Contact oldContact = existingContact; // Use the verified contact
 
-        // Update the contact
+        // Update basic contact information
         contactMapper.updateContactFromDto(contactRequestDTO, oldContact);
 
-        // Re-link child entities after mapping
-        linkChildEntities(oldContact);
+        // Clear and update phone numbers
+        oldContact.getPhoneNumbers().clear();
+        if (contactRequestDTO.getPhoneNumbers() != null) {
+            contactRequestDTO.getPhoneNumbers().forEach(dto -> {
+                PhoneNumber phone = new PhoneNumber();
+                phone.setNumber(dto.getNumber());
+                phone.setCountryCode(dto.getCountryCode());
+                phone.setContact(oldContact);
+                oldContact.getPhoneNumbers().add(phone);
+            });
+        }
+
+        // Clear and update emails
+        oldContact.getEmails().clear();
+        if (contactRequestDTO.getEmails() != null) {
+            contactRequestDTO.getEmails().forEach(dto -> {
+                Email email = new Email();
+                email.setEmail(dto.getEmail());
+                email.setContact(oldContact);
+                oldContact.getEmails().add(email);
+            });
+        }
+
+        // Clear and update addresses
+        oldContact.getAddresses().clear();
+        if (contactRequestDTO.getAddresses() != null) {
+            contactRequestDTO.getAddresses().forEach(dto -> {
+                Address address = new Address();
+                address.setStreetAddress(dto.getStreetAddress());
+                address.setStreetAddress2(dto.getStreetAddress2());
+                address.setCity(dto.getCity());
+                address.setState(dto.getState());
+                address.setCountry(dto.getCountry());
+                address.setPincode(dto.getPincode());
+                address.setContact(oldContact);
+                oldContact.getAddresses().add(address);
+            });
+        }
+
+        // Clear and update websites
+        oldContact.getWebsites().clear();
+        if (contactRequestDTO.getWebsites() != null) {
+            contactRequestDTO.getWebsites().forEach(dto -> {
+                Website website = new Website();
+                website.setUrl(dto.getUrl());
+                website.setContact(oldContact);
+                oldContact.getWebsites().add(website);
+            });
+        }
+
+        // Clear and update significant dates
+        oldContact.getSignificantDates().clear();
+        if (contactRequestDTO.getSignificantDates() != null) {
+            contactRequestDTO.getSignificantDates().forEach(dto -> {
+                SignificantDate date = new SignificantDate();
+                date.setDate(dto.getDate());
+                date.setMonth(dto.getMonth());
+                date.setYear(dto.getYear());
+                date.setContact(oldContact);
+                oldContact.getSignificantDates().add(date);
+            });
+        }
 
         // Handle labels separately
         handleLabels(oldContact, contactRequestDTO.getLabels());
@@ -258,13 +315,13 @@ public class ContactServiceImpl implements ContactService {
                 label = labelRepo.findByNameAndAppUser(labelDTO.getName().trim(), currentUser);
             }
 
-            // If still no label found, create a new one for current user
-            if (label == null && labelDTO.getName() != null && !labelDTO.getName().trim().isEmpty()) {
-                label = new Label();
-                label.setName(labelDTO.getName().trim());
-                label.setAppUser(currentUser); // Link to current user
-                label = labelRepo.save(label); // saving new label
-            }
+            // // If still no label found, create a new one for current user
+            // if (label == null && labelDTO.getName() != null && !labelDTO.getName().trim().isEmpty()) {
+            //     label = new Label();
+            //     label.setName(labelDTO.getName().trim());
+            //     label.setAppUser(currentUser); // Link to current user
+            //     label = labelRepo.save(label); // saving new label
+            // }
 
             if (label != null) {
                 labels.add(label);

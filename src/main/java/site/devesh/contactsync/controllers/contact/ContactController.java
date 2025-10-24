@@ -73,7 +73,8 @@ public class ContactController {
             ContactResponseDTO responseDTO = contactService.updateContact(id, contactRequestDTO);
             return ResponseEntity.ok().body(responseDTO);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 
