@@ -293,7 +293,7 @@ function Home({ showFavorites = false, filterLabel = null, trash = false }) {
           {displayedContacts.map((contact, index) => (
             <div
               key={contact.id}
-              onClick={() => handleSelectedContact(contact.id)}
+              onClick={() => handleSelectedContact(contact.id,contact.isDeleted)}
               className={`flex items-center px-4 py-2 whitespace-nowrap bg-gray-50 border border-gray-300 
         ${index === 0 ? "rounded-t-2xl" : ""} 
         ${index === displayedContacts.length - 1 ? "rounded-b-2xl" : ""} 
