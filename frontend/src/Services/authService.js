@@ -57,15 +57,16 @@ export const authService = {
     try {
       const refreshToken = Cookies.get(REFRESH_TOKEN);
       if (!refreshToken) throw new Error("No refresh token available");
-
+      
       const response = await api.post("/auth/v1/refreshToken", {
         token: refreshToken,
       });
       // console.log("Access Token after refresh: " , response)
       const { accessToken, token: newRefreshToken } = response.data;
       if (!accessToken) throw new Error("Invalid refresh token response");
-
+      
       authService.setToken(accessToken, newRefreshToken);
+      console.info("Token refreshed successfully👌");
       return accessToken;
     } catch (err) {
       const errorMessage =

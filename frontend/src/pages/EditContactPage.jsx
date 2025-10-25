@@ -287,6 +287,7 @@ function EditContactPage() {
 
                 {selectedLabels.length > 0 ? (
                   <button
+                    type="button"  // use type button in form because default it is a type -> submit.
                     onClick={openLabelModal}
                     className="flex justify-center items-center border rounded-full px-1 "
                   >
