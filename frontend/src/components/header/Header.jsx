@@ -17,6 +17,7 @@ function Header({ onMenuClick }) {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const navigate = useNavigate();
   const currentUser = useSelector(selectUser);
+  const userStatus = useSelector((state) => state.user.status);
 
   const handleSelectContact = (contact) => {
     // Navigate to contact detail page or handle selection
@@ -30,10 +31,12 @@ function Header({ onMenuClick }) {
         <div className="flex gap-4 px-4 py-2 w-full justify-between">
           {/* Left section */}
           <div className="flex items-center justify-center pr-8">
-            <div className="p-3 rounded-full hover:rounded-full hover:bg-gray-200 cursor-pointer">
+            <div
+              className="p-3 rounded-full hover:rounded-full hover:bg-gray-200 cursor-pointer"
+              onClick={onMenuClick}
+            >
               <MenuIcon
                 sx={{ fontSize: 28, cursor: "pointer", color: "#818589" }}
-                onClick={onMenuClick}
               />
             </div>
             <NavLink to="/" className="flex items-center justify-center">
@@ -69,7 +72,9 @@ function Header({ onMenuClick }) {
               className="text-gray-600 p-1 rounded-full hover:rounded-full hover:bg-gray-200 cursor-pointer"
               onClick={() => navigate("/account")}
             >
-              {currentUser?.profile_image_url ? (
+              {userStatus === 'loading' ? (
+                <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse" />
+              ) : currentUser?.profile_image_url ? (
                 <img
                   src={currentUser.profile_image_url}
                   alt="Profile"
@@ -117,7 +122,9 @@ function Header({ onMenuClick }) {
               readOnly
             />
             <div className="ml-2 flex-shrink-0">
-              {currentUser?.profile_image_url ? (
+              {userStatus === 'loading' ? (
+                <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
+              ) : currentUser?.profile_image_url ? (
                 <img
                   src={currentUser.profile_image_url}
                   alt="Profile"

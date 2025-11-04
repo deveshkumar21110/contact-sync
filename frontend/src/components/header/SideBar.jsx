@@ -15,7 +15,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchLabels, STATUSES } from "../../redux/labelSlice";
+import { fetchLabels, selectContactLabels, STATUSES } from "../../redux/labelSlice";
 import {
   selectContacts,
   selectFavouriteContacts,
@@ -25,6 +25,7 @@ import {
 const Sidebar = ({ isOpen = true, toggleSidebar }) => {
   const contactCount = useSelector(selectContacts).length;
   const favouriteCount = useSelector(selectFavouriteContacts).length;
+  const labelCount = useSelector(selectContactLabels).length;
   const trashContacts = useSelector(selectTrashedContacts).length;
   const dispatch = useDispatch();
   const {
@@ -115,7 +116,7 @@ const Sidebar = ({ isOpen = true, toggleSidebar }) => {
             label="Import"
             active={location.pathname === "/import"}
             onClick={() => handleNavClick("/import")}
-            />
+          />
           <SidebarItem
             icon={<DeleteOutlineOutlined />}
             label="Trash"
@@ -127,23 +128,17 @@ const Sidebar = ({ isOpen = true, toggleSidebar }) => {
 
         {/* Labels */}
         <p className="text-sm mt-6 mb-2">Labels</p>
-        {labels.map((label) => (
-          <div
-            key={label.id}
-            className={`flex items-center px-3 py-2 cursor-pointer rounded-3xl transition-colors duration-150
-              ${
-                location.pathname === `/label/${label.id}`
-                  ? "bg-blue-100 text-blue-700"
-                  : "hover:bg-blue-100 hover:text-blue-700 text-gray-700"
-              }`}
+        <div className="space-y-1">
+          {labels.map((label) => (
+            <SidebarItem
+            icon={<Label />}
+            label={label.name}
+            // badge={trashContacts}
+            active={location.pathname === `/label/${label.id}`}
             onClick={() => handleNavClick(`/label/${label.id}`)}
-          >
-            <Label className="text-gray-700" fontSize="medium" />
-            <span className="md:pl-3 text-base font-medium flex-1">
-              {label.name}
-            </span>
-          </div>
-        ))}
+          />
+          ))}
+        </div>
       </div>
     </div>
   );
