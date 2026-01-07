@@ -117,6 +117,24 @@ export const authService = {
     }
   },
 
+  googleAuth: async (code) => {
+    try {
+      const response = await api.post("/auth/v1/google", {code});
+
+      if(response.data) {
+        const {access_token, token:refresh_token} = response.data;
+
+        authService.setToken(access_token,refresh_token);
+        scheduleTokenRefresh(access_token);
+
+        return response.data;
+      }
+    } catch (error) {
+      authService.logout();
+      throw error;
+    }
+  },
+
   getUserRoles: () => {
     if (cachedRoles) return cachedRoles;
 

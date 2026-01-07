@@ -15,6 +15,20 @@ function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const loginWithGoogle = () => {
+    const params = new URLSearchParams({
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+      redirect_uri: "http://localhost:5173/oauth/google/callback",
+      response_type: "code",
+      scope: "openid email profile",
+      access_type: "offline",
+      prompt: "consent"
+    });
+
+    window.location.href =
+      `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -98,10 +112,7 @@ function LoginPage() {
           <div className="space-y-3">
             <button
               type="button"
-              onClick={() => {
-                window.location.href =
-                  "http://localhost:8080/oauth/google/login";
-              }}
+              onClick={() => loginWithGoogle()}
               className="w-full flex items-center justify-center gap-3 border border-gray-700 rounded-md py-2 bg-gray-200 text-gray-800 hover:bg-gray-300"
             >
               <svg
