@@ -11,13 +11,26 @@ function SignupPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const loginWithGoogle = () => {
+    const params = new URLSearchParams({
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+      redirect_uri: import.meta.env.VITE_REDIRECT_URI,
+      response_type: "code",
+      scope: "openid email profile",
+      access_type: "offline",
+      prompt: "consent",
+    });
+
+    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     setSuccess("");
     try {
-  await authService.signup({ username: name, email, password });
+      await authService.signup({ username: name, email, password });
       setSuccess("Signup successful! Please login.");
       setTimeout(() => navigate("/login"), 1500);
     } catch {
@@ -28,48 +41,107 @@ function SignupPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-80">
-        <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
-        {error && <div className="text-red-500 mb-2">{error}</div>}
-        {success && <div className="text-green-600 mb-2">{success}</div>}
-        <input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full mb-4 p-2 border rounded"
-          required
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full mb-4 p-2 border rounded"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          autoComplete="new-password"
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full mb-4 p-2 border rounded"
-          required
-        />
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-          disabled={loading}
-        >
-          {loading ? "Signing up..." : "Sign Up"}
-        </button>
-        <div className="mt-4 text-center">
-          <span>Already have an account? </span>
-          <button type="button" className="text-blue-600 underline" onClick={() => navigate("/login")}>Login</button>
+    <div className="min-h-screen flex items-center justify-center bg-gray-200 py-12 px-4">
+      <div className="w-full max-w-md">
+        <div className="bg-white border border-gray-800 rounded-md shadow-lg p-8 ">
+          <h1 className="text-2xl font-semibold text-gray-800 mb-6">
+            Sign up to ContactSync
+          </h1>
+
+          {error && (
+            <div className="text-red-700 bg-gray-300 px-3 py-2 mb-4">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            {success && <div className="text-green-600 mb-2">{success}</div>}
+            <label className="text-sm text-gray-700">Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="mt-2 mb-4 block w-full rounded-md bg-transparent border border-gray-700 px-3 py-2 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              required
+            />
+            <label className="text-sm text-gray-700">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-2 mb-4 block w-full rounded-md bg-transparent border border-gray-700 px-3 py-2 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              required
+            />
+            <label className="text-sm text-gray-700">Create Password</label>
+            <input
+              type="password"
+              value={password}
+              autoComplete="new-password"
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-2 mb-4 block w-full rounded-md bg-transparent border border-gray-700 px-3 py-2 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              required
+            />
+            <button
+              type="submit"
+              className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
+              disabled={loading}
+            >
+              {loading ? "Signing up..." : "Sign Up"}
+            </button>
+            <div className="mt-4 text-center">
+              <span>Already have an account? </span>
+              <button
+                type="button"
+                className="text-blue-600 underline"
+                onClick={() => navigate("/login")}
+              >
+                Login
+              </button>
+            </div>
+          </form>
+
+          <div className="flex items-center text-sm text-gray-800 my-4">
+            <div className="flex-1 h-px bg-gray-700"></div>
+            <div className="text-gray-800 px-3">or</div>
+            <div className="flex-1 h-px bg-gray-700"></div>
+          </div>
+
+          <div>
+            <button
+              type="button"
+              onClick={() => {
+                loginWithGoogle();
+              }}
+              className="w-full bg-gray-200 py-2 flex items-center justify-center gap-3 border border-gray-700 rounded-md text-gray-800 hover:bg-gray-300"
+            >
+              <svg
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M23.64 12.205c0-.8-.072-1.568-.208-2.31H12v4.376h6.44c-.277 1.494-1.133 2.76-2.415 3.605v2.998h3.897c2.286-2.103 3.58-5.196 3.58-8.669z"
+                  fill="#4285F4"
+                />
+                <path
+                  d="M12 24c3.24 0 5.958-1.07 7.944-2.906l-3.897-2.997c-1.082.726-2.467 1.156-4.047 1.156-3.106 0-5.74-2.096-6.686-4.913H1.27v3.086C3.24 21.803 7.36 24 12 24z"
+                  fill="#34A853"
+                />
+                <path
+                  d="M5.314 14.34a7.238 7.238 0 010-4.68V6.574H1.27a12 12 0 000 10.852l4.044-3.085z"
+                  fill="#FBBC05"
+                />
+                <path
+                  d="M12 4.77c1.758 0 3.345.605 4.592 1.796l3.44-3.44C17.954 1.262 15.236 0 12 0 7.36 0 3.24 2.197 1.27 5.574l4.044 3.086C6.26 6.865 8.894 4.77 12 4.77z"
+                  fill="#EA4335"
+                />
+              </svg>{" "}
+              Continue with Google
+            </button>
+          </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { store } from './redux/store.js'
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom'
 import Layout from './Layout'
 import {ProtectedRoute, AuthInitializer,SnackbarProvider, Person, UserAccountPage, LabelFilterPage, TrashPage} from './index.js';
-import {EditContactPage,CreateContactPage,SignupPage,LoginPage,HomePage,FavoritesPage} from './index'
+import {EditContactPage,CreateContactPage,SignupPage,LoginPage,HomePage,FavoritesPage,GoogleCallback} from './index'
 const router = createBrowserRouter(
   createRoutesFromElements(
 
@@ -15,6 +15,7 @@ const router = createBrowserRouter(
       <Route  index element={<ProtectedRoute> <HomePage/> </ProtectedRoute>} />
       <Route path='login' element={<LoginPage/>} />
       <Route path='signup' element={<SignupPage/>} />
+      <Route path='auth/v1/callback' element={<GoogleCallback/>} />
       <Route path='new' element={<ProtectedRoute> <CreateContactPage /></ProtectedRoute>} />
       <Route path="person/:id" element={<ProtectedRoute><Person /></ProtectedRoute>} />
       <Route path="person/:id/edit" element={<ProtectedRoute><EditContactPage /></ProtectedRoute>} />
