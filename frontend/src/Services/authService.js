@@ -119,13 +119,25 @@ export const authService = {
 
   googleAuth: async (code) => {
     try {
-      const response = await api.post("/auth/v1/google", {code});
+      const response = await api.get(`/auth/v1/callback?code=${code}`);
+      console.log("Response of Oauth: ", response);
+      console.log("Response status:", response.status, "Response data:", response.data);
 
-      if(response.data) {
-        const {access_token, token:refresh_token} = response.data;
+      if (response.data) {
+        // support either snake_case or camelCase from backend
+        const accessToken = response.data.accessToken || response.data.access_token;
+        const refreshToken = response.data.token || response.data.refresh_token;
 
-        authService.setToken(access_token,refresh_token);
-        scheduleTokenRefresh(access_token);
+        console.log("Extracted tokens -> accessToken type:", typeof accessToken, "present:", !!accessToken, "refreshToken present:", !!refreshToken);
+
+        try {
+          authService.setToken(accessToken, refreshToken);
+        } catch (e) {
+          console.error("setToken failed:", e);
+          throw e;
+        }
+
+        scheduleTokenRefresh(accessToken);
 
         return response.data;
       }

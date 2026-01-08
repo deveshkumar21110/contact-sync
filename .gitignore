@@ -16,3 +16,4 @@ src/main/resources/application.properties
 .vscode/
 node_modules
 frontend/src/.env
+frontend/.env

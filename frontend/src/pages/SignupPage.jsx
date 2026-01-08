@@ -11,6 +11,19 @@ function SignupPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const loginWithGoogle = () => {
+    const params = new URLSearchParams({
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+      redirect_uri: import.meta.env.VITE_REDIRECT_URI,
+      response_type: "code",
+      scope: "openid email profile",
+      access_type: "offline",
+      prompt: "consent",
+    });
+
+    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -94,9 +107,11 @@ function SignupPage() {
           </div>
 
           <div>
-            <button 
+            <button
               type="button"
-              onClick={() => {}}
+              onClick={() => {
+                loginWithGoogle();
+              }}
               className="w-full bg-gray-200 py-2 flex items-center justify-center gap-3 border border-gray-700 rounded-md text-gray-800 hover:bg-gray-300"
             >
               <svg
@@ -121,7 +136,8 @@ function SignupPage() {
                   d="M12 4.77c1.758 0 3.345.605 4.592 1.796l3.44-3.44C17.954 1.262 15.236 0 12 0 7.36 0 3.24 2.197 1.27 5.574l4.044 3.086C6.26 6.865 8.894 4.77 12 4.77z"
                   fill="#EA4335"
                 />
-              </svg> Continue with Google
+              </svg>{" "}
+              Continue with Google
             </button>
           </div>
         </div>

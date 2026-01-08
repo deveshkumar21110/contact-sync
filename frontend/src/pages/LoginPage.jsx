@@ -18,7 +18,7 @@ function LoginPage() {
   const loginWithGoogle = () => {
     const params = new URLSearchParams({
       client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-      redirect_uri: "http://localhost:5173/oauth/google/callback",
+      redirect_uri: import.meta.env.VITE_REDIRECT_URI,
       response_type: "code",
       scope: "openid email profile",
       access_type: "offline",
