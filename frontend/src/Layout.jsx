@@ -11,6 +11,8 @@ function Layout() {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  const [animate, setAnimate] = useState(false);
+
   useEffect(() => {
     // open sidebar only if screen is >= 1024px (lg in Tailwind)
     if (window.innerWidth >= 1024) {
@@ -20,6 +22,12 @@ function Layout() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    setAnimate(false);
+    const timer = setTimeout(() => setAnimate(true), 20);
+    return () => clearTimeout(timer);
   }, [location.pathname]);
 
   const toggleSidebar = () => {
@@ -45,17 +53,25 @@ function Layout() {
 
       {/* Main Content Area */}
       <div
-        className={`flex-1 transition-all duration-300 ${
+        className={`flex-1 transition-all duration-700 ${
           !hideSidebar && isSidebarOpen ? "lg:ml-72" : ""
         }`}
       >
         {!hideHeader && <Header onMenuClick={toggleSidebar} />}
         <main
-          className={`bg-gray-50 transition-all duration-300 min-h-screen ${
+          className={`bg-gray-50 min-h-screen ${
             !hideHeader ? "mt-20 lg:mt-20" : ""
           }`}
         >
-          <Outlet />
+          {/* Page transition wrapper */}
+          <div
+            key={location.pathname}
+            className={`transition-all duration-700 ease-in-out ${
+              animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>
